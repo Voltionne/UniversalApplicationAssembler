@@ -16,14 +16,20 @@ def is_number_colon_number(s: str) -> bool:
     
     return parts[0].isdigit() and parts[1].isdigit()
 
-def iterate_nested_dictionary(d: dict):
+def iterate_nested_dictionary(d: dict, parent: str = None):
 
-    for value in d.values():
+    for key in d:
 
-        if isinstance(value, dict):
+        if isinstance(d[key], dict):
 
-            yield from iterate_nested_dictionary(value)
+            if parent:
+                yield from iterate_nested_dictionary(d[key], parent=parent + [key])
+            else:
+                yield from iterate_nested_dictionary(d[key], parent=[key])
 
         else:
-            yield value
+            if parent:
+                yield parent + [key, d[key]]
+            else:
+                yield [key, d[key]]
 
