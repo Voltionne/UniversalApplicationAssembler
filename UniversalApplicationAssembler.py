@@ -3,6 +3,9 @@
 import os as _os
 import yaml as _yaml
 
+from helpers import is_number_colon_number as _is_number_colon_number
+from helpers import iterate_nested_dictionary as _iterate_nested_dictionary
+
 class Assembler:
 
     def __init__(self, source_file: _os.PathLike = None, auto_update: bool = True):
@@ -54,9 +57,33 @@ class Assembler:
 
                 yaml_config = _yaml.safe_load(file) #read the file
 
-                #starts the parsing
-                assert isinstance(yaml_config, dict), "Config file yaml is not a dictionary!"
+                self._preparser(yaml_config)
 
-                assert "format" in yaml_config, "\"format\" key is not in the ISA configuration. It is needed for knowing the formats and instructions!"
-                assert "definitions" in yaml_config["format"], "\"definitions\" key is not in the ISA format configuration. It is needed to refer to concepts!"
-                assert "bits" in yaml_config["format"], "\"bits\" key is not in ISA format configuration. It is needed to know the bit size of instructions!"
+
+    def _preparser(self, yaml_config):
+
+        """
+        Does all the assertions for starting correctly the configuration
+        
+        :param yaml_config: The yaml config
+        """
+
+        #starts the parsing
+        assert isinstance(yaml_config, dict), "Config file yaml is not a dictionary!"
+
+        assert "format" in yaml_config, "\"format\" key is not in the ISA configuration. It is needed for knowing the formats and instructions!"
+        assert "definitions" in yaml_config["format"], "\"definitions\" key is not in the ISA format configuration. It is needed to refer to concepts!"
+        assert "bits" in yaml_config["format"], "\"bits\" key is not in ISA format configuration. It is needed to know the bit size of instructions!"
+
+        #get the number of bits of each instruction
+        self.bits = yaml_config["format"]["bits"]
+        assert isinstance(self.bits, int), "\"bits\" must be an integer!"
+
+        #get all definitions used for parsing formats
+        self.definitions = yaml_config["format"]["definitions"]
+        assert isinstance(self.definitions, dict), "\"definitions\" must be a dictionary will all definitions!"
+
+        #checking that each definition makes sense.
+        for key in self.definitions:
+            assert isinstance(self.definitions[key], str), "Each definition in definitions has to be a string!"
+            assert _is_number_colon_number(self.definitions[key]), "Each definition must follow the format \"number:number\""
