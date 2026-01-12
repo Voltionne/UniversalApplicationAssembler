@@ -52,4 +52,11 @@ class Assembler:
 
             with open(source) as file:
 
-                pass
+                yaml_config = _yaml.safe_load(file) #read the file
+
+                #starts the parsing
+                assert isinstance(yaml_config, dict), "Config file yaml is not a dictionary!"
+
+                assert "format" in yaml_config, "\"format\" key is not in the ISA configuration. It is needed for knowing the formats and instructions!"
+                assert "definitions" in yaml_config["format"], "\"definitions\" key is not in the ISA format configuration. It is needed to refer to concepts!"
+                assert "bits" in yaml_config["format"], "\"bits\" key is not in ISA format configuration. It is needed to know the bit size of instructions!"
