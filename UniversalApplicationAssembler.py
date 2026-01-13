@@ -88,3 +88,24 @@ class Assembler:
             self.definitions[key] = _Value()
             self.definitions[key].create_from_definition(definition)
 
+    def _parse_one_level(self, current_level) -> list:
+
+        """
+        INTERNAL FUNCTION. Parses just one dictionary level of the yaml config file and returns possible sublevels.
+        
+        :param current_level: The current level
+        :return: possible sublevels
+        :rtype: list
+        """
+
+        assert isinstance(current_level, dict), f"current_level \"{current_level}\" is not a dict!"
+
+        #check for certain keyword presence
+        if "instructions" in current_level: #this level defines instructions -> LAST LEVEL OF RECURSION
+            pass
+
+        #Check if some definition is mentioned
+        for key in self.definitions:
+
+            if key in current_level:
+                pass
