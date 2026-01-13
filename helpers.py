@@ -1,3 +1,72 @@
+from warnings import warn as _warn
+
+class InstructionTemplate:
+
+    """
+    Represents a full ISA instruction
+    """
+
+    def __init__(self, bits: int , mappings: dict[str, "Value"] = None):
+
+        """
+        Creates a new InstructionTemplate
+        
+        :param bits: Description
+        :type bits: int
+        :param mappings: The mapping of Values to bit positions (optional -> can be later specified calling define_mappings)
+        :type mappings: dict[str, "Value"]
+        """
+
+        self.bits = bits
+
+    def define_mappings(self, mappings: dict[str, "Value"] = None):
+        
+        """
+        Adjusts the InstructionTemplate so that it uses a certain mappings
+        
+        :param mappings: The mappings of Values to bit positions
+        :type mappings: dict[str, "Value"]
+        """
+
+        self.fields = [] #where the final fields will be stored
+        used_up_bits = [False for _ in range(self.bits)] #to check if bits are already used up
+
+        for key in mappings:
+
+            assert isinstance(key, str), f"Expected mapping keys to be strings, not {type(key)}"
+
+            assert is_number_colon_number(key) or key.isnumeric(), "Expected mapping keys to be of the format \"number:number\" or \"number\""
+
+            if is_number_colon_number(key): #format n:n
+                parts = key.split(":")
+
+                #convert the numbers to integer
+                parts[0] = int(parts[0])
+                parts[1] = int(parts[1])
+
+                bits = abs(parts[0] - parts[1]) + 1 #calculate number of bits
+
+                assert mappings[key].bits == bits, f"Expected {bits} bit[s], not {mappings[key.bits]} bit[s]!"
+
+                for bit_position in gradient_range(parts[0], parts[1]):
+                    assert not used_up_bits[bit_position], f"Mapping with key \"{key}\", corresponding to {mappings[key]}, is overlapping in bit {bit_position} of format!" #no overlap!
+                    
+                    used_up_bits[bit_position] = False
+                    
+                #if reached here -> there is no bit overlap -> add as field
+                self.fields.append(mappings[key])
+
+            else: #isnumeric()
+                assert mappings[key].bits == 1, f"Expected 1 bit Value, not {mappings[key].bits} bits!"
+
+                assert not used_up_bits[int(key)], f"Mapping with key \"{key}\", corresponding to {mappings[key]}, is overlapping in bit {int(key)} of format!" #no overlap!
+
+                used_up_bits[int(key)] = True #the bit is now used up
+                self.fields.append(mappings[key]) #now it is an official field
+
+        if any(used_up_bits):
+            _warn(f"InstructionTemplate used up only {sum(used_up_bits)} bits out of {self.bits} bits: there is unused bits!!")
+
 class Value:
 
     """
