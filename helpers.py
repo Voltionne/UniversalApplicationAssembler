@@ -9,6 +9,35 @@ class Value:
         self.bits = bits
         self.value = "?" * bits
 
+    def create_from_definition(self, definition: str):
+
+        """
+        Configurates the value so that it initilizes following a definition
+        
+        :param definition: The string that defines the value
+        :type definition: str
+        """
+
+        assert isinstance(definition, str), f"\"{definition}\" is not an str!" #just in case
+
+        if ":" in definition:
+            parts = definition.split(":")
+            assert len(parts) == 2
+            assert parts[0].isnumeric() and parts[1].isnumeric()
+
+            parts[0] = int(parts[0])
+            parts[1] = int(parts[1])
+
+            self.bits = abs(parts[0] - parts[1]) + 1 #set the number of bits
+
+            self.value = "?" * self.bits
+
+        else: #is only one number -> one bit
+            assert definition.isnumeric()
+
+            self.bits = 1
+            self.value = "?"
+
     def set_partial_value(self, set_dict: dict):
 
         """
