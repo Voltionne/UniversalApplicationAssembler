@@ -28,8 +28,8 @@ class InstructionTemplate:
         :type mappings: dict[str, "Value"]
         """
 
-        self.fields = [] #where the final fields will be stored
-        used_up_bits = [False for _ in range(self.bits)] #to check if bits are already used up
+        self.fields: list[Value] = [] #where the final fields will be stored
+        self.used_up_bits = [False for _ in range(self.bits)] #to check if bits are already used up
 
         for key in mappings:
 
@@ -49,9 +49,9 @@ class InstructionTemplate:
                 assert mappings[key].bits == bits, f"Expected {bits} bit[s], not {mappings[key.bits]} bit[s]!"
 
                 for bit_position in gradient_range(parts[0], parts[1]):
-                    assert not used_up_bits[bit_position], f"Mapping with key \"{key}\", corresponding to {mappings[key]}, is overlapping in bit {bit_position} of format!" #no overlap!
+                    assert not self.used_up_bits[bit_position], f"Mapping with key \"{key}\", corresponding to {mappings[key]}, is overlapping in bit {bit_position} of format!" #no overlap!
                     
-                    used_up_bits[bit_position] = False
+                    self.used_up_bits[bit_position] = False
                     
                 #if reached here -> there is no bit overlap -> add as field
                 self.fields.append(mappings[key])
@@ -59,13 +59,25 @@ class InstructionTemplate:
             else: #isnumeric()
                 assert mappings[key].bits == 1, f"Expected 1 bit Value, not {mappings[key].bits} bits!"
 
-                assert not used_up_bits[int(key)], f"Mapping with key \"{key}\", corresponding to {mappings[key]}, is overlapping in bit {int(key)} of format!" #no overlap!
+                assert not self.used_up_bits[int(key)], f"Mapping with key \"{key}\", corresponding to {mappings[key]}, is overlapping in bit {int(key)} of format!" #no overlap!
 
-                used_up_bits[int(key)] = True #the bit is now used up
+                self.used_up_bits[int(key)] = True #the bit is now used up
                 self.fields.append(mappings[key]) #now it is an official field
 
-        if any(used_up_bits):
-            _warn(f"InstructionTemplate used up only {sum(used_up_bits)} bits out of {self.bits} bits: there is unused bits!!")
+        if any(self.used_up_bits):
+            _warn(f"InstructionTemplate used up only {sum(self.used_up_bits)} bits out of {self.bits} bits: there is unused bits!!")
+
+    def check_completeness(self):
+
+        """
+        Checks if all the fields of the InstructionTemplate have been filled.
+        """
+
+        for field in self.fields:
+            if "?" in field.value:
+                return False
+            
+        return True
 
 class Value:
 
