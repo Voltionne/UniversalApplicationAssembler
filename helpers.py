@@ -4,7 +4,7 @@ class Value:
     Represents a binary value
     """
 
-    def __init__(self, bits: int):
+    def __init__(self, bits: int = 1):
 
         self.bits = bits
         self.value = "?" * bits
