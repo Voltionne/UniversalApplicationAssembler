@@ -3,8 +3,7 @@
 import os as _os
 import yaml as _yaml
 
-from helpers import is_number_colon_number as _is_number_colon_number
-from helpers import iterate_nested_dictionary as _iterate_nested_dictionary
+from helpers import Value as _Value
 
 class Assembler:
 
@@ -59,11 +58,10 @@ class Assembler:
 
                 self._preparser(yaml_config)
 
-
     def _preparser(self, yaml_config):
 
         """
-        Does all the assertions for starting correctly the configuration
+        INTERNAL FUNCTION. Does all the assertions for starting correctly the configuration
         
         :param yaml_config: The yaml config
         """
@@ -83,7 +81,10 @@ class Assembler:
         self.definitions = yaml_config["format"]["definitions"]
         assert isinstance(self.definitions, dict), "\"definitions\" must be a dictionary will all definitions!"
 
-        #checking that each definition makes sense.
+        #convert definitions to values
         for key in self.definitions:
-            assert isinstance(self.definitions[key], str), "Each definition in definitions has to be a string!"
-            assert _is_number_colon_number(self.definitions[key]), "Each definition must follow the format \"number:number\""
+
+            definition = self.definitions[key]
+            self.definitions[key] = _Value()
+            self.definitions[key].create_from_definition(definition)
+
