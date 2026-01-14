@@ -185,14 +185,19 @@ class Value:
 
         self.value = bin(value).removeprefix("0b").rjust(self.bits, "0")
 
-    def check_value(self):
+    def check_value(self) -> bool:
 
         """
-        Checks if the value is 100% set. If not, it raises an exception
+        Checks if the value is 100% set.
+        
+        :return: True or false
+        :rtype: bool
         """
 
         if "?" in self.value:
-            raise ValueError(f"There are bits that are still not set in value. Current value is {self.value}")
+            return False
+        else:
+            return True
 
 def gradient_range(a: int, b: int):
 
