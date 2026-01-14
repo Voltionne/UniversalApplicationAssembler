@@ -17,12 +17,13 @@ class InstructionTemplate:
         :type mappings: dict[str, tuple[str, "Value"]]
         """
 
+        #dict -> FIELD_NAME: (BIT_RANGE, VALUE)
+
         self.bits = bits
 
         if mappings:
             self.define_mappings(mappings)
 
-    #def define_mappings(self, mappings: dict[str, "Value"] = None):
     def define_mappings(self, mappings: dict[str, tuple[str, "Value"]] = None):
         
         """
@@ -74,6 +75,21 @@ class InstructionTemplate:
         if any(self.used_up_bits):
             _warn(f"InstructionTemplate used up only {sum(self.used_up_bits)} bits out of {self.bits} bits: there is unused bits!!")
 
+    def define_parameters(self, parameters: dict):
+        
+        """
+        Defines parameters of the InstructionTemplate
+        
+        :param parameters: The dict that contains the parameters -> includes values and mapping
+        :type parameters: dict
+        """
+
+        assert "values" in parameters, f"Parameters dictionary has no \"values\" key!"
+        assert "mapping" in parameters, f"Parameters dictionary has no \"mapping\" key!"
+
+        self.parameters = parameters
+
+    #SET FUNCTIONS
     def set_partial_field(self, name: str, set_dict: dict):
 
         """
