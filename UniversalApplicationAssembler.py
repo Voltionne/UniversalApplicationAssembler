@@ -52,6 +52,8 @@ class Assembler:
 
         for source in self.sources:
 
+            self.global_values = [] #all the global values that are set.
+
             with open(source) as file:
 
                 yaml_config = _yaml.safe_load(file) #read the file
@@ -104,7 +106,11 @@ class Assembler:
             
             #check for a certain keyword presence
             if key == "instructions": #this level defines instructions -> LAST LEVEL OF RECURSION
-                pass
+                
+                #do assertion checks
+                instructions = current_level["instructions"]
+
+                assert isinstance(instructions, list), f"Expected instructions to be a list, not {type(instructions)}!"
 
             #Check if some definition is mentioned
             for def_key in self.definitions:
