@@ -53,6 +53,7 @@ class Assembler:
         for source in self.sources:
 
             self.global_values = [] #all the global values that are set.
+            self.instructions = [] #all the instruction templates that are set.
 
             with open(source) as file:
 
@@ -111,6 +112,11 @@ class Assembler:
                 instructions = current_level["instructions"]
 
                 assert isinstance(instructions, list), f"Expected instructions to be a list, not {type(instructions)}!"
+
+                for instruction in instructions:
+                    pass
+
+                return [] #return an empty list -> nothing more to iterate
 
             #Check if some definition is mentioned
             for def_key in self.definitions:
