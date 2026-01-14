@@ -80,8 +80,8 @@ class InstructionTemplate:
         Checks if all the fields of the InstructionTemplate have been filled.
         """
 
-        for field in self.fields:
-            if "?" in field.value:
+        for field_name in self.fields:
+            if not self.fields[field_name].check_value():
                 return False
             
         return True
