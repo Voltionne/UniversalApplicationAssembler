@@ -8,4 +8,4 @@ Currently there is no documentation of this project. It will be added in the fut
 
 ## Examples
 
-Currently there is also no public examples. Some of them will get released in the future, for reference, implementing some custom architectures.
+Currently there is also no public examples. Some of them will get released in the future implementing some custom architectures.
