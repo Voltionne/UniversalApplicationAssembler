@@ -1,5 +1,99 @@
 from warnings import warn as _warn
 
+class TranslationContext:
+
+    """
+    Represents a parameter translation system
+    """
+
+    def __init__(self, translation_dict: dict):
+        self.translation_dict = translation_dict
+
+    def translate(self, parameter_type: str, value: str) -> int:
+
+        """
+        Docstring for translate
+        
+        :param parameter_type: The type of the parameters, represented as a string separated by commas
+        :type parameter_type: str
+        :param value: The value itself of the paramater
+        :type value: str
+        :return: The value that represents the parameter
+        :rtype: int
+        """
+
+        parts = parameter_type.split(".")
+
+        current_level = self.translation_dict
+
+        #accesses the translation
+        for part in parts:
+
+            assert part in current_level, f"\"{part}\" is not a key inside {current_level}"
+
+            current_level = current_level[part]
+
+        if isinstance(current_level, dict): #it is a translator
+            
+            assert value in current_level, f"Translator {current_level} has not key \"{value}\""
+
+            assert isinstance(current_level[value], int), f"Expected the translator to give an integer, not {type(current_level[value])}"
+
+            return current_level[value]
+
+        elif isinstance(current_level, str): #it is a immediate specification
+
+            assert is_number_colon_number(current_level) or current_level.isnumeric(), f"Parameter immediate with argument \"{current_level}\" is not recognized"
+
+            bits = 0
+            if is_number_colon_number(current_level):
+                parts = current_level.split(":")
+
+                bits = abs(parts[0] - parts[1]) + 1 #calculate number of bits
+
+            else: #isnumeric()
+
+                bits = 1
+
+            if value.isnumeric():
+
+                assert int(value) >= 0 and int(value) < 2**bits, f"immediate value {value} does surpass the limit of {bits} bit[s]!"
+
+                return int(value)
+            
+            else: #check if it is a certain base
+                if value[:2] == "0x":
+                    
+                    val = int(value[2:], 16)
+
+                    assert val >= 0 and val < 2**bits, f"immediate value {value} does surpass the limit of {bits} bit[s]!"
+
+                    return val
+
+                elif value[:2] == "0o":
+                    
+                    val = int(value[2:], 8)
+
+                    assert val >= 0 and val < 2**bits, f"immediate value {value} does surpass the limit of {bits} bit[s]!"
+
+                    return val
+                
+                elif value[:2] == "0b":
+                    
+                    val = int(value[2:], 2)
+
+                    assert val >= 0 and val < 2**bits, f"immediate value {value} does surpass the limit of {bits} bit[s]!"
+
+                    return val
+                
+                else:
+                    raise ValueError(f"\"{value}\" not recognized as a number!")
+                
+        elif isinstance(current_level, int): #literal number
+            return current_level
+        else:
+            raise TypeError(f"translator in not a dict, str, or int. It is a {type(current_level)}")
+
 class InstructionTemplate:
 
     """
