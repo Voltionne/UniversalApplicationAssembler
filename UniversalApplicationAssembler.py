@@ -4,6 +4,7 @@ import os as _os
 import yaml as _yaml
 
 from helpers import Value as _Value
+from helpers import InstructionTemplate as _InstructionTemplate
 
 class Assembler:
 
@@ -53,7 +54,7 @@ class Assembler:
         for source in self.sources:
 
             self.global_values = [] #all the global values that are set.
-            self.instructions = [] #all the instruction templates that are set.
+            self.instructions: dict[str, _InstructionTemplate] = {} #all the instruction templates that are set.
 
             with open(source) as file:
 
@@ -122,4 +123,4 @@ class Assembler:
             for def_key in self.definitions:
 
                 if key == def_key:
-                    pass
+                    self.global_values.append(def_key) #now it is a globally defined field!
