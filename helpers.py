@@ -6,7 +6,7 @@ class InstructionTemplate:
     Represents a full ISA instruction
     """
 
-    def __init__(self, bits: int , mappings: dict[str, tuple[str, "Value"]] = None):
+    def __init__(self, bits: int , mappings: dict[str, tuple[str, "Value"]] = None, parameters: dict = None):
 
         """
         Creates a new InstructionTemplate
@@ -15,6 +15,8 @@ class InstructionTemplate:
         :type bits: int
         :param mappings: The mapping of Values to bit positions (optional -> can be later specified calling define_mappings)
         :type mappings: dict[str, tuple[str, "Value"]]
+        :param parameters: the parameters of the instruction, represented using a dict with values and mapping
+        :type parameters: dict
         """
 
         #dict -> FIELD_NAME: (BIT_RANGE, VALUE)
@@ -23,6 +25,9 @@ class InstructionTemplate:
 
         if mappings:
             self.define_mappings(mappings)
+
+        if parameters:
+            self.define_parameters(parameters)
 
     def define_mappings(self, mappings: dict[str, tuple[str, "Value"]] = None):
         
