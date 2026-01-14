@@ -74,6 +74,36 @@ class InstructionTemplate:
         if any(self.used_up_bits):
             _warn(f"InstructionTemplate used up only {sum(self.used_up_bits)} bits out of {self.bits} bits: there is unused bits!!")
 
+    def set_partial_field(self, name: str, set_dict: dict):
+
+        """
+        Sets the some partial value to some field. 
+        
+        :param name: The name of the field
+        :type name: str
+        :param set_dict: The dict that determines the set
+        :type set_dict: dict
+        """
+
+        assert name in self.fields, f"\"{name}\" is not a field out of {list(self.fields.keys())}!"
+
+        self.fields[name].set_partial_value(set_dict)
+
+    def set_full_field(self, name: str, value: int): 
+        
+        """
+        Sets the full value of a full field
+        
+        :param name: The name of the field
+        :type name: str
+        :param value: The value itself
+        :type value: int
+        """
+
+        assert name in self.fields, f"\"{name}\" is not a field out of {list(self.fields.keys())}!"
+
+        self.fields[name].set_full_value(value)
+
     def check_completeness(self):
 
         """
