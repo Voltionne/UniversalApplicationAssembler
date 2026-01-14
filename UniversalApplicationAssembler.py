@@ -100,12 +100,14 @@ class Assembler:
 
         assert isinstance(current_level, dict), f"current_level \"{current_level}\" is not a dict!"
 
-        #check for certain keyword presence
-        if "instructions" in current_level: #this level defines instructions -> LAST LEVEL OF RECURSION
-            pass
-
-        #Check if some definition is mentioned
-        for key in self.definitions:
-
-            if key in current_level:
+        for key in current_level:
+            
+            #check for a certain keyword presence
+            if key == "instructions": #this level defines instructions -> LAST LEVEL OF RECURSION
                 pass
+
+            #Check if some definition is mentioned
+            for def_key in self.definitions:
+
+                if key == def_key:
+                    pass
