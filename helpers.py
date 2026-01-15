@@ -299,7 +299,11 @@ class InstructionTemplate:
             raise ValueError(f"Compiling an instruction that is not completed!")
         
         for field_name in self.fields:
-            pass
+            
+            key = self.fields[field_name][0] #where it is located
+            value = self.fields[field_name][1] #the value itself
+
+            #WIP
 
 class Value:
 
