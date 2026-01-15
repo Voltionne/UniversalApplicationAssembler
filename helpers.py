@@ -189,6 +189,8 @@ class InstructionTemplate:
         assert isinstance(self.parameters["values"], list), f"The values of parameters are not in a list, it is a {type(self.parameters["values"])}!"
         assert isinstance(self.parameters["mapping"], list), f"The mapping of parameters are not in a list, it is a {type(self.parameters["mapping"])}!"
 
+        assert len(self.parameters["values"]) == len(self.parameters["mapping"]), f"Missmatch between number of parameters and mapping specified, respectively: {len(self.parameters["values"])} vs {len(self.parameters["mapping"])}"
+
         for value in self.parameters["values"]:
             assert isinstance(value, str), f"Expected value \"{value}\" to be a string, not a {type(value)}"
 
