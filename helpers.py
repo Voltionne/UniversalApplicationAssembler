@@ -132,7 +132,7 @@ class InstructionTemplate:
         :type mappings: dict[str, tuple[str, "Value"]]
         """
 
-        self.fields: dict[str, Value] = {} #where the final fields will be stored
+        self.fields: dict[str, tuple[str, Value]] = mappings #add all fields directly. Then check for errors.
         self.used_up_bits = [False for _ in range(self.bits)] #to check if bits are already used up
 
         for field_name in mappings:
@@ -161,7 +161,8 @@ class InstructionTemplate:
                     self.used_up_bits[bit_position] = False
                     
                 #if reached here -> there is no bit overlap -> add as field
-                self.fields[field_name] = value
+                #Not added because already added
+                #self.fields[field_name] = value
 
             else: #isnumeric()
                 assert value.bits == 1, f"Expected 1 bit Value, not {value.bits} bits!"
@@ -169,7 +170,8 @@ class InstructionTemplate:
                 assert not self.used_up_bits[int(key)], f"Mapping with key \"{key}\", corresponding to {value}, is overlapping in bit {int(key)} of format!" #no overlap!
 
                 self.used_up_bits[int(key)] = True #the bit is now used up
-                self.fields[field_name] = value #now it is an official field
+                #Not added because already added
+                #self.fields[field_name] = value #now it is an official field
 
         if any(self.used_up_bits):
             _warn(f"InstructionTemplate used up only {sum(self.used_up_bits)} bits out of {self.bits} bits: there is unused bits!!")
@@ -255,7 +257,7 @@ class InstructionTemplate:
 
         assert name in self.fields, f"\"{name}\" is not a field out of {list(self.fields.keys())}!"
 
-        self.fields[name].set_partial_value(set_dict)
+        self.fields[name][1].set_partial_value(set_dict)
 
     def set_full_field(self, name: str, value: int): 
         
@@ -270,7 +272,7 @@ class InstructionTemplate:
 
         assert name in self.fields, f"\"{name}\" is not a field out of {list(self.fields.keys())}!"
 
-        self.fields[name].set_full_value(value)
+        self.fields[name][1].set_full_value(value)
 
     def check_completeness(self):
 
@@ -279,7 +281,7 @@ class InstructionTemplate:
         """
 
         for field_name in self.fields:
-            if not self.fields[field_name].check_value():
+            if not self.fields[field_name][1].check_value():
                 return False
             
         return True
