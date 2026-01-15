@@ -1,6 +1,6 @@
 # UniversalApplicationAssembler
 
-The Universal Application Assembler is a totally configurable assembler that let's you target any ISA spefication by simply writing a config yaml file defining the characteristics of each instruction. The idea is of have an universal assembler that is trivial to port to any ISA.
+The Universal Application Assembler (UAA) is a totally configurable assembler that let's you target any ISA spefication by simply writing a config yaml file defining the characteristics of each instruction. The idea is of have an universal assembler that is trivial to port to any ISA.
 
 ## Documentation
 
