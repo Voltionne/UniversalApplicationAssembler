@@ -233,13 +233,13 @@ class InstructionTemplate:
 
                     final_value = (translated_value >> bits_done) & mask #the final value after applying the mask and correcting
 
-                    self.fields[sub_mapping].set_full_value(final_value) #set the value
+                    self.set_full_field(sub_mapping, final_value) #set the value
 
                     #increase bits_done to perform the next iterations correctly
                     bits_done += sub_mapping_bits
 
             else: #must 100% be str because of the check in define_parameters
-                self.fields[self.parameters["mapping"][i]].set_full_value(translated_value)
+                self.set_full_field(self.parameters["mapping"][i], translated_value)
 
     #SET FUNCTIONS
     def set_partial_field(self, name: str, set_dict: dict):
