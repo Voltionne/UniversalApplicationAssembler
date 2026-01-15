@@ -203,6 +203,44 @@ class InstructionTemplate:
 
         self.parameters = parameters
 
+    def apply(self, translation_context: TranslationContext, parameters: list[str]):
+
+        """
+        Applies parameters to the instruction, following a certain translation context.
+        
+        :param translation_context: The translation context object that sets all parameter translations to fields
+        :type translation_context: TranslationContext
+        :param parameters: A list with all parameters
+        :type parameters: list[str]
+        """
+
+        assert len(parameters) == len(self.parameters["values"]), f"Missmatch between number of parameters! Got {len(parameters)}, expected {len(self.parameters["values"])}"
+
+        #iterate over each parameter
+        for i in range(len(parameters)):
+
+            translated_value = translation_context.translate(parameter_type=self.parameters["values"][i], value=parameters[i]) #translate each parameter
+
+            if isinstance(self.parameters["mapping"][i], list):
+
+                bits_done = 0 #counts how many bits are already set.
+                
+                for sub_mapping in reversed(self.parameters["mapping"][i]): #iterates over the mappings, reversed to do first the LSBs.
+
+                    sub_mapping_bits = self.fields[sub_mapping].bits
+
+                    mask = 2 ** sub_mapping_bits - 1 #creates a mask
+
+                    final_value = (translated_value >> bits_done) & mask #the final value after applying the mask and correcting
+
+                    self.fields[sub_mapping].set_full_value(final_value) #set the value
+
+                    #increase bits_done to perform the next iterations correctly
+                    bits_done += sub_mapping_bits
+
+            else: #must 100% be str because of the check in define_parameters
+                self.fields[self.parameters["mapping"][i]].set_full_value(translated_value)
+
     #SET FUNCTIONS
     def set_partial_field(self, name: str, set_dict: dict):
 
