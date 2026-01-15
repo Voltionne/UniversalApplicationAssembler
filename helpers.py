@@ -283,6 +283,21 @@ class InstructionTemplate:
                 return False
             
         return True
+    
+    def compile_instruction(self) -> str:
+
+        """
+        Returns the numerical value of the compiled instruction in binary.
+        
+        :return: The binary representation of the instruction
+        :rtype: str
+        """
+
+        if not self.check_completeness():
+            raise ValueError(f"Compiling an instruction that is not completed!")
+        
+        for field_name in self.fields:
+            pass
 
 class Value:
 
