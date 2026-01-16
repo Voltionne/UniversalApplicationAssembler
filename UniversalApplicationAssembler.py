@@ -2,11 +2,14 @@
 
 import os as _os
 import yaml as _yaml
+import PyGAU #DEBUGGING
 
 from helpers import Value as _Value
 from helpers import InstructionTemplate as _InstructionTemplate
 from helpers import TranslationContext as _TranslationContext
 from helpers import is_number_colon_number as _is_number_colon_number
+
+reporter = PyGAU.debug.Report()
 
 class Assembler:
 
@@ -131,13 +134,16 @@ class Assembler:
 
             self.translation_context = _TranslationContext(translation_dict=yaml_config["parameters"])
 
+    @reporter.report_function(report_parameters=False)
     def _parse_recursively(self, current_level: dict):
 
         sublevels = self._parse_one_level(current_level)
 
         for sublevel in sublevels:
+            print("CALLING RECURSIVELY LEVEL:", sublevel)
             self._parse_recursively(current_level[sublevel])
 
+    @reporter.report_function(report_parameters=False)
     def _parse_one_level(self, current_level: dict):
 
         assert isinstance(current_level, dict), f"Expected current_level to be a dict, not {type(current_level)}"
@@ -176,8 +182,10 @@ class Assembler:
         if there_where_instructions and sub_levels:
             raise RecursionError(f"There where more sublevels of recursion after instructions where declared!")
         else:
+            print("END OF ONE LEVEL. SUB:", sub_levels)
             return sub_levels
         
+    @reporter.report_function(report_parameters=False)
     def _parse_instruction(self, instruction: dict):
         
         #make checks that all is specified:
