@@ -295,6 +295,9 @@ class InstructionTemplate:
         :rtype: str
         """
 
+        compiled_instruction = "?" * self.bits #the compiled final instruction
+        compiled_instruction = list(compiled_instruction) #passing to list to modify
+
         if not self.check_completeness():
             raise ValueError(f"Compiling an instruction that is not completed!")
         
@@ -303,7 +306,22 @@ class InstructionTemplate:
             key = self.fields[field_name][0] #where it is located
             value = self.fields[field_name][1] #the value itself
 
-            #WIP
+            if is_number_colon_number(key):
+                parts = key.split(":")
+
+                parts[0] = int(parts[0])
+                parts[1] = int(parts[1])
+
+                for bit_n, mapped_bit in enumerate(gradient_range(parts[1], parts[0])): #7:0 would be 0, 1, 2, 3, ...
+                    compiled_instruction[-mapped_bit + 1] = (int(value.value) >> bit_n) & 0b1 #write one bit at a time -> from LSB in the order specified by the key.
+
+            else: #is a simple str -> 1 bit
+
+                compiled_instruction[-int(key) + 1] = int(value.value) #simply copy-paste the value directly
+
+        return "".join(compiled_instruction)
+
+                    
 
 class Value:
 
