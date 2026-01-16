@@ -190,15 +190,12 @@ class Assembler:
         
         #make checks that all is specified:
         assert "name" in instruction, f"Expected name in instruction!"
+        print("NAME:", instruction["name"])
         assert isinstance(instruction["name"], str), f"Expected a str for name, not {type(instruction["name"])}"
 
         template = _InstructionTemplate(bits=self.bits) #creates the basic template
 
         used_fields: dict[str, tuple[str, _Value]] = {}
-
-        if "parameters" in instruction:
-
-            template.define_parameters(instruction["parameters"]) #define the parameters of the instruction
 
         for key in instruction:
 
@@ -217,6 +214,33 @@ class Assembler:
             #add to used up fields
             used_fields[key] = self.definitions[key]
 
+        #this instruction has parameters
+        if "parameters" in instruction:
+
+            #check that parameters are in definitions
+            assert "mapping" in instruction["parameters"]
+            for mapping in instruction["parameters"]["mapping"]:
+
+                if isinstance(mapping, list):
+                    for sub_mapping in mapping:
+                        assert isinstance(sub_mapping, str)
+                        assert sub_mapping in self.definitions
+
+                        #add as used field
+                        used_fields[sub_mapping] = self.definitions[sub_mapping]
+                else:
+                    assert isinstance(mapping, str)
+                    assert mapping in self.definitions
+
+                    #add as used field
+                    used_fields[mapping] = self.definitions[mapping]
+
+        #define the mappings first
         template.define_mappings(used_fields) #add the fields
 
+        #then if needed define the parameters
+        if "parameters" in instruction:
+            template.define_parameters(instruction["parameters"]) #define the parameters of the instruction
+
+        #add to the instruction dictionary
         self.instructions[instruction["name"]] = template
