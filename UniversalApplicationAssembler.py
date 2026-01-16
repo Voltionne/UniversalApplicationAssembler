@@ -205,7 +205,7 @@ class Assembler:
             if key in {"name", "parameters"}: #skip as already processed
                 continue
 
-            assert key in self.definitions, f"Expected to make reference to a defined field in a instruction!"
+            assert key in self.definitions, f"Key \"{key}\" is not a defined field! Expected to make reference to a defined field in an instruction."
 
             assert isinstance(instruction[key], dict) or isinstance(instruction[key], int), f"Expected definition mention to be dict or int, not {type(instruction[key])}!"
 
