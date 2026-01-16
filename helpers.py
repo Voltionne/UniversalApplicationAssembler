@@ -188,15 +188,15 @@ class InstructionTemplate:
         assert "values" in parameters, f"Parameters dictionary has no \"values\" key!"
         assert "mapping" in parameters, f"Parameters dictionary has no \"mapping\" key!"
 
-        assert isinstance(self.parameters["values"], list), f"The values of parameters are not in a list, it is a {type(self.parameters["values"])}!"
-        assert isinstance(self.parameters["mapping"], list), f"The mapping of parameters are not in a list, it is a {type(self.parameters["mapping"])}!"
+        assert isinstance(parameters["values"], list), f"The values of parameters are not in a list, it is a {type(parameters["values"])}!"
+        assert isinstance(parameters["mapping"], list), f"The mapping of parameters are not in a list, it is a {type(parameters["mapping"])}!"
 
-        assert len(self.parameters["values"]) == len(self.parameters["mapping"]), f"Missmatch between number of parameters and mapping specified, respectively: {len(self.parameters["values"])} vs {len(self.parameters["mapping"])}"
+        assert len(parameters["values"]) == len(parameters["mapping"]), f"Missmatch between number of parameters and mapping specified, respectively: {len(parameters["values"])} vs {len(parameters["mapping"])}"
 
-        for value in self.parameters["values"]:
+        for value in parameters["values"]:
             assert isinstance(value, str), f"Expected value \"{value}\" to be a string, not a {type(value)}"
 
-        for mapping in self.parameters["mapping"]:
+        for mapping in parameters["mapping"]:
             assert isinstance(mapping, str) or isinstance(mapping, list), f"Expected mapping \"{mapping}\" to be a string or list, not a {type(mapping)}"
 
             if isinstance(mapping, list):
