@@ -47,9 +47,13 @@ class TranslationContext:
 
             assert is_number_colon_number(current_level) or current_level.isnumeric(), f"Parameter immediate with argument \"{current_level}\" is not recognized"
 
+            #calculating bits
             bits = 0
             if is_number_colon_number(current_level):
                 parts = current_level.split(":")
+
+                parts[0] = int(parts[0])
+                parts[1] = int(parts[1])
 
                 bits = abs(parts[0] - parts[1]) + 1 #calculate number of bits
 
@@ -57,6 +61,7 @@ class TranslationContext:
 
                 bits = 1
 
+            #using the value
             if value.isnumeric():
 
                 assert int(value) >= 0 and int(value) < 2**bits, f"immediate value {value} does surpass the limit of {bits} bit[s]!"
