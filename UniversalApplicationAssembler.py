@@ -63,6 +63,14 @@ class Assembler:
 
             self._preparser(yaml_config)
 
+            sublevels = self._parse_one_level(yaml_config["format"]) #parse the level "format"
+
+            sublevels.remove("definitions")
+            sublevels.remove("bits")
+
+            for sublevel in sublevels:
+                self._parse_recursively(yaml_config["format"][sublevel])
+
     def _preparser(self, yaml_config):
 
         """
@@ -123,6 +131,13 @@ class Assembler:
 
             self.translation_context = _TranslationContext(translation_dict=yaml_config["parameters"])
 
+    def _parse_recursively(self, current_level: dict):
+
+        sublevels = self._parse_one_level(current_level)
+
+        for sublevel in sublevels:
+            self._parse_recursively(current_level[sublevel])
+
     def _parse_one_level(self, current_level: dict):
 
         assert isinstance(current_level, dict), f"Expected current_level to be a dict, not {type(current_level)}"
@@ -167,6 +182,7 @@ class Assembler:
         
         #make checks that all is specified:
         assert "name" in instruction, f"Expected name in instruction!"
+        assert isinstance(instruction["name"], str), f"Expected a str for name, not {type(instruction["name"])}"
 
         template = _InstructionTemplate(bits=self.bits) #creates the basic template
 
@@ -193,4 +209,6 @@ class Assembler:
             #add to used up fields
             used_fields[key] = self.definitions[key]
 
-        template.define_mappings(used_fields) #add the fields   
+        template.define_mappings(used_fields) #add the fields
+
+        self.instructions[instruction["name"]] = template
