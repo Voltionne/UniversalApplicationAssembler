@@ -324,7 +324,7 @@ class InstructionTemplate:
 
                 compiled_instruction[-int(key) + 1] = int(value.value) #simply copy-paste the value directly
 
-        return "".join(compiled_instruction)
+        return "".join(map(lambda x: str(x), compiled_instruction))
 
     def __repr__(self):
 
