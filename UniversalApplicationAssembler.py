@@ -127,23 +127,43 @@ class Assembler:
 
         assert isinstance(current_level, dict), f"Expected current_level to be a dict, not {type(current_level)}"
 
+        sub_levels = []
+        there_where_instructions = False
+        definition_keys = set(self.definitions.keys())
+
         for key in current_level:
 
             #Check if some definition is mentioned
-            for definition_key in self.definitions:
 
-                if key == definition_key:
-                    self.global_values.add(key) #add the definition mentioned as globally affected.
+            if key in definition_keys:
+                
+                self.global_values.add(key) #add the definition mentioned as globally affected.
 
-                    assert isinstance(current_level[definition_key], dict) or isinstance(current_level[definition_key], int), f"Expected definition mention to be dict or int, not {type(current_level[definition_key])}!"
+                assert isinstance(current_level[key], dict) or isinstance(current_level[key], int), f"Expected definition mention to be dict or int, not {type(current_level[key])}!"
 
-                    if isinstance(current_level[definition_key], dict): #partial value set
-                        self.definitions[definition_key][1].set_partial_value(current_level[definition_key])
-                    else: #is a integer -> full value set
-                        self.definitions[definition_key][1].set_full_value(current_level[definition_key])
-                        
+                if isinstance(current_level[key], dict): #partial value set
+                    self.definitions[key][1].set_partial_value(current_level[key])
+                else: #is a integer -> full value set
+                    self.definitions[key][1].set_full_value(current_level[key])
+
             #check the presence of certain special keys
-            if key == "instructions": #this level specifies instructions -> LAST LEVEL OF RECURSION
-                pass
+            elif key == "instructions": #this level specifies instructions -> LAST LEVEL OF RECURSION
+                there_where_instructions = True #marks that there where instructions detected -> TO AVOID MORE RECURSION
+
+                assert isinstance(current_level["instructions"], list), f"Expected instructions to be specified in a list, not in {type(current_level["instructions"])}!"
+
+                for instruction in current_level["instructions"]:
+                    self._parse_instruction(instruction)
+            
+            else: #another key -> POTENTIAL SUBLEVEL
+                sub_levels.append(key)
+
+        if there_where_instructions and sub_levels:
+            raise RecursionError(f"There where more sublevels of recursion after instructions where declared!")
+        else:
+            return sub_levels
+        
+    def _parse_instruction(self, instruction_list: list):
+        pass
 
                 
