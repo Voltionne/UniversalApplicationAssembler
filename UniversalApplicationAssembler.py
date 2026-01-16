@@ -54,7 +54,7 @@ class Assembler:
 
         assert self.source, f"No source defined!"
 
-        self.global_values = []
+        self.global_values: set = set()
         self.instructions: dict[str, _InstructionTemplate] = {}
 
         with open(self.source) as file:
@@ -122,5 +122,28 @@ class Assembler:
             assert isinstance(yaml_config["parameters"], dict), f"Expected key \"parameters\" to be a dict, not {type(yaml_config["parameters"])}!"
 
             self.translation_context = _TranslationContext(translation_dict=yaml_config["parameters"])
+
+    def _parse_one_level(self, current_level: dict):
+
+        assert isinstance(current_level, dict), f"Expected current_level to be a dict, not {type(current_level)}"
+
+        for key in current_level:
+
+            #Check if some definition is mentioned
+            for definition_key in self.definitions:
+
+                if key == definition_key:
+                    self.global_values.add(key) #add the definition mentioned as globally affected.
+
+                    assert isinstance(current_level[definition_key], dict) or isinstance(current_level[definition_key], int), f"Expected definition mention to be dict or int, not {type(current_level[definition_key])}!"
+
+                    if isinstance(current_level[definition_key], dict): #partial value set
+                        self.definitions[definition_key][1].set_partial_value(current_level[definition_key])
+                    else: #is a integer -> full value set
+                        self.definitions[definition_key][1].set_full_value(current_level[definition_key])
+                        
+            #check the presence of certain special keys
+            if key == "instructions": #this level specifies instructions -> LAST LEVEL OF RECURSION
+                pass
 
                 
