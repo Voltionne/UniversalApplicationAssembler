@@ -163,7 +163,34 @@ class Assembler:
         else:
             return sub_levels
         
-    def _parse_instruction(self, instruction_list: list):
-        pass
+    def _parse_instruction(self, instruction: dict):
+        
+        #make checks that all is specified:
+        assert "name" in instruction, f"Expected name in instruction!"
 
-                
+        template = _InstructionTemplate(bits=self.bits) #creates the basic template
+
+        used_fields: dict[str, tuple[str, _Value]] = {}
+
+        if "parameters" in instruction:
+
+            template.define_parameters(instruction["parameters"]) #define the parameters of the instruction
+
+        for key in instruction:
+
+            if key in {"name", "parameters"}: #skip as already processed
+                continue
+
+            assert key in self.definitions, f"Expected to make reference to a defined field in a instruction!"
+
+            assert isinstance(instruction[key], dict) or isinstance(instruction[key], int), f"Expected definition mention to be dict or int, not {type(instruction[key])}!"
+
+            if isinstance(instruction[key], dict): #partial value set
+                self.definitions[key][1].set_partial_value(instruction[key])
+            else: #is a integer -> full value set
+                self.definitions[key][1].set_full_value(instruction[key])
+
+            #add to used up fields
+            used_fields[key] = self.definitions[key]
+
+        template.define_mappings(used_fields) #add the fields   
