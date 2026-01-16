@@ -433,6 +433,10 @@ class Value:
             return False
         else:
             return True
+        
+    def __repr__(self):
+
+        return f"<Value: value={self.value}, bits={self.bits}>"
 
 def gradient_range(a: int, b: int):
 
