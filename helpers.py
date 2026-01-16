@@ -1,4 +1,6 @@
-from warnings import warn as _warn
+import warnings as _warnings
+
+_warnings.simplefilter("always")
 
 class TranslationContext:
 
@@ -173,8 +175,8 @@ class InstructionTemplate:
                 #Not added because already added
                 #self.fields[field_name] = value #now it is an official field
 
-        if any(self.used_up_bits):
-            _warn(f"InstructionTemplate used up only {sum(self.used_up_bits)} bits out of {self.bits} bits: there is unused bits!!")
+        if sum(self.used_up_bits) < self.bits:
+            _warnings.warn(f"InstructionTemplate used up only {sum(self.used_up_bits)} bits out of {self.bits} bits: there is unused bits!!")
 
     def define_parameters(self, parameters: dict):
         
