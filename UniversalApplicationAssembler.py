@@ -2,14 +2,11 @@
 
 import os as _os
 import yaml as _yaml
-import PyGAU #DEBUGGING
 
 from helpers import Value as _Value
 from helpers import InstructionTemplate as _InstructionTemplate
 from helpers import TranslationContext as _TranslationContext
 from helpers import is_number_colon_number as _is_number_colon_number
-
-reporter = PyGAU.debug.Report()
 
 class Assembler:
 
@@ -74,6 +71,58 @@ class Assembler:
             for sublevel in sublevels:
                 self._parse_recursively(yaml_config["format"][sublevel])
 
+    def compile_code(self, assembly_source: _os.PathLike, end_result: _os.PathLike):
+
+        """
+        Compiles a whole assembly file and outputs the binary result
+        
+        :param assembly_source: The assembly source file path
+        :type assembly_source: _os.PathLike
+        :param end_result: The path where the binary result will be stored
+        :type end_result: _os.PathLike
+        """
+
+        assembly_data: str = None
+        with open(assembly_source) as file:
+            assembly_data = file.read()
+
+        preprocessed_data = self._preprocess_str(assembly_data)
+        
+        binary_list = []
+
+        for instruction in preprocessed_data:
+
+            if isinstance(self.instructions[instruction[0]], list): #multiple instructions with the same name
+
+                correct_results = [] #all possible correct results
+
+                for instruction_encoding in self.instructions[instruction[0]]:
+                    try:
+                        if len(instruction) == 1: #only opcode, no parameters
+                            correct_results.append(instruction_encoding.compile_instruction())
+                        else: #there is also parameters
+                            instruction_encoding.apply(self.translation_context, parameters=instruction[1:])
+                            correct_results.append(instruction_encoding.compile_instruction())
+                    except Exception as e:
+                        pass
+                        
+
+                #assert only one correct
+                assert len(correct_results) == 1, f"{len(correct_results)} ambiguous encodings where found!"
+                binary_list.append(correct_results[0])
+
+            else:
+
+                if len(instruction) == 1: #only opcode, no parameters
+                    binary_list.append(self.instructions[instruction[0]].compile_instruction())
+                else: #there is also parameters
+                    self.instructions[instruction[0]].apply(self.translation_context, parameters=instruction[1:])
+                    binary_list.append(self.instructions[instruction[0]].compile_instruction())
+
+        with open(end_result, mode="w") as file:
+            file.write("\n".join(binary_list))
+
+    #RELATED TO PARSING
     def _preparser(self, yaml_config):
 
         """
@@ -134,16 +183,13 @@ class Assembler:
 
             self.translation_context = _TranslationContext(translation_dict=yaml_config["parameters"])
 
-    @reporter.report_function(report_parameters=False)
     def _parse_recursively(self, current_level: dict):
 
         sublevels = self._parse_one_level(current_level)
 
         for sublevel in sublevels:
-            print("CALLING RECURSIVELY LEVEL:", sublevel)
             self._parse_recursively(current_level[sublevel])
 
-    @reporter.report_function(report_parameters=False)
     def _parse_one_level(self, current_level: dict):
 
         assert isinstance(current_level, dict), f"Expected current_level to be a dict, not {type(current_level)}"
@@ -182,15 +228,12 @@ class Assembler:
         if there_where_instructions and sub_levels:
             raise RecursionError(f"There where more sublevels of recursion after instructions where declared!")
         else:
-            print("END OF ONE LEVEL. SUB:", sub_levels)
             return sub_levels
         
-    @reporter.report_function(report_parameters=False)
     def _parse_instruction(self, instruction: dict):
         
         #make checks that all is specified:
         assert "name" in instruction, f"Expected name in instruction!"
-        print("NAME:", instruction["name"])
         assert isinstance(instruction["name"], str), f"Expected a str for name, not {type(instruction["name"])}"
 
         template = _InstructionTemplate(bits=self.bits) #creates the basic template
@@ -243,4 +286,40 @@ class Assembler:
             template.define_parameters(instruction["parameters"]) #define the parameters of the instruction
 
         #add to the instruction dictionary
-        self.instructions[instruction["name"]] = template
+        if instruction["name"] in self.instructions: #DAMN. IT ALREADY EXISTS!
+            if isinstance(self.instructions[instruction["name"]], _InstructionTemplate): #There is only one instruction more.
+                self.instructions[instruction["name"]] = [self.instructions[instruction["name"]], template]
+            else: #must be a list
+                self.instructions[instruction["name"]].append(template)
+        else:
+            self.instructions[instruction["name"]] = template
+
+    #RELATED TO COMPILING
+    def _preprocess_str(self, string : str) -> list[str]:
+
+        """
+        INTERNAL FUNCTION. Preprocesses an assembly source to make compiling easy
+        """
+
+        #PHASE 1. REMOVE COMMENTS AND SEPARATE INSTRUCTIONS
+        clean_string = "\n".join(line.split("//")[0].rstrip() for line in string.splitlines())
+
+        clean_string = clean_string.split("\n")
+
+        clean_string = [spli.strip() for spli in clean_string if spli.strip() != ""]
+
+        #PHASE 2. SUBDIVIDE INSTRUCTIONS IN OPCODES AND PARAMETERS
+        #first element is always opcode, the rest are parameters IN ORDER
+
+        final_preprocessed = []
+
+        for instruction in clean_string:
+            #separating parameters
+            subdivisions = instruction.split(",")
+
+            #separate first parameters from opcode
+            subdivisions = subdivisions[0].split(" ") + subdivisions[1:]
+
+            final_preprocessed.append([e.strip() for e in subdivisions if e.strip() != ""])
+
+        return final_preprocessed
