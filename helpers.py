@@ -160,7 +160,7 @@ class InstructionTemplate:
                 for bit_position in gradient_range(parts[0], parts[1]):
                     assert not self.used_up_bits[bit_position], f"Mapping with key \"{key}\", corresponding to {value}, is overlapping in bit {bit_position} of format!" #no overlap!
                     
-                    self.used_up_bits[bit_position] = False
+                    self.used_up_bits[bit_position] = True
                     
                 #if reached here -> there is no bit overlap -> add as field
                 #Not added because already added
@@ -204,6 +204,9 @@ class InstructionTemplate:
             if isinstance(mapping, list):
                 for sub_mapping in mapping:
                     assert isinstance(sub_mapping, str), f"Expected sub_mapping \"{sub_mapping}\" to be a string, not a {type(sub_mapping)}"
+                    assert sub_mapping in self.fields, f"Parameter maps to a non-defined field: \"{sub_mapping}\"!"
+            else:
+                assert mapping in self.fields, f"Parameter maps to a non-defined field: \"{mapping}\"!"
 
         self.parameters = parameters
 
@@ -231,7 +234,7 @@ class InstructionTemplate:
                 
                 for sub_mapping in reversed(self.parameters["mapping"][i]): #iterates over the mappings, reversed to do first the LSBs.
 
-                    sub_mapping_bits = self.fields[sub_mapping].bits
+                    sub_mapping_bits = self.fields[sub_mapping][1].bits
 
                     mask = 2 ** sub_mapping_bits - 1 #creates a mask
 
