@@ -6,6 +6,7 @@ import yaml as _yaml
 from helpers import Value as _Value
 from helpers import InstructionTemplate as _InstructionTemplate
 from helpers import TranslationContext as _TranslationContext
+from helpers import is_number_colon_number as _is_number_colon_number
 
 class Assembler:
 
@@ -23,13 +24,14 @@ class Assembler:
         #general variables
         self.auto_update = auto_update
 
-        #the famous source
-        self.source = source_file
-
-        self.bits = None
+        #parser specifications
+        self.bits: int = None
         self.instructions: dict[str, _InstructionTemplate] = {}
         self.translation_context: _TranslationContext = None
+        self.definitions: dict[str, tuple[str, _Value]] = {}
 
+        #the famous source (specified the last because it can autotriger update)
+        self.source = source_file 
 
     @property
     def source(self):
@@ -71,4 +73,54 @@ class Assembler:
 
         assert isinstance(yaml_config, dict), "Config file yaml is not a dictionary!"
 
-        pass
+        # ----------------------------------------------------
+        # CHECK FORMAT KEY
+        # ----------------------------------------------------
+        # This key is mandatory. It should include at least a bits specification and definitions specification
+
+        assert "format" in yaml_config, f"Expected key \"format\" in yaml configuration file!"
+        assert "bits" in yaml_config["format"], f"Expected bit specification inside the \"format\" key of the yaml configuration file!"
+        assert "definitions" in yaml_config["format"], f"Expected definitions specification inside the \"format\" key of the yaml configuration file!"
+
+        #CHECK BITS
+        assert isinstance(yaml_config["format"]["bits"], int), f"Expected bits to be an integer number, not {type(yaml_config["format"]["bits"])}"
+        self.bits = yaml_config["format"]["bits"]
+
+        #CHECK DEFINITIONS
+        assert isinstance(yaml_config["format"]["definitions"], dict), f"Expected definitions to be a dictionary, not {type(yaml_config["format"]["definitions"])}"
+
+        definitions_dict = yaml_config["format"]["definitions"] #a shortcut to the definitions dict
+
+        for definition_name in definitions_dict:
+
+            #check that type and format is correct
+            assert isinstance(definitions_dict[definition_name], str), f"Expected each definition to be a string, not type {type(definition_name)}"
+
+            assert _is_number_colon_number(definitions_dict[definition_name]) or definitions_dict[definition_name].isnumeric(), f"Expected each definition to follow the format \"n:n\" or \"n\""
+
+            if _is_number_colon_number(definitions_dict[definition_name]):
+
+                parts = definitions_dict[definition_name].split(":")
+                
+                parts[0] = int(parts[0])
+                parts[1] = int(parts[1])
+
+                bits = abs(parts[0] - parts[1]) + 1 #calculate number of bits
+
+                self.definitions[definition_name] = (definitions_dict[definition_name], _Value(bits)) #add the definition to the definitions dict.
+
+            else: #a regular str
+
+                self.definitions[definition_name] = (definitions_dict[definition_name], _Value()) #add the definition to the definitions dict.
+
+        # ----------------------------------------------------
+        # CHECK PARAMETERS KEY
+        # ----------------------------------------------------
+
+        if "parameters" in yaml_config: #there is parameters specification -> translation context
+
+            assert isinstance(yaml_config["parameters"], dict), f"Expected key \"parameters\" to be a dict, not {type(yaml_config["parameters"])}!"
+
+            self.translation_context = _TranslationContext(translation_dict=yaml_config["parameters"])
+
+                
