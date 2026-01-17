@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "PyUAA" #the name for distribution
-version="0.1.0"
+version="0.1"
 requires-python = ">=3.9"
 authors = [
     {name = "SpaceProgrammer", email="spaceprogrammerbusiness@gmail.com"}
@@ -20,8 +20,7 @@ license = "LicenseRef-Voltionne-Restrictive"
 license-files = ["LICENSE"]
 
 dependencies = [
-    "yaml",
-    "os"
+    "pyyaml"
 ]
 
 [project.urls]
