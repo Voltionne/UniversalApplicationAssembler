@@ -1,4 +1,4 @@
-base_isa.yaml
-test.*
-test_result.*
+tests/
 __pycache__/
+dist/
+PyUAA*/
