@@ -49,7 +49,7 @@ class Assembler:
         parser = _ISAparser(self.source)
         self.translation_context, self.instructions = parser.parse()
 
-    def compile_code(self, assembly_source: _os.PathLike, end_result: _os.PathLike):
+    def compile_code(self, assembly_source: _os.PathLike, end_result: _os.PathLike, real_bin: bool = True):
 
         """
         Compiles a whole assembly file and outputs the binary result
@@ -58,6 +58,8 @@ class Assembler:
         :type assembly_source: _os.PathLike
         :param end_result: The path where the binary result will be stored
         :type end_result: _os.PathLike
+        :param real_bin: If true, the output is a binary file. If false, it writes strings where each line if an instruction.
+        :type real_bin: bool
         """
 
         assembly_data: str = None
@@ -97,8 +99,19 @@ class Assembler:
                     self.instructions[instruction[0]].apply(self.translation_context, parameters=instruction[1:])
                     binary_list.append(self.instructions[instruction[0]].compile_instruction())
 
-        with open(end_result, mode="w") as file:
-            file.write("\n".join(binary_list))
+        if real_bin:
+            binary_str = "".join(binary_list)
+
+            num = int(binary_str, 2) #convert to a binary number
+            num_bytes = (len(binary_str) + 7) // 8
+
+            byte_data = num.to_bytes(num_bytes, byteorder="big")
+
+            with open(end_result, mode="wb") as file:
+                file.write(byte_data)
+        else:
+            with open(end_result, mode="w") as file:
+                file.write("\n".join(binary_list))
 
     def _preprocess_str(self, string : str) -> list[str]:
 
