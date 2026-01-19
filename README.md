@@ -4,7 +4,7 @@ The Universal Application Assembler (UAA) is a totally configurable assembler th
 
 ## Documentation
 
-Currently there is no documentation of this project. It will be added in the future.
+All the documentation can be found [here](docs/index.md). Don't take it seriously, currently it is a placeholder and waiting for better documentation
 
 ## Examples
 
