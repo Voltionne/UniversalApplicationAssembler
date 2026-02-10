@@ -5,8 +5,6 @@ Create easily custom assemblers specifying ISAs with a YAML configuration file
 import os as _os
 
 from .parser import ISAparser as _ISAparser
-from .helpers.classes import InstructionTemplate as _InstructionTemplate
-from .helpers.classes import Value as _Value
 
 class Assembler:
 
