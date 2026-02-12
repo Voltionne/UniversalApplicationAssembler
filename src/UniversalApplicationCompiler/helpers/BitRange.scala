@@ -4,4 +4,6 @@ import scala.math._
 
 case class BitRange(initialPos: Int, finalPos: Int) {
   val bits: Int = abs(initialPos - finalPos) - 1
+
+  def setPartialValue = 0 //temporal
 }
