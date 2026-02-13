@@ -1,7 +1,7 @@
 package UniversalApplicationCompiler
 
-object Main {
-  def main(args: Array[String]): Unit = {
-    println("It works!")
-  }
-}
+import UniversalApplicationCompiler.helpers.BitRange
+
+object Main:
+  def main(args: Array[String]): Unit =
+    println("Runs!")
