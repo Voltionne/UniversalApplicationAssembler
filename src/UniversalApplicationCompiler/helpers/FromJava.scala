@@ -1,5 +1,6 @@
 package UniversalApplicationCompiler.helpers
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
 /**
@@ -15,7 +16,7 @@ object FromJava:
   def convert(value: Any): Any = value match
     
     case m: java.util.Map[?, ?] =>
-      m.asScala.view.map { case (k, y) => convert(k) -> convert(y) }.toMap
+      mutable.LinkedHashMap.from(m.asScala.view.map { case (k, y) => convert(k) -> convert(y) })
     case l: java.util.List[?] =>
       l.asScala.view.map(convert).toList
     case s: java.util.Set[?] =>
