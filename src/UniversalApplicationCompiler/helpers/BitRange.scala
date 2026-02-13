@@ -2,8 +2,10 @@ package UniversalApplicationCompiler.helpers
 
 import scala.math._
 
-case class BitRange(initialPos: Int, finalPos: Int) {
-  val bits: Int = abs(initialPos - finalPos) - 1
+case class BitRange(a: Int, b: Int):
+  val bits: Int = abs(a - b) + 1
+  val value: String = "0" * bits
 
-  def setPartialValue = 0 //temporal
-}
+  def setPartialValue(setDict: Map[String, Any]): Unit = ???
+  def setFullValue(value: Int): Unit = ???
+  def checkValue: Boolean = ???
