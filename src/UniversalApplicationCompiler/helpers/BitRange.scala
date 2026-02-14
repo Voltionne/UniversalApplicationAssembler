@@ -29,25 +29,42 @@ case class BitRange(a: Int, b: Int):
 
           require(set >= 0 && set < pow(2, bitsSet))
 
-          val setValueBinArray: Array[Char] = f"${set.toBinaryString}%8s".replace(' ', '0').toCharArray
+          val setValueBinArray: Array[Char] = set.toBinaryString.reverse.padTo(bitsSet, '0').reverse.toCharArray
+          println(setValueBinArray.mkString)
 
-          val valueAsArrayReverse: Array[Char] = value.toCharArray.reverse //convert to array temporally (because string is immutable)
+          var valueAsArray: Array[Char] = value.toCharArray //convert to array temporally (because string is immutable)
 
           for (i, idx) <- gradientRange(parts(0).toInt, parts(1).toInt).zipWithIndex do
-            valueAsArrayReverse(i) = setValueBinArray(idx)
+            if a > b then //LSB
+              valueAsArray = valueAsArray.reverse
 
-          value = valueAsArrayReverse.reverse.mkString
+              valueAsArray(i - b) = setValueBinArray(idx)
+
+              valueAsArray = valueAsArray.reverse
+
+            else
+              valueAsArray(i - a) = setValueBinArray(idx)
+          
+          value = valueAsArray.mkString
 
         else
 
           require(bits.forall(p => p.isDigit)) //check that bits is a digit
           require(set == 0 || set == 1) //check that set is a binary digit
 
-          val valueAsArrayReverse: Array[Char] = value.toCharArray.reverse
+          var valueAsArray: Array[Char] = value.toCharArray
 
-          valueAsArrayReverse(bits.toInt) = set.toChar
+          if a > b then //LSB
 
-          value = valueAsArrayReverse.reverse.mkString
+            valueAsArray = valueAsArray.reverse
+
+            valueAsArray(bits.toInt - b) = set.toString.head
+
+            valueAsArray = valueAsArray.reverse
+          else
+            valueAsArray(bits.toInt - a) = set.toString.head
+
+          value = valueAsArray.mkString
 
   def setFullValue(value: Int): Unit =
     require(value >= 0 && value < pow(2, bits))
