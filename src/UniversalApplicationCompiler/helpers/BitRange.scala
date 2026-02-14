@@ -5,7 +5,7 @@ import UniversalApplicationCompiler.helpers.Functions.gradientRange
 
 case class BitRange(a: Int, b: Int):
   val bits: Int = abs(a - b) + 1
-  var value: String = "0" * bits
+  var value: String = "?" * bits
   val endianness: String = if a > b then "little" else "big"
 
   def setPartialValue(setDict: Map[String, Any]): Unit =
@@ -29,7 +29,7 @@ case class BitRange(a: Int, b: Int):
 
           require(set >= 0 && set < pow(2, bitsSet))
 
-          val setValueBinArray: Array[Char] = (f"${set.toBinaryString}%8s".replace(' ', '0')).toCharArray
+          val setValueBinArray: Array[Char] = f"${set.toBinaryString}%8s".replace(' ', '0').toCharArray
 
           val valueAsArrayReverse: Array[Char] = value.toCharArray.reverse //convert to array temporally (because string is immutable)
 
@@ -49,5 +49,8 @@ case class BitRange(a: Int, b: Int):
 
           value = valueAsArrayReverse.reverse.mkString
 
-  def setFullValue(value: Int): Unit = ???
-  def checkValue: Boolean = ???
+  def setFullValue(value: Int): Unit =
+    require(value >= 0 && value < pow(2, bits))
+    this.value = value.toBinaryString.reverse.padTo(bits, '0').reverse
+
+  def checkValue: Boolean = if value contains "?" then false else true
