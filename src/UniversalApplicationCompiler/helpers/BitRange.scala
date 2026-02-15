@@ -8,14 +8,14 @@ case class BitRange(a: Int, b: Int):
   var value: String = "?" * bits
   val endianness: String = if a > b then "little" else "big"
 
-  def setPartialValue(setDict: Map[String, Any]): Unit =
-    require(setDict contains "set")
-    require(setDict("set").isInstanceOf[Int])
+  def setPartialValue(setMap: Map[String, Any]): Unit =
+    require(setMap contains "set")
+    require(setMap("set").isInstanceOf[Int])
 
-    require(setDict contains "bits")
-    require(setDict("bits").isInstanceOf[String])
+    require(setMap contains "bits")
+    require(setMap("bits").isInstanceOf[String])
 
-    (setDict("set"), setDict("bits")) match
+    (setMap("set"), setMap("bits")) match
       case (set: Int, bits: String) =>
         if bits contains ":" then
 
