@@ -2,8 +2,9 @@ package UniversalApplicationCompiler.helpers
 
 import UniversalApplicationCompiler.helpers.Functions.gradientRange
 
-case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], parameters: Map[String, List[Any]]):
+case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], parameters: Map[String, List[String | List[String]]]):
 
+  //Checks for fields
   require: //Check that no bit collisions
     val usedBits: Array[Boolean] = Array.fill(bits)(false)
 
@@ -14,6 +15,12 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], paramet
         else {usedBits(idx) = true; true}
       }
     }
+
+  //Checks for parameters
+  require(parameters contains "values")
+  require(parameters contains "mappings")
+  require(parameters("values").length == parameters("mappings").length)
+  require(parameters("values").forall(value => value.isInstanceOf[String])) //In case of the values, all elements must be strings
 
   def apply(translationContext: TranslationContext, parameters: Array[String]): Unit = ???
 
