@@ -2,7 +2,7 @@ package UniversalApplicationCompiler.helpers
 
 import UniversalApplicationCompiler.helpers.Functions.gradientRange
 
-case class InstructionTemplate(bits: Int, fields: Map[String, BitRange]):
+case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], parameters: Map[String, List[Any]]):
 
   require: //Check that no bit collisions
     val usedBits: Array[Boolean] = Array.fill(bits)(false)
@@ -15,4 +15,14 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange]):
       }
     }
 
-  def apply(): Unit = ???
+  def apply(translationContext: TranslationContext, parameters: Array[String]): Unit = ???
+
+  def setPartialField(fieldName: String, setMap: Map[String, Any]): Unit = fields(fieldName).setPartialValue(setMap)
+  def setFullField(fieldName: String, value: Int): Unit = fields(fieldName).setFullValue(value)
+  def checkCompleteness: Boolean =
+    fields.forall {
+      case (fieldName, bitRange) =>
+        bitRange.checkValue
+    }
+
+  def compileInstruction: String = ???
