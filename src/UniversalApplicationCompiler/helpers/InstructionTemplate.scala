@@ -17,7 +17,22 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], paramet
       }
     }
 
-  def apply(translationContext: TranslationContext, parameters: Array[String]): Unit = ???
+  def apply(translationContext: TranslationContext, parameters: Array[String]): Unit =
+    require(parameters.length == this.parameters.length)
+
+    for idx <- parameters.indices do
+
+      //get the TranslationContext leaf of the datatype
+      val leafTranslationContext = translationContext.search(this.parameters.values(idx))
+
+      //Step 1: The translation
+      leafTranslationContext match
+        case bitRange: BitRange => //It is an immediate specification
+          ???
+        case map: Map[String, Int] => //It is a map translation
+          ???
+
+
 
   def setPartialField(fieldName: String, setMap: Map[String, Any]): Unit = fields(fieldName).setPartialValue(setMap)
   def setFullField(fieldName: String, value: Int): Unit = fields(fieldName).setFullValue(value)
