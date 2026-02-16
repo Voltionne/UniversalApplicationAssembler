@@ -4,15 +4,6 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
 /**
- * Represents the parameters of a function
- * @param values the datatypes of each of the parameters
- * @param mappings the fields where each parameter maps.
- */
-case class ParametersDefinition(values: List[String], mappings: List[String | List[String]]):
-  require(values.length == mappings.length)
-
-
-/**
  * Convert things from Java to Scala (as Scala uses the JDK and some libraries use datatypes of Java)
  */
 object Conversions:
