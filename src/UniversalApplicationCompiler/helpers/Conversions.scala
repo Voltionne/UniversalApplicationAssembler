@@ -4,7 +4,7 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
 /**
- * Convert things from Java to Scala (as Scala uses the JDK and some libraries use datatypes of Java)
+ * Converts things to other things, to simplify coding
  */
 object Conversions:
 
@@ -36,7 +36,7 @@ object Conversions:
         else throw new IllegalArgumentException("values must be a list of Strings")
       case Some(_) => throw new IllegalArgumentException("values must be a list")
       case None => throw new IllegalArgumentException("missing 'values'")
-    
+
     val mappings: List[String | List[String]] = map.get("mappings") match
       case Some(l: List[_]) =>
         if l.forall {
