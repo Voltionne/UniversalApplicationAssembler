@@ -1,5 +1,6 @@
 package UniversalApplicationCompiler.helpers
 
+import UniversalApplicationCompiler.datatypes.BitVector
 import UniversalApplicationCompiler.helpers.Functions.gradientRange
 import UniversalApplicationCompiler.helpers.ParametersDefinition
 
@@ -30,10 +31,8 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], paramet
         case bitRange: BitRange => //It is an immediate specification
           ???
         case m: Map[_, _] => //It is a map translation
-          require(m.forall { case (k, y) => k.isInstanceOf[String] && y.isInstanceOf[Int] })
-          val map = m.asInstanceOf[Map[String, Int]]
-
-
+          require(m.forall { case (k, y) => k.isInstanceOf[String] && y.isInstanceOf[BitVector] })
+          val map = m.asInstanceOf[Map[String, BitVector]]
 
   def setPartialField(fieldName: String, setMap: Map[String, Any]): Unit = fields(fieldName).setPartialValue(setMap)
   def setFullField(fieldName: String, value: Int): Unit = fields(fieldName).setFullValue(value)

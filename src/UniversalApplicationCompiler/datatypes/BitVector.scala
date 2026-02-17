@@ -1,4 +1,4 @@
-package UniversalApplicationCompiler.Datatypes
+package UniversalApplicationCompiler.datatypes
 
 final case class BitVector private(value: BigInt, width: Int):
 
