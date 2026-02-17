@@ -16,7 +16,7 @@ case class BitRange(a: Int, b: Int):
     require(setMap("bits").isInstanceOf[String])
 
     (setMap("set"), setMap("bits")) match
-      case (set: Int, bits: String) =>
+      case (set: BigInt, bits: String) =>
         if bits contains ":" then
 
           //This means it specifies a whole range
@@ -27,10 +27,9 @@ case class BitRange(a: Int, b: Int):
 
           val bitsSet = abs(parts(0).toInt - parts(1).toInt) + 1
 
-          require(set >= 0 && set < pow(2, bitsSet))
+          require(set >= 0 && set < (BigInt(1) << bitsSet))
 
-          val setValueBinArray: Array[Char] = set.toBinaryString.reverse.padTo(bitsSet, '0').reverse.toCharArray
-          println(setValueBinArray.mkString)
+          val setValueBinArray: Array[Char] = set.toString(2).reverse.padTo(bitsSet, '0').reverse.toCharArray
 
           var valueAsArray: Array[Char] = value.toCharArray //convert to array temporally (because string is immutable)
 
@@ -66,8 +65,8 @@ case class BitRange(a: Int, b: Int):
 
           value = valueAsArray.mkString
 
-  def setFullValue(value: Int): Unit =
-    require(value >= 0 && value < pow(2, bits))
-    this.value = value.toBinaryString.reverse.padTo(bits, '0').reverse
+  def setFullValue(value: BigInt): Unit =
+    require(value >= 0 && value < (BigInt(1) << bits))
+    this.value = value.toString(2).reverse.padTo(bits, '0').reverse
 
   def checkValue: Boolean = if value contains "?" then false else true
