@@ -70,3 +70,13 @@ case class BitRange(a: Int, b: Int):
     this.value = value.toString(2).reverse.padTo(bits, '0').reverse
 
   def checkValue: Boolean = if value contains "?" then false else true
+
+  def compile(bits: Int): String =
+    require(checkValue)
+
+    //"P" stands for placeholder
+
+    if endianness == "little" then
+      (value + "P" * b).reverse.padTo(bits, 'P').reverse
+    else //big
+      ("P" * a + value).padTo(bits, 'P')

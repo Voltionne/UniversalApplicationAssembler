@@ -73,4 +73,17 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], paramet
         bitRange.checkValue
     }
 
-  def compileInstruction: String = ???
+  def compileInstruction: String =
+    //Not done because already done in BitRange
+    //require(checkCompleteness)
+
+    val compiledInstructionArray = ("?" * bits).toCharArray
+
+    val compiledResults: List[String] = List()
+
+    for (fieldName, bitRange) <- fields do
+      compiledResults +: bitRange.compile(bits)
+    
+    compiledResults.map(_.toList).transpose.map {
+      column => column.find(_ != 'P').getOrElse('P')
+    }.mkString
