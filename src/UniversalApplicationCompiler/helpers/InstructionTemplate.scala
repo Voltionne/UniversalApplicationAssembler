@@ -1,8 +1,9 @@
 package UniversalApplicationCompiler.helpers
 
-import UniversalApplicationCompiler.datatypes.BitVector
+import scala.math.*
 import UniversalApplicationCompiler.helpers.Functions.gradientRange
 import UniversalApplicationCompiler.helpers.ParametersDefinition
+import UniversalApplicationCompiler.helpers.{SingleParameterMapping, MultipleParameterMapping}
 
 case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], parameters: ParametersDefinition):
 
@@ -29,13 +30,43 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], paramet
       //Step 1: The translation
       leafTranslationContext match
         case bitRange: BitRange => //It is an immediate specification
-          ???
+
+          val immediateValue = Casts.stringToBigInt(parameters(idx)) //convert the string to immediate BigInt
+
+          this.parameters.mappings(idx) match
+            case SingleParameterMapping(s: String) =>
+              setFullField(s, immediateValue)
+            case MultipleParameterMapping(mappings: List[String]) =>
+
+              var bitsDone = 0 //counts how many bits already done
+
+              for mapping <- mappings.reverse do //iterates over the mappings, reversed to do first the LSB
+
+                val mappingBits = fields(mapping).bits
+
+                val mask: BigInt = (BigInt(1) << mappingBits) - 1
+
+                val finalValue = (immediateValue >> bitsDone) & mask
+
+                setFullField(mapping, finalValue)
+
+                //increase the bits done to do the other iterations correctly
+                bitsDone += mappingBits
+
         case m: Map[_, _] => //It is a map translation
-          require(m.forall { case (k, y) => k.isInstanceOf[String] && y.isInstanceOf[BitVector] })
-          val map = m.asInstanceOf[Map[String, BitVector]]
+          require(m.forall { case (k, y) => k.isInstanceOf[String] && y.isInstanceOf[BigInt] })
+          val map = m.asInstanceOf[Map[String, BigInt]]
+
+          val translatedBigInt = map(parameters(idx))
+
+          this.parameters.mappings(idx) match
+
+            case SingleParameterMapping(s: String) =>
+              setFullField(s, translatedBigInt)
+            case MultipleParameterMapping(l: List[String]) => throw new IllegalArgumentException("Currently don't support multiple mappings in case of translation table!")
 
   def setPartialField(fieldName: String, setMap: Map[String, Any]): Unit = fields(fieldName).setPartialValue(setMap)
-  def setFullField(fieldName: String, value: Int): Unit = fields(fieldName).setFullValue(value)
+  def setFullField(fieldName: String, value: BigInt): Unit = fields(fieldName).setFullValue(value)
   def checkCompleteness: Boolean =
     fields.forall {
       case (fieldName, bitRange) =>
