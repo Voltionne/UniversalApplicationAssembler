@@ -52,4 +52,3 @@ object Conversions:
       case None => throw new IllegalArgumentException("missing 'mappings'")
 
     ParametersDefinition(values, mappings)
-
