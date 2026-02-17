@@ -2,10 +2,10 @@ package UniversalApplicationCompiler.helpers
 
 import UniversalApplicationCompiler.datatypes.BitVector
 
-case class TranslationContext(leaf: BitRange | Map[String, BitVector]):
+case class TranslationContext(leaf: BitRange | Map[String, BigInt]):
   val children: scala.collection.mutable.Map[String, TranslationContext] = scala.collection.mutable.Map() //start with a map that is empty
 
-  def search(referenceString: String): BitRange | Map[String, BitVector] =
+  def search(referenceString: String): BitRange | Map[String, BigInt] =
     val references = referenceString.split(".")
 
     var currentTranslationContext: TranslationContext = this
