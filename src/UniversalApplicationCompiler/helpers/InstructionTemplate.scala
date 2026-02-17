@@ -29,8 +29,9 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], paramet
       leafTranslationContext match
         case bitRange: BitRange => //It is an immediate specification
           ???
-        case map: Map[String, Int] => //It is a map translation
-          ???
+        case m: Map[_, _] => //It is a map translation
+          require(m.forall { case (k, y) => k.isInstanceOf[String] && y.isInstanceOf[Int] })
+          val map = m.asInstanceOf[Map[String, Int]]
 
 
 
