@@ -21,6 +21,9 @@ object Conversions:
       l.asScala.view.map(convertFromJava).toList
     case s: java.util.Set[?] =>
       s.asScala.view.map(convertFromJava).toSet
+    case int32: Integer => BigInt(int32)
+    case int64: Long => BigInt(int64)
+    case bigint: java.math.BigInteger => bigint.asInstanceOf[BigInt] //Convert BigInteger of java to BigInt
     case other => other
 
   /**
