@@ -2,6 +2,7 @@ package UniversalApplicationCompiler.helpers
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
+import UniversalApplicationCompiler.helpers.{ParameterMapping, SingleParameterMapping, MultipleParameterMapping}
 
 /**
  * Converts things to other things, to simplify coding
@@ -40,13 +41,20 @@ object Conversions:
       case Some(_) => throw new IllegalArgumentException("values must be a list")
       case None => throw new IllegalArgumentException("missing 'values'")
 
-    val mappings: List[String | List[String]] = map.get("mappings") match
+    val mappings: List[ParameterMapping] = map.get("mappings") match
       case Some(l: List[_]) =>
         if l.forall {
           case _: String => true
           case l: List[_] => l.forall(_.isInstanceOf[String])
           case _ => false
-        } then l.asInstanceOf[List[String | List[String]]]
+        } then
+          val temporalList = l.asInstanceOf[List[String | List[String]]]
+          
+          temporalList.map {
+            case s: String => SingleParameterMapping(s)
+            case l: List[String] => MultipleParameterMapping(l)
+          }
+          
         else throw new IllegalArgumentException("mappings must be a list that contains either Strings or lists of Strings")
       case Some(_) => throw new IllegalArgumentException("mappings must be a list")
       case None => throw new IllegalArgumentException("missing 'mappings'")
