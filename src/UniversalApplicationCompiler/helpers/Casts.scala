@@ -1,7 +1,5 @@
 package UniversalApplicationCompiler.helpers
 
-import UniversalApplicationCompiler.datatypes.BitVector
-
 object Casts:
 
   /**
