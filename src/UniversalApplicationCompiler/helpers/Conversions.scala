@@ -10,7 +10,7 @@ import UniversalApplicationCompiler.helpers.{ParameterMapping, SingleParameterMa
 object Conversions:
 
   /**
-   * Automatically converts a YAML file maps, sets, and lists from Java to Scala types.
+   * Automatically converts a YAML file maps, sets, and lists from Java to Scala types. It calls recursively for maps.
    * @param value the value to be parsed
    * @return the converted type
    */
