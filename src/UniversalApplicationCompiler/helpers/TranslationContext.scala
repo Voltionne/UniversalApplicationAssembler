@@ -1,7 +1,5 @@
 package UniversalApplicationCompiler.helpers
 
-import UniversalApplicationCompiler.datatypes.BitVector
-
 case class TranslationContext(leaf: BitRange | Map[String, BigInt]):
   val children: scala.collection.mutable.Map[String, TranslationContext] = scala.collection.mutable.Map() //start with a map that is empty
 
