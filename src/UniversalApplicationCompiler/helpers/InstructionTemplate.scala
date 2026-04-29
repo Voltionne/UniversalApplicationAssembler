@@ -25,7 +25,7 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], paramet
     for idx <- parameters.indices do
 
       //get the TranslationContext leaf of the datatype
-      val leafTranslationContext = translationContext.search(this.parameters.values(idx))
+      val leafTranslationContext = translationContext.search(this.parameters.values(idx)).leaf
 
       //Step 1: The translation
       leafTranslationContext match
