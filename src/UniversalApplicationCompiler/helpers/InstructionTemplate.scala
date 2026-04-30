@@ -42,7 +42,7 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], paramet
       leafTranslationContext match
         case bitRange: BitRange => //It is an immediate specification
 
-          val immediateValue = Casts.stringToBigInt(parameters(idx)) //convert the string to immediate BigInt
+          val immediateValue = Conversions.stringToBigInt(parameters(idx)) //convert the string to immediate BigInt
 
           this.parameters.mappings(idx) match
             case SingleParameterMapping(s: String) =>
