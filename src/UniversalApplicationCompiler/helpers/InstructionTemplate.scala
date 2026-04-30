@@ -30,7 +30,7 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], paramet
    * @param translationContext The used translation context or scope
    * @param parameters A list that includes the parameters used.
    */
-  def apply(translationContext: TranslationContext, parameters: Array[String]): Unit =
+  def apply(translationContext: TranslationContextLeaf, parameters: Array[String]): Unit =
     require(parameters.length == this.parameters.length)
 
     for idx <- parameters.indices do
