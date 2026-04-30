@@ -4,14 +4,16 @@ import scala.math.*
 import UniversalApplicationCompiler.helpers.Functions.gradientRange
 import UniversalApplicationCompiler.helpers.ParametersDefinition
 import UniversalApplicationCompiler.helpers.{SingleParameterMapping, MultipleParameterMapping}
+import  UniversalApplicationCompiler.helpers.Node
 
 /**
  * Represents a full ISA instruction. It is meant to be applied over a string that represents an instruction to compile it to binary instantly.
  * @param bits The number of bits the instruction has.
  * @param fields The fields of the instruction, it is a map where each key is the name of the field and a BitRange represents it.
  * @param parameters A class that represents the parameters of the instruction.
+ * @param translationContextNode The translation context node/scope where this instruction was declared.
  */
-case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], parameters: ParametersDefinition):
+case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], parameters: ParametersDefinition, translationContextNode: Node):
 
   //Checks for fields
   require: //Check that no bit collisions
@@ -27,19 +29,25 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], paramet
 
   /**
    * Given the parameters and a certain translation context it sets up the fields accordingly.
-   * @param translationContext The used translation context or scope
    * @param parameters A list that includes the parameters used.
    */
-  def apply(translationContext: TranslationContext, parameters: Array[String]): Unit =
+  def apply(parameters: Array[String]): Unit =
     require(parameters.length == this.parameters.length)
 
     for idx <- parameters.indices do
 
-      //get the TranslationContext leaf of the datatype
-      val leafTranslationContext = translationContext.search(this.parameters.datatypes(idx)).leaf
+      val leafTranslationContext =
+
+        if translationContextNode.getScope.contains(this.parameters.datatypes(idx)) then //First check if the translation is in current scope
+
+          translationContextNode.getScope(this.parameters.datatypes(idx))
+
+        else //if not, then search it from the top
+          
+          translationContextNode.getTop.searchLeaf(this.parameters.datatypes(idx))
 
       //Step 1: The translation
-      leafTranslationContext match
+      leafTranslationContext.leaf match
         case bitRange: BitRange => //It is an immediate specification
 
           val immediateValue = Conversions.stringToBigInt(parameters(idx)) //convert the string to immediate BigInt
