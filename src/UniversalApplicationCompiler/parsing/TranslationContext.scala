@@ -1,4 +1,6 @@
-package UniversalApplicationCompiler.helpers
+package UniversalApplicationCompiler.parsing
+
+import UniversalApplicationCompiler.datatypes.BitRange
 
 import scala.annotation.tailrec
 import scala.collection.mutable

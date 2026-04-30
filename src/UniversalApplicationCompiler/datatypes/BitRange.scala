@@ -1,7 +1,8 @@
-package UniversalApplicationCompiler.helpers
+package UniversalApplicationCompiler.datatypes
 
-import scala.math._
 import UniversalApplicationCompiler.helpers.Functions.gradientRange
+
+import scala.math.*
 
 /**
  * Represents a range of bits, using SystemVerilog notation. Therefore, it can be little-endian, big-endian, and any size.

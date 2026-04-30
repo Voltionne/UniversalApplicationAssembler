@@ -1,13 +1,15 @@
-package UniversalApplicationCompiler.helpers
+package UniversalApplicationCompiler.parsing
+
+import UniversalApplicationCompiler.datatypes.BitRange
+import UniversalApplicationCompiler.helpers.Functions.gradientRange
+import UniversalApplicationCompiler.helpers.{Conversions, MultipleParameterMapping, ParametersDefinition, SingleParameterMapping}
+import UniversalApplicationCompiler.parsing.Node
 
 import scala.math.*
-import UniversalApplicationCompiler.helpers.Functions.gradientRange
-import UniversalApplicationCompiler.helpers.ParametersDefinition
-import UniversalApplicationCompiler.helpers.{SingleParameterMapping, MultipleParameterMapping}
-import  UniversalApplicationCompiler.helpers.Node
 
 /**
  * Represents a full ISA instruction. It is meant to be applied over a string that represents an instruction to compile it to binary instantly.
+ *
  * @param bits The number of bits the instruction has.
  * @param fields The fields of the instruction, it is a map where each key is the name of the field and a BitRange represents it.
  * @param parameters A class that represents the parameters of the instruction.
@@ -43,7 +45,7 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], paramet
           translationContextNode.getScope(this.parameters.datatypes(idx))
 
         else //if not, then search it from the top
-          
+
           translationContextNode.getTop.searchLeaf(this.parameters.datatypes(idx))
 
       //Step 1: The translation

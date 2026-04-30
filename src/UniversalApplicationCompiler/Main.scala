@@ -1,6 +1,6 @@
 package UniversalApplicationCompiler
 
-import UniversalApplicationCompiler.helpers.BitRange
+import UniversalApplicationCompiler.datatypes.BitRange
 
 object Main:
   def main(args: Array[String]): Unit =
