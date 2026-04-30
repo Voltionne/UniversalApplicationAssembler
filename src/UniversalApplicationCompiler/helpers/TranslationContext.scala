@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**
- * Groups all the classes used to create the TranslationContext tree
+ * Groups all the classes used to create the TranslationContext tree.
  */
 sealed trait TranslationContext:
   var parent: Option[Node] = None //Parent will always be a Node, as they are the only ones who can have children.
@@ -16,6 +16,11 @@ case class Node() extends TranslationContext:
   //As it is not the final Node, it can have children
   val children: mutable.Map[String, TranslationContext] = mutable.Map.empty
 
+  /**
+   * Adds a child to this node, which can be either another Node or a Leaf.
+   * @param child The child to add.
+   * @param childName The name to identify the child inside the children map.
+   */
   def addChild(child: TranslationContext, childName: String): Unit =
     if children.values.exists(_ eq child) then
       throw new IllegalArgumentException(s"Duplicate child!: ${child}")
@@ -23,6 +28,11 @@ case class Node() extends TranslationContext:
     if child.parent.exists(_ != this) then
       throw new IllegalArgumentException("Child has already a parent!")
 
+  /**
+   * Searches a certain Node or Leaf between all the children, recursively.
+   * @param referenceString The reference string that identifies the wanted child, separated each level with a dot.
+   * @return The wanted child.
+   */
   def search(referenceString: String): TranslationContext =
     val references = referenceString.split(".")
 
@@ -36,20 +46,38 @@ case class Node() extends TranslationContext:
 
     currentTranslationContext
 
-  def getScope: Map[String, TranslationContext] =
+  /**
+   * Gets all visible Leaves from the scope in this current Node.
+   * @return A map with all the leaves
+   */
+  def getScope: Map[String, Leaf] =
 
     var currentTranslationContext = this
 
     @tailrec
-    def recursiveCall(node: Option[Node], current: Map[String, TranslationContext]): Map[String, TranslationContext] =
+    def recursiveCall(node: Option[Node], current: Map[String, Leaf]): Map[String, Leaf] =
       node match
         case None => current
         case Some(parent) =>
-          val updated = current ++ parent.children
+          val updated = current ++ parent.children.filter((key, translationContext) => translationContext.isInstanceOf[Leaf]).asInstanceOf[Map[String, Leaf]]
 
           recursiveCall(node, updated)
+    
+    recursiveCall(parent, children.filter((key, translationContext) => translationContext.isInstanceOf[Leaf]).asInstanceOf[Map[String, Leaf]])
 
-    recursiveCall(parent, children.toMap)
+  /**
+   * Returns the top node, searching recursively through parents
+   * @return The top node
+   */
+  def getTop: Node =
+    
+    @tailrec
+    def recursiveCall(current: Node): Node =
+      current.parent match
+        case None => current
+        case Some(parent) => recursiveCall(parent)
+        
+    recursiveCall(this)
 
 /**
  * Represents a Leaf of the TranslationContext tree, it has a parent but no children.
