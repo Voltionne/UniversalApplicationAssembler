@@ -29,11 +29,11 @@ case class Node() extends TranslationContext:
       throw new IllegalArgumentException("Child has already a parent!")
 
   /**
-   * Searches a certain Node or Leaf between all the children, recursively.
-   * @param referenceString The reference string that identifies the wanted child, separated each level with a dot.
-   * @return The wanted child.
+   * Searches a certain Leaf between all the children, recursively.
+   * @param referenceString The reference string that identifies the wanted leaf, separated each level with a dot.
+   * @return The wanted leaf.
    */
-  def search(referenceString: String): TranslationContext =
+  def searchLeaf(referenceString: String): Leaf =
     val references = referenceString.split(".")
 
     var currentTranslationContext: TranslationContext = this
@@ -42,9 +42,11 @@ case class Node() extends TranslationContext:
 
       currentTranslationContext match
         case n: Node => currentTranslationContext = n.children(reference)
-        case other => throw new IllegalArgumentException("Expected a Node, not a Leaf!")
-
-    currentTranslationContext
+        case other => throw new IllegalArgumentException("Expected a Node, not a Leaf! For finding a subreference")
+    
+    currentTranslationContext match
+      case n: Node => throw new IllegalArgumentException("Expected a Leaf, not a Node! For returning")
+      case l: Leaf => l
 
   /**
    * Gets all visible Leaves from the scope in this current Node.
