@@ -26,7 +26,8 @@ class IsaParser(val yamlConfigPath: String, var autoParse: Boolean = true):
       case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
         val map = m.asInstanceOf[Map[String, Any]]
         parseRecursively(map) //start the recursive parsing
-      case other => ??? //currently not implemented
+      case other =>
+        throw new IllegalArgumentException("Expected Map[String, Any]")
 
   //Top-level parsers
   private def parseRecursively(currentLevel: Map[String, Any]): Unit =
