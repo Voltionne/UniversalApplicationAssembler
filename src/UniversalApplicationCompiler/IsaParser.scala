@@ -24,17 +24,19 @@ class IsaParser(val yamlConfigPath: String, var autoParse: Boolean = true):
     parse()
     
   def parse(): Unit =
-    parseFirstPass()
-    parseSecondPass()
+
+    //The top TranslationContext
+    val currentTranslationContext = Node()
+    
+    //execute the two passes
+    parseFirstPass(currentTranslationContext)
+    parseSecondPass(currentTranslationContext)
     
   //-----------------------------------------
   // FIRST PASS
   //-----------------------------------------  
 
-  private def parseFirstPass(): Unit =
-
-    //The top TranslationContext
-    val currentTranslationContext = Node() //Literally none, this is the top level.
+  private def parseFirstPass(currentTranslationContext: Node): Unit =
 
     yamlData match
       case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
@@ -66,7 +68,7 @@ class IsaParser(val yamlConfigPath: String, var autoParse: Boolean = true):
   // SECOND PASS
   //-----------------------------------------
         
-  private def parseSecondPass(): Unit = ???
+  private def parseSecondPass(currentTranslationContext: Node): Unit = ???
 
   //parse structures
   private def parseInstruction(): Unit = ???
