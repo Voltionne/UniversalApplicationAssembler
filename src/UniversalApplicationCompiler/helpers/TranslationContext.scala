@@ -27,6 +27,9 @@ case class Node() extends TranslationContext:
 
     if child.parent.exists(_ != this) then
       throw new IllegalArgumentException("Child has already a parent!")
+      
+    children(childName) = child
+    child.parent = Some(this)
 
   /**
    * Searches a certain Leaf between all the children, recursively.
