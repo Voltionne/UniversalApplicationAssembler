@@ -4,6 +4,9 @@ import UniversalApplicationAssembler.helpers.Functions.gradientRange
 
 import scala.math.*
 
+def isSetMap(setMap: Map[String, Any]): Boolean =
+  (setMap contains "set") && setMap("set").isInstanceOf[Int] && (setMap contains "bits") && setMap("bits").isInstanceOf[String] && setMap.size == 2
+
 /**
  * Represents a range of bits, using SystemVerilog notation. Therefore, it can be little-endian, big-endian, and any size.
  * @param a The left-most digit index
@@ -19,11 +22,7 @@ case class BitRange(a: Int, b: Int):
    * @param setMap A map that includes "set" which indicates the value to be set and "bits" which indicates what bits does it affect the set, as a string in format "a:b" (SystemVerilog style)
    */
   def setPartialValue(setMap: Map[String, Any]): Unit =
-    require(setMap contains "set")
-    require(setMap("set").isInstanceOf[Int])
-
-    require(setMap contains "bits")
-    require(setMap("bits").isInstanceOf[String])
+    require(isSetMap(setMap))
 
     (setMap("set"), setMap("bits")) match
       case (set: BigInt, bits: String) =>
