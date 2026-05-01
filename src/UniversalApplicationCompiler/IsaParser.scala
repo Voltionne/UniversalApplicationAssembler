@@ -30,6 +30,7 @@ class IsaParser(val yamlConfigPath: String, var autoParse: Boolean = true):
 
     //The top TranslationContext
     val currentTranslationContext = Node()
+    var bits = -1
     
     //execute the two passes
     parseFirstPass(currentTranslationContext)
