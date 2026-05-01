@@ -102,12 +102,9 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
             )
 
           case i: BigInt => () //This means it is an assignment, it skips it.
-          case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) => //Either a translation table or a sublevel
+          case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) => //Either a setMap or a sublevel
             val map = m.asInstanceOf[Map[String, Any]]
 
-          //Assume that it is a sublevel -> add as possible sublevels.
-          case other =>
-            sublevels = sublevels :+ key
             if !isSetMap(map) then sublevels = sublevels :+ key
             //if it is setMap, ignore until assignment
 
@@ -145,7 +142,7 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
     sublevels
 
   //-----------------------------------------
-  // SECOND PASS -> Sets up all
+  // SECOND PASS -> Resolves references
   //-----------------------------------------
         
   private def parseSecondPass(currentTranslationContext: Node): Unit = ???
