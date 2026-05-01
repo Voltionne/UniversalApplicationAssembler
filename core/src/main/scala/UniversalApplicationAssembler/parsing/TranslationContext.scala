@@ -24,7 +24,7 @@ case class Node() extends TranslationContext:
    * @param childName The name to identify the child inside the children map.
    */
   def addChild(child: TranslationContext, childName: String): Unit =
-    if children.values.exists(_ eq child) then
+    if children.contains(childName) then
       throw new IllegalArgumentException(s"Duplicate child!: ${child}")
 
     if child.parent.exists(_ != this) then
@@ -74,11 +74,11 @@ case class Node() extends TranslationContext:
           val updated = parentLeaves ++ current
 
           recursiveCall(parent.parent, updated.toMap)
-    
+
     val thisLeaves = children.collect {
       case (k, leaf: Leaf) => k -> leaf
     }
-    
+
     recursiveCall(parent, thisLeaves.toMap)
 
   /**
