@@ -44,12 +44,12 @@ class IsaParser(val yamlConfigPath: String, var autoParse: Boolean = true):
     yamlData match
       case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
         val map = m.asInstanceOf[Map[String, Any]]
-        parseRecursively(map, currentTranslationContext) //start the recursive parsing
+        parseRecursivelyFirstPass(map, currentTranslationContext) //start the recursive parsing
       case other =>
         throw new IllegalArgumentException("Expected Map[String, Any]")
         
   //Top-level parsers
-  private def parseRecursively(currentLevel: Map[String, Any], currentTranslationContext: Node): Unit =
+  private def parseRecursivelyFirstPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Unit =
 
     val sublevels = parseLevel(currentLevel, currentTranslationContext)
 
@@ -61,7 +61,7 @@ class IsaParser(val yamlConfigPath: String, var autoParse: Boolean = true):
           val newTranslationContext = Node()
           currentTranslationContext.addChild(newTranslationContext, sublevel)
       
-          parseRecursively(m.asInstanceOf[Map[String, Any]], newTranslationContext)
+          parseRecursivelyFirstPass(m.asInstanceOf[Map[String, Any]], newTranslationContext)
 
         case other => throw new IllegalArgumentException("Expected Map[String, Any]")
 
@@ -72,6 +72,8 @@ class IsaParser(val yamlConfigPath: String, var autoParse: Boolean = true):
   //-----------------------------------------
         
   private def parseSecondPass(currentTranslationContext: Node): Unit = ???
+
+  private def parseRecursivelySecondPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Unit = ???
 
   //parse structures
   private def parseInstruction(): Unit = ???
