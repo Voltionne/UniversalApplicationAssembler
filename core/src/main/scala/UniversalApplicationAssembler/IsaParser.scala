@@ -69,7 +69,7 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
 
   private def parseLevelFirstPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Array[String] =
 
-    val sublevels = Array[String]()
+    var sublevels = Array[String]()
 
     val currentScope = currentTranslationContext.getScope
 
@@ -98,7 +98,8 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
           )
 
         //Assume that it is a sublevel -> add as possible sublevels.
-        case other => sublevels ++ key
+        case other =>
+          sublevels = sublevels :+ key
 
     sublevels
 
