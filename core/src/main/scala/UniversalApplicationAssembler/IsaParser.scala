@@ -102,16 +102,23 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
             )
 
           case i: BigInt => () //This means it is an assignment, it skips it.
-          case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) => () //If this isn't a translation table, it must be an assignment dictionary. It skips it.
+          case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) => //Either a translation table or a sublevel
+            val map = m.asInstanceOf[Map[String, Any]]
 
           //Assume that it is a sublevel -> add as possible sublevels.
           case other =>
             sublevels = sublevels :+ key
+            if !isSetMap(map) then sublevels = sublevels :+ key
+            //if it is setMap, ignore until assignment
+
+          case other => throw new IllegalArgumentException("Unrecognized construction")
 
     val currentScope = currentTranslationContext.getScope
 
+    println(sublevels.mkString("Array(", ", ", ")"))
+
     //Managing assignments
-    for (key, value) <- currentLevel if key != "instructions" && key != "bits" do
+    for (key, value) <- currentLevel if key != "instructions" && key != "bits" && !sublevels.contains(key) do
 
       value match
 
