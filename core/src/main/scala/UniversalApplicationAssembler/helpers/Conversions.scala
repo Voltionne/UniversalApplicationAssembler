@@ -1,6 +1,5 @@
 package UniversalApplicationAssembler.helpers
 
-import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 import UniversalApplicationAssembler.helpers.{ParameterMapping, SingleParameterMapping, MultipleParameterMapping}
 
@@ -17,7 +16,7 @@ object Conversions:
   def convertFromJava(value: Any): Any = value match
     
     case m: java.util.Map[?, ?] =>
-      mutable.LinkedHashMap.from(m.asScala.view.map { case (k, y) => convertFromJava(k) -> convertFromJava(y) })
+      Map.from(m.asScala.view.map { case (k, y) => convertFromJava(k) -> convertFromJava(y) })
     case l: java.util.List[?] =>
       l.asScala.view.map(convertFromJava).toList
     case s: java.util.Set[?] =>
