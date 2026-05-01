@@ -114,8 +114,6 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
 
     val currentScope = currentTranslationContext.getScope
 
-    println(sublevels.mkString("Array(", ", ", ")"))
-
     //Managing assignments
     for (key, value) <- currentLevel if key != "instructions" && key != "bits" && !sublevels.contains(key) do
 
@@ -126,18 +124,30 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
 
         case i: BigInt =>
 
-          currentScope(key) match
-            case Leaf(l: BitRange) =>
-              l.setFullValue(i)
-            case other => throw new IllegalArgumentException("Trying to set a value to a translation table!")
+          //Get the reference from the current scope
+          currentScope.get(key) match
+            case Some(Leaf(br: BitRange)) =>
+              br.setFullValue(i)
+            case Some(other) => throw new IllegalArgumentException("Not expected format")
+            case None => //If reference not found, search from the top
+              currentTranslationContext.getTop.searchLeaf(key) match
+                case Leaf(br: BitRange) =>
+                  br.setFullValue(i)
+                case other => throw new IllegalArgumentException("Trying to set a value to a translation table!")
 
         case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
           val setMap = m.asInstanceOf[Map[String, Any]]
 
-          currentScope(key) match
-            case Leaf(l: BitRange) =>
-              l.setPartialValue(setMap)
-            case other => throw new IllegalArgumentException("Trying to set a value to a translation table!")
+          //Get the reference from the current scope
+          currentScope.get(key) match
+            case Some(Leaf(br: BitRange)) =>
+              br.setPartialValue(setMap)
+            case Some(other) => throw new IllegalArgumentException("Not expected format")
+            case None => //If reference not found, search from the top
+              currentTranslationContext.getTop.searchLeaf(key) match
+                case Leaf(br: BitRange) =>
+                  br.setPartialValue(setMap)
+                case other => throw new IllegalArgumentException("Trying to set a value to a translation table!")
 
         case other => () //Do nothing, theoretically handled earlier
 
