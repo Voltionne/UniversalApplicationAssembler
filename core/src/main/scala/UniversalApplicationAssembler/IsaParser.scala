@@ -38,7 +38,7 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
     currentTranslationContext
     
   //-----------------------------------------
-  // FIRST PASS
+  // FIRST PASS -> Gets all definitions and assignments
   //-----------------------------------------  
 
   private def parseFirstPass(currentTranslationContext: Node): Unit =
@@ -72,7 +72,7 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
 
     var sublevels = Array[String]()
 
-    for (key, value) <- currentLevel if key != "instructions" do { //Skip "instructions" key as that will be checked in the second pass and declarations inside it are not allowed (in v0.2.0)!
+    for (key, value) <- currentLevel if key != "instructions" do //Skip "instructions" key as that will be checked in the second pass and declarations inside it are not allowed (in v0.2.0)!
 
       if key == "bits" then
         value match
@@ -95,26 +95,46 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
           case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) && m.values.forall(_.isInstanceOf[BigInt]) => //This is a translation table definition
             val map = m.asInstanceOf[Map[String, BigInt]]
 
-          //Add the new definition
-          currentTranslationContext.addChild(
-            Leaf(map),
-            key
-          )
             //Add the new definition
             currentTranslationContext.addChild(
               Leaf(map),
               key
             )
 
+          case i: BigInt => () //This means it is an assignment, it skips it.
+          case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) => () //If this isn't a translation table, it must be an assignment dictionary. It skips it.
+
           //Assume that it is a sublevel -> add as possible sublevels.
           case other =>
             sublevels = sublevels :+ key
-    }
+
+    val currentScope = currentTranslationContext.getScope
+
+    //Managing assignments
+    for (key, value) <- currentLevel if key != "instructions" && key != "bits" do
+
+      value match
+        case i: BigInt =>
+
+          currentScope(key) match
+            case Leaf(l: BitRange) =>
+              l.setFullValue(i)
+            case other => throw new IllegalArgumentException("Trying to set a value to a translation table!")
+
+        case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
+          val setMap = m.asInstanceOf[Map[String, Any]]
+
+          currentScope(key) match
+            case Leaf(l: BitRange) =>
+              l.setPartialValue(setMap)
+            case other => throw new IllegalArgumentException("Trying to set a value to a translation table!")
+
+        case other => () //Do nothing, theoretically handled earlier
 
     sublevels
 
   //-----------------------------------------
-  // SECOND PASS
+  // SECOND PASS -> Sets up all
   //-----------------------------------------
         
   private def parseSecondPass(currentTranslationContext: Node): Unit = ???
