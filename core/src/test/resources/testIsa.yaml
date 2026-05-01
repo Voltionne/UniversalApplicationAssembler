@@ -1,3 +1,5 @@
+bits: 10
+
 translationTable:
   a: 1
   b: 2
@@ -11,6 +13,9 @@ someDefs:
   a: "5:4"
 
   nestedSomeDefs:
+
+    bits: 5
+
     table2:
       a: 4
       b: 3

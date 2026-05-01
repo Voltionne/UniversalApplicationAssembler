@@ -14,7 +14,7 @@ sealed trait TranslationContext:
 /**
  * Represents a node of the TranslationContext tree, it has children which can be other Nodes or Leaves.
  */
-case class Node() extends TranslationContext:
+case class Node(var bits: BigInt) extends TranslationContext:
   //As it is not the final Node, it can have children
   val children: mutable.Map[String, TranslationContext] = mutable.Map.empty
 

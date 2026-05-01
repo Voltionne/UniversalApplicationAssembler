@@ -20,17 +20,17 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
     val yaml = new Yaml()
     val raw: Any = yaml.load(yamlConfigInputStream)
     Conversions.convertFromJava(raw)
-  var bits: Int = -1
 
   //Auto-parse during construction if autoParse is enabled.
   if autoParse then
     parse()
-    
+
   def parse(): Node =
 
+    val bits = -1
+
     //The top TranslationContext
-    val currentTranslationContext = Node()
-    var bits = -1
+    val currentTranslationContext = Node(bits)
     
     //execute the two passes
     parseFirstPass(currentTranslationContext)
@@ -61,7 +61,7 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
         case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
 
           //Create new node to represent the sublevel
-          val newTranslationContext = Node()
+          val newTranslationContext = Node(currentTranslationContext.bits) //bits get propagated down initially
           currentTranslationContext.addChild(newTranslationContext, sublevel)
       
           parseRecursivelyFirstPass(m.asInstanceOf[Map[String, Any]], newTranslationContext)
@@ -72,33 +72,44 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
 
     var sublevels = Array[String]()
 
-    for (key, value) <- currentLevel if key != "instructions" && key != "bits" do //Skip "instructions" key as that will be checked in the second pass and declarations inside it are not allowed (in v0.2.0)!
+    for (key, value) <- currentLevel if key != "instructions" do { //Skip "instructions" key as that will be checked in the second pass and declarations inside it are not allowed (in v0.2.0)!
 
-      //Will only match for definitions, NO REFERENCES.
-      value match
-        case s: String => //This is a BitRange definition
+      if key == "bits" then
+        value match
+          case i: BigInt => currentTranslationContext.bits = i
+          case other => throw new IllegalArgumentException("Bits number is not an integer!")
+      else
+        //Will only match for definitions, NO REFERENCES.
+        value match
+          case s: String => //This is a BitRange definition
 
-          //Add the new definition
-          currentTranslationContext.addChild(
-            {
-             val split = s.split(':')
-             Leaf(BitRange(split(0).toInt, split(1).toInt))
-            },
-            key
-          )
+            //Add the new definition
+            currentTranslationContext.addChild(
+              {
+               val split = s.split(':')
+               Leaf(BitRange(split(0).toInt, split(1).toInt))
+              },
+              key
+            )
 
-        case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) && m.values.forall(_.isInstanceOf[BigInt]) => //This is a translation table definition
-          val map = m.asInstanceOf[Map[String, BigInt]]
+          case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) && m.values.forall(_.isInstanceOf[BigInt]) => //This is a translation table definition
+            val map = m.asInstanceOf[Map[String, BigInt]]
 
           //Add the new definition
           currentTranslationContext.addChild(
             Leaf(map),
             key
           )
+            //Add the new definition
+            currentTranslationContext.addChild(
+              Leaf(map),
+              key
+            )
 
-        //Assume that it is a sublevel -> add as possible sublevels.
-        case other =>
-          sublevels = sublevels :+ key
+          //Assume that it is a sublevel -> add as possible sublevels.
+          case other =>
+            sublevels = sublevels :+ key
+    }
 
     sublevels
 
