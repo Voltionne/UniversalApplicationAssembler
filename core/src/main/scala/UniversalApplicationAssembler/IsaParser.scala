@@ -114,6 +114,10 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
     for (key, value) <- currentLevel if key != "instructions" && key != "bits" do
 
       value match
+
+        case s: String => () //This is a BitRange definition. Skipped
+        case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) && m.values.forall(_.isInstanceOf[BigInt]) => () //This is a translation table definition. Skipped
+
         case i: BigInt =>
 
           currentScope(key) match
