@@ -66,11 +66,20 @@ case class Node() extends TranslationContext:
       node match
         case None => current
         case Some(parent) =>
-          val updated = current ++ parent.children.filter((key, translationContext) => translationContext.isInstanceOf[Leaf]).asInstanceOf[Map[String, Leaf]]
 
-          recursiveCall(node, updated)
+          val parentLeaves = parent.children.collect {
+            case (k, leaf: Leaf) => k -> leaf
+          }
+
+          val updated = parentLeaves ++ current
+
+          recursiveCall(parent.parent, updated.toMap)
     
-    recursiveCall(parent, children.filter((key, translationContext) => translationContext.isInstanceOf[Leaf]).asInstanceOf[Map[String, Leaf]])
+    val thisLeaves = children.collect {
+      case (k, leaf: Leaf) => k -> leaf
+    }
+    
+    recursiveCall(parent, thisLeaves.toMap)
 
   /**
    * Returns the top node, searching recursively through parents
