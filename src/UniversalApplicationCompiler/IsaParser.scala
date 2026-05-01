@@ -52,7 +52,7 @@ class IsaParser(val yamlConfigPath: String, var autoParse: Boolean = true):
   //Top-level parsers
   private def parseRecursivelyFirstPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Unit =
 
-    val sublevels = parseLevel(currentLevel, currentTranslationContext)
+    val sublevels = parseLevelFirstPass(currentLevel, currentTranslationContext)
 
     for sublevel <- sublevels do
       
@@ -66,7 +66,40 @@ class IsaParser(val yamlConfigPath: String, var autoParse: Boolean = true):
 
         case other => throw new IllegalArgumentException("Expected Map[String, Any]")
 
-  private def parseLevel(currentLevel: Map[String, Any], currentTranslationContext: Node): Array[String] = ???
+  private def parseLevelFirstPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Array[String] =
+
+    val sublevels = Array[String]()
+
+    val currentScope = currentTranslationContext.getScope
+
+    for (key, value) <- currentLevel if key != "instructions" && key != "bits" do //Skip "instructions" key as that will be checked in the second pass and declarations inside it are not allowed (in v0.2.0)!
+      
+      //Will only match for definitions, NO REFERENCES.
+      value match
+        case s: String => //This is a BitRange definition
+          
+          //Add the new definition
+          currentTranslationContext.addChild(
+            {
+             val split = s.split(':')
+             Leaf(BitRange(split(0).toInt, split(1).toInt)) 
+            },
+            key
+          )
+        
+        case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) && m.values.forall(_.isInstanceOf[BigInt]) => //This is a translation table definition
+          val map = m.asInstanceOf[Map[String, BigInt]]
+          
+          //Add the new definition
+          currentTranslationContext.addChild(
+            Leaf(map),
+            key
+          )
+
+        //Assume that it is a sublevel -> add as possible sublevels.
+        case other => sublevels ++ key
+
+    sublevels
 
   //-----------------------------------------
   // SECOND PASS
@@ -75,6 +108,8 @@ class IsaParser(val yamlConfigPath: String, var autoParse: Boolean = true):
   private def parseSecondPass(currentTranslationContext: Node): Unit = ???
 
   private def parseRecursivelySecondPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Unit = ???
+
+  private def parseLevelSecondPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Unit = ???
 
   //parse structures
   private def parseInstruction(): Unit = ???
