@@ -26,7 +26,7 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
   if autoParse then
     parse()
     
-  def parse(): Unit =
+  def parse(): Node =
 
     //The top TranslationContext
     val currentTranslationContext = Node()
@@ -34,7 +34,8 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
     
     //execute the two passes
     parseFirstPass(currentTranslationContext)
-    parseSecondPass(currentTranslationContext)
+    //parseSecondPass(currentTranslationContext)
+    currentTranslationContext
     
   //-----------------------------------------
   // FIRST PASS
