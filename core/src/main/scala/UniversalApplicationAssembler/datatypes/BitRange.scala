@@ -5,7 +5,7 @@ import UniversalApplicationAssembler.helpers.Functions.gradientRange
 import scala.math.*
 
 def isSetMap(setMap: Map[String, Any]): Boolean =
-  (setMap contains "set") && setMap("set").isInstanceOf[Int] && (setMap contains "bits") && setMap("bits").isInstanceOf[String] && setMap.size == 2
+  (setMap contains "set") && setMap("set").isInstanceOf[BigInt] && (setMap contains "bits") && setMap("bits").isInstanceOf[String] && setMap.size == 2
 
 /**
  * Represents a range of bits, using SystemVerilog notation. Therefore, it can be little-endian, big-endian, and any size.
