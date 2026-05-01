@@ -33,7 +33,7 @@ object Conversions:
    */
   def convertParametersMap(map: Map[String, Any]): ParametersDefinition =
 
-    val values: List[String] = map.get("Values") match
+    val values: List[String] = map.get("values") match
       case Some(l: List[_]) =>
         if l.forall(_.isInstanceOf[String]) then l.asInstanceOf[List[String]]
         else throw new IllegalArgumentException("values must be a list of Strings")
