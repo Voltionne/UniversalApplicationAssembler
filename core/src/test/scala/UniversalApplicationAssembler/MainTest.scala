@@ -8,5 +8,6 @@ class MainTest extends munit.FunSuite:
 
     Using.resource(getClass.getResourceAsStream("/testIsa.yaml")) {stream =>
       val isaParser = IsaParser(stream, false)
+      val node = isaParser.parse()
     }
   }
