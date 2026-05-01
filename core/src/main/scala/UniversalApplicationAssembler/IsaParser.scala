@@ -18,7 +18,7 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
   //loads the YAML data and converts it to Scala datatypes
   val yamlData: Any =
     val yaml = new Yaml()
-    val raw = yaml.load(yamlConfigInputStream)
+    val raw: Any = yaml.load(yamlConfigInputStream)
     Conversions.convertFromJava(raw)
   var bits: Int = -1
 
