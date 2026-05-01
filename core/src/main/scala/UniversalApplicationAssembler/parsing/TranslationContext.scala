@@ -1,6 +1,6 @@
-package UniversalApplicationCompiler.parsing
+package UniversalApplicationAssembler.parsing
 
-import UniversalApplicationCompiler.datatypes.BitRange
+import UniversalApplicationAssembler.datatypes.BitRange
 
 import scala.annotation.tailrec
 import scala.collection.mutable

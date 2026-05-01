@@ -1,4 +1,4 @@
-package UniversalApplicationCompiler.helpers
+package UniversalApplicationAssembler.helpers
 
 /**
  * Nice functions to save coding time!

@@ -1,9 +1,9 @@
-package UniversalApplicationCompiler.parsing
+package UniversalApplicationAssembler.parsing
 
-import UniversalApplicationCompiler.datatypes.BitRange
-import UniversalApplicationCompiler.helpers.Functions.gradientRange
-import UniversalApplicationCompiler.helpers.{Conversions, MultipleParameterMapping, ParametersDefinition, SingleParameterMapping}
-import UniversalApplicationCompiler.parsing.Node
+import UniversalApplicationAssembler.datatypes.BitRange
+import UniversalApplicationAssembler.helpers.Functions.gradientRange
+import UniversalApplicationAssembler.helpers.{Conversions, MultipleParameterMapping, ParametersDefinition, SingleParameterMapping}
+import UniversalApplicationAssembler.parsing.Node
 
 import scala.math.*
 

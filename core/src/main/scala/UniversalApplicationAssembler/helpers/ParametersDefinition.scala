@@ -1,4 +1,4 @@
-package UniversalApplicationCompiler.helpers
+package UniversalApplicationAssembler.helpers
 
 sealed trait ParameterMapping
 case class SingleParameterMapping(mappingLocation: String) extends ParameterMapping

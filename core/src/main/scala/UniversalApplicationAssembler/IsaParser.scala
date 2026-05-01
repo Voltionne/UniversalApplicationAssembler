@@ -1,11 +1,11 @@
-package UniversalApplicationCompiler
+package UniversalApplicationAssembler
 
-import UniversalApplicationCompiler.datatypes.BitRange
+import UniversalApplicationAssembler.datatypes.BitRange
 import org.yaml.snakeyaml.Yaml
 
 import java.nio.file.{Files, Paths}
-import UniversalApplicationCompiler.helpers.Conversions
-import UniversalApplicationCompiler.parsing.{Leaf, Node, TranslationContext}
+import UniversalApplicationAssembler.helpers.Conversions
+import UniversalApplicationAssembler.parsing.{Leaf, Node, TranslationContext}
 
 /**
  * Interprets an ISA based on a YAML file.

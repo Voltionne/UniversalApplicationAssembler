@@ -1,8 +1,8 @@
-package UniversalApplicationCompiler.helpers
+package UniversalApplicationAssembler.helpers
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
-import UniversalApplicationCompiler.helpers.{ParameterMapping, SingleParameterMapping, MultipleParameterMapping}
+import UniversalApplicationAssembler.helpers.{ParameterMapping, SingleParameterMapping, MultipleParameterMapping}
 
 /**
  * Converts things to other things, to simplify coding
