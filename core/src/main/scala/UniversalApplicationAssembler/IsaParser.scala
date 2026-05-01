@@ -1,6 +1,6 @@
 package UniversalApplicationAssembler
 
-import UniversalApplicationAssembler.datatypes.BitRange
+import UniversalApplicationAssembler.datatypes.{BitRange, isSetMap}
 import org.yaml.snakeyaml.Yaml
 
 import java.io.InputStream
@@ -145,12 +145,65 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
   // SECOND PASS -> Resolves references
   //-----------------------------------------
         
-  private def parseSecondPass(currentTranslationContext: Node): Unit = ???
+  private def parseSecondPass(currentTranslationContext: Node): Unit =
 
-  private def parseRecursivelySecondPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Unit = ???
+    yamlData match
+      case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
+        val map = m.asInstanceOf[Map[String, Any]]
+        parseRecursivelySecondPass(map, currentTranslationContext) //start the recursive parsing
+      case other =>
+        throw new IllegalArgumentException("Expected Map[String, Any]")
 
-  private def parseLevelSecondPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Unit = ???
+  private def parseRecursivelySecondPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Unit =
+
+    val sublevels = parseLevelSecondPass(currentLevel, currentTranslationContext)
+
+    for sublevel <- sublevels do
+
+      currentLevel(sublevel) match
+        case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
+
+          //Go to the sublevel
+          //VERY IMPORTANT NOTE: "instructions" and "bits" WILL FAIL, THEY ARE NOT MEANT TO BE PASSED HERE.
+          val newTranslationContext = currentTranslationContext.children(sublevel)
+
+          newTranslationContext match
+            case n: Node => parseRecursivelySecondPass(m.asInstanceOf[Map[String, Any]], n)
+            case other => throw new IllegalArgumentException("Tried to enter in a Leaf sublevel!")
+
+        case other => throw new IllegalArgumentException("Expected Map[String, Any]")
+
+  private def parseLevelSecondPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Array[String] =
+
+    var sublevels = Array[String]()
+
+    for (key, value) <- currentLevel if key == "bits" do //Only skip "bits" level, as that is already set
+
+      if key == "instructions" then
+
+        value match
+          case l: List[?] if l.forall {
+            case m: Map[?, ?] => m.keys.forall(_.isInstanceOf[String])
+            case _ => false
+          } =>
+            val instructions = l.asInstanceOf[List[Map[String, Any]]]
+
+            for instruction <- instructions do
+              parseInstruction(instruction, currentTranslationContext)
+
+          case other => throw new IllegalArgumentException("Expected instructions to be as a List[Map[String, Any]]")
+
+      else //As assignments and definitions are handled already -> do nothing with other things.
+
+        //Find sublevels
+        value match
+          //check if at least one that is not BigInt, for not confusing with translation table
+          case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) && m.values.exists(!_.isInstanceOf[BigInt]) => //Either a setMap or a sublevel.
+            val map = m.asInstanceOf[Map[String, Any]]
+
+            if !isSetMap(map) then sublevels = sublevels :+ key
+
+    sublevels
 
   //parse structures
-  private def parseInstruction(): Unit = ???
-  private def parseDefinitions(): Unit = ???
+  private def parseInstruction(instructionLevel: Map[String, Any], currentTranslationContext: Node): Unit = ???
