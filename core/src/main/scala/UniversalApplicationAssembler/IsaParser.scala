@@ -3,22 +3,22 @@ package UniversalApplicationAssembler
 import UniversalApplicationAssembler.datatypes.BitRange
 import org.yaml.snakeyaml.Yaml
 
-import java.nio.file.{Files, Paths}
+import java.io.InputStream
 import UniversalApplicationAssembler.helpers.Conversions
-import UniversalApplicationAssembler.parsing.{Leaf, Node, TranslationContext}
+import UniversalApplicationAssembler.parsing.{Leaf, Node}
 
 /**
  * Interprets an ISA based on a YAML file.
  *
- * @param yamlConfigPath the path of the YAML file
+ * @param yamlConfigInputStream the input stream of the YAML config file.
  * @param autoParse if true, the parsing process starts automatically. If false, IsaParser.parse() must be called.
  */
-class IsaParser(val yamlConfigPath: String, var autoParse: Boolean = true):
+class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean = true):
 
   //loads the YAML data and converts it to Scala datatypes
   val yamlData: Any =
     val yaml = new Yaml()
-    val raw = yaml.load(Files.newInputStream(Paths.get(yamlConfigPath)))
+    val raw = yaml.load(yamlConfigInputStream)
     Conversions.convertFromJava(raw)
   var bits: Int = -1
 
@@ -73,23 +73,23 @@ class IsaParser(val yamlConfigPath: String, var autoParse: Boolean = true):
     val currentScope = currentTranslationContext.getScope
 
     for (key, value) <- currentLevel if key != "instructions" && key != "bits" do //Skip "instructions" key as that will be checked in the second pass and declarations inside it are not allowed (in v0.2.0)!
-      
+
       //Will only match for definitions, NO REFERENCES.
       value match
         case s: String => //This is a BitRange definition
-          
+
           //Add the new definition
           currentTranslationContext.addChild(
             {
              val split = s.split(':')
-             Leaf(BitRange(split(0).toInt, split(1).toInt)) 
+             Leaf(BitRange(split(0).toInt, split(1).toInt))
             },
             key
           )
-        
+
         case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) && m.values.forall(_.isInstanceOf[BigInt]) => //This is a translation table definition
           val map = m.asInstanceOf[Map[String, BigInt]]
-          
+
           //Add the new definition
           currentTranslationContext.addChild(
             Leaf(map),
