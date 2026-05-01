@@ -5,7 +5,7 @@ import org.yaml.snakeyaml.Yaml
 
 import java.io.InputStream
 import UniversalApplicationAssembler.helpers.Conversions
-import UniversalApplicationAssembler.parsing.{Leaf, Node}
+import UniversalApplicationAssembler.parsing.{InstructionTemplate, Leaf, Node}
 
 /**
  * Interprets an ISA based on a YAML file.
@@ -16,10 +16,12 @@ import UniversalApplicationAssembler.parsing.{Leaf, Node}
 class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean = true):
 
   //loads the YAML data and converts it to Scala datatypes
-  val yamlData: Any =
+  private val yamlData: Any =
     val yaml = new Yaml()
     val raw: Any = yaml.load(yamlConfigInputStream)
     Conversions.convertFromJava(raw)
+
+  var instructions = Array[InstructionTemplate]()
 
   //Auto-parse during construction if autoParse is enabled.
   if autoParse then
@@ -206,4 +208,22 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
     sublevels
 
   //parse structures
-  private def parseInstruction(instructionLevel: Map[String, Any], currentTranslationContext: Node): Unit = ???
+  private def parseInstruction(instructionLevel: Map[String, Any], currentTranslationContext: Node): Unit =
+
+    val instructionTemplate = InstructionTemplate(
+      currentTranslationContext.bits.toInt,
+      currentTranslationContext.getScope.collect {
+        case (k, Leaf(bitRange: BitRange)) => k -> bitRange
+      },
+      Conversions.convertParametersMap {
+        instructionLevel.get("parameters") match
+          case Some(m: Map[?, ?]) if m.keys.forall(_.isInstanceOf[String]) =>
+            val map = m.asInstanceOf[Map[String, Any]]
+            map
+          case Some(_) => throw new IllegalArgumentException("Incorrect format for parameters")
+          case None => Map[String, Any]() //NO PARAMETERS
+      },
+      currentTranslationContext
+    )
+
+    instructions = instructions :+ instructionTemplate
