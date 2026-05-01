@@ -1,0 +1,21 @@
+translationTable:
+  a: 1
+  b: 2
+  c: 3
+  d: 4
+
+topDef: "4:5"
+
+someDefs:
+
+  a: "5:4"
+
+  nestedSomeDefs:
+    table2:
+      a: 4
+      b: 3
+      c: 2
+      d: 1
+    bitrange: "7:5"
+
+    a: "1:2" #Overwrite of someDefs.a
