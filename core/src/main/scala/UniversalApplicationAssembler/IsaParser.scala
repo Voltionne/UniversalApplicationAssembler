@@ -59,7 +59,8 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
       
       currentLevel(sublevel) match
         case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
-          
+
+          //Create new node to represent the sublevel
           val newTranslationContext = Node()
           currentTranslationContext.addChild(newTranslationContext, sublevel)
       
@@ -70,8 +71,6 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
   private def parseLevelFirstPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Array[String] =
 
     var sublevels = Array[String]()
-
-    val currentScope = currentTranslationContext.getScope
 
     for (key, value) <- currentLevel if key != "instructions" && key != "bits" do //Skip "instructions" key as that will be checked in the second pass and declarations inside it are not allowed (in v0.2.0)!
 
