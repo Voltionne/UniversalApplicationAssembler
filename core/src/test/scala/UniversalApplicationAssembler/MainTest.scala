@@ -1,5 +1,7 @@
 package UniversalApplicationAssembler
 
+import UniversalApplicationAssembler.parsing.Node
+
 import scala.util.Using
 
 class MainTest extends munit.FunSuite:
@@ -9,5 +11,8 @@ class MainTest extends munit.FunSuite:
     Using.resource(getClass.getResourceAsStream("/testIsa.yaml")) {stream =>
       val isaParser = IsaParser(stream, false)
       val node = isaParser.parse()
+
+      println("Tree:")
+      visualizeNodes(node)
     }
   }
