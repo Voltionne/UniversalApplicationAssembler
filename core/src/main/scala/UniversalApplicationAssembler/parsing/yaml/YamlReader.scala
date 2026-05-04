@@ -15,9 +15,9 @@ object YamlReader:
 
   /**
    * Reads a YAML file and returns it as a tree of nodes.
-   * @param yamlConfigInputStream The input stream of the file
+   * @param yamlInputStream The input stream of the file
    * @return The top node of the tree
    */
-  def readYamlFile(yamlConfigInputStream: InputStream): Node =
+  def readYamlFile(yamlInputStream: InputStream): Node =
     val compose = new Compose(settings)
-    compose.composeInputStream(yamlConfigInputStream).orElseThrow()
+    compose.composeInputStream(yamlInputStream).orElseThrow()
