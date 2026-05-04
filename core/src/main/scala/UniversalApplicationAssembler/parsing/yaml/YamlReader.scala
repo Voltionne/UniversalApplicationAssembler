@@ -2,7 +2,7 @@ package UniversalApplicationAssembler.parsing.yaml
 
 import org.snakeyaml.engine.v2.api.LoadSettings
 import org.snakeyaml.engine.v2.api.lowlevel.Compose
-import org.snakeyaml.engine.v2.nodes.{Node, ScalarNode}
+import org.snakeyaml.engine.v2.nodes.Node
 
 import java.io.InputStream
 
