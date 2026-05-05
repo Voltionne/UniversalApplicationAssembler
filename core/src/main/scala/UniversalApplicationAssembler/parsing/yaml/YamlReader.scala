@@ -1,18 +1,31 @@
 package UniversalApplicationAssembler.parsing.yaml
 
-import UniversalApplicationAssembler.parsing.yaml.engine.PublicConstructor
-import org.snakeyaml.engine.v2.api.LoadSettings
+import UniversalApplicationAssembler.parsing.yaml.engine.{FixedIntConstructor, FixedScalarResolver, PublicConstructor}
+import org.snakeyaml.engine.v2.api.{LoadSettings, ConstructNode}
+import org.snakeyaml.engine.v2.schema.CoreSchema
 import org.snakeyaml.engine.v2.api.lowlevel.Compose
-import org.snakeyaml.engine.v2.nodes.Node
+import org.snakeyaml.engine.v2.nodes.{Node, Tag}
+import org.snakeyaml.engine.v2.resolver.ScalarResolver
 
 import java.io.InputStream
+import java.util
 
 /**
  * Provides methods for reading a YAML file using SnakeYAML-engine
  */
 object YamlReader:
 
-  private val settings: LoadSettings = LoadSettings.builder().build() //Default arguments are nice enough
+  private val settings: LoadSettings =
+
+    val coreSchema: CoreSchema = new CoreSchema(): //Add overwritten ScalarNode resolver
+      override def getScalarResolver: ScalarResolver = FixedScalarResolver(true)
+
+    val constructs = new util.HashMap[Tag, ConstructNode]()
+
+    constructs.put(Tag.INT, new FixedIntConstructor()) //Add overwritten Tag.INT constructor
+
+    LoadSettings.builder().setTagConstructors(constructs).setSchema(coreSchema).build()
+
 
   private val publicConstructor: PublicConstructor = PublicConstructor(settings)
 
