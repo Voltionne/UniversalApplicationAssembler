@@ -36,6 +36,21 @@ case class TranslationNode(var bits: BigInt):
     children(childName) = child
     child.parent = Some(this)
 
+    /**
+     * Searches a certain Leaf between all the children, recursively.
+     *
+     * @param path The reference string that identifies the wanted leaf, separated each level with a dot.
+     * @return The wanted leaf.
+     */
+    def searchTranslationLeaf(path: String): Option[TranslationLeaf] =
+      val pathSplit = path.split('.')
+
+      val optionTranslationNode = pathSplit.init.foldLeft(Option(this)) { (current, key) =>
+        current.flatMap(node => node.children.get(key))
+      }
+
+      optionTranslationNode.flatMap(node => node.changes.get(pathSplit.last))
+
   /**
    * Gets all visible Leaves from the scope in this current Node.
    * @return A map with all the leaves
