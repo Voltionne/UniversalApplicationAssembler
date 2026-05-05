@@ -9,12 +9,12 @@ import scala.collection.mutable
  * Groups all the classes used to create the TranslationContext tree.
  */
 sealed trait TranslationContext:
-  var parent: Option[Node] = None //Parent will always be a Node, as they are the only ones who can have children.
+  var parent: Option[TranslationNode] = None //Parent will always be a Node, as they are the only ones who can have children.
 
 /**
  * Represents a node of the TranslationContext tree, it has children which can be other Nodes or Leaves.
  */
-case class Node(var bits: BigInt) extends TranslationContext:
+case class TranslationNode(var bits: BigInt) extends TranslationContext:
   //As it is not the final Node, it can have children
   val children: mutable.Map[String, TranslationContext] = mutable.Map.empty
 
@@ -25,7 +25,7 @@ case class Node(var bits: BigInt) extends TranslationContext:
    */
   def addChild(child: TranslationContext, childName: String): Unit =
     if children.contains(childName) then
-      throw new IllegalArgumentException(s"Duplicate child!: ${child}")
+      throw new IllegalArgumentException(s"Duplicate child!: $child")
 
     if child.parent.exists(_ != this) then
       throw new IllegalArgumentException("Child has already a parent!")
@@ -35,10 +35,11 @@ case class Node(var bits: BigInt) extends TranslationContext:
 
   /**
    * Searches a certain Leaf between all the children, recursively.
+   *
    * @param referenceString The reference string that identifies the wanted leaf, separated each level with a dot.
    * @return The wanted leaf.
    */
-  def searchLeaf(referenceString: String): Leaf =
+  def searchLeaf(referenceString: String): TranslationLeaf =
     val references = referenceString.split(".")
 
     var currentTranslationContext: TranslationContext = this
@@ -46,12 +47,12 @@ case class Node(var bits: BigInt) extends TranslationContext:
     for reference <- references do
 
       currentTranslationContext match
-        case n: Node => currentTranslationContext = n.children(reference)
+        case n: TranslationNode => currentTranslationContext = n.children(reference)
         case other => throw new IllegalArgumentException("Expected a Node, not a Leaf! For finding a subreference")
-    
+
     currentTranslationContext match
-      case n: Node => throw new IllegalArgumentException("Expected a Leaf, not a Node! For returning")
-      case l: Leaf => l
+      case n: TranslationNode => throw new IllegalArgumentException("Expected a Leaf, not a Node! For returning")
+      case l: TranslationLeaf => l
 
   /**
    * Gets all visible Leaves from the scope in this current Node.
@@ -62,7 +63,7 @@ case class Node(var bits: BigInt) extends TranslationContext:
     var currentTranslationContext = this
 
     @tailrec
-    def recursiveCall(node: Option[Node], current: Map[String, Leaf]): Map[String, Leaf] =
+    def recursiveCall(node: Option[TranslationNode], current: Map[String, Leaf]): Map[String, Leaf] =
       node match
         case None => current
         case Some(parent) =>
@@ -85,10 +86,10 @@ case class Node(var bits: BigInt) extends TranslationContext:
    * Returns the top node, searching recursively through parents
    * @return The top node
    */
-  def getTop: Node =
+  def getTop: TranslationNode =
     
     @tailrec
-    def recursiveCall(current: Node): Node =
+    def recursiveCall(current: TranslationNode): TranslationNode =
       current.parent match
         case None => current
         case Some(parent) => recursiveCall(parent)
@@ -99,4 +100,4 @@ case class Node(var bits: BigInt) extends TranslationContext:
  * Represents a Leaf of the TranslationContext tree, it has a parent but no children.
  * @param leaf The leaf, which can be either a BitRange or a translation table (i.e. a map)
  */
-case class Leaf(leaf: BitRange | Map[String, BigInt]) extends TranslationContext
+case class TranslationLeaf(leaf: BitRange | Map[String, BigInt]) extends TranslationContext
