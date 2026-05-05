@@ -29,4 +29,18 @@ object YamlReader:
    * @param node The node to convert
    * @return The value as a Scala datatype.
    */
-  def constructToScala(node: Node): Any = publicConstructor.constructToScala(node)
+  def constructToScala(node: Node): Any = publicConstructor.constructToScala(node) //This exposes the publicConstructor
+
+  /**
+   * Returns a pretty text with the location of a node in the original YAML file. Useful for debugging.
+   * @param node The node to find its location.
+   * @param addExtraText Whatever add an introduction or return the plain location directly. True by default.
+   * @return The location of the node.
+   */
+  def getNodeLocation(node: Node, addExtraText: Boolean = true): String =
+    val mark = node.getStartMark.orElseThrow()
+
+    if addExtraText then
+      s"Location: line ${mark.getLine + 1}, column ${mark.getColumn + 1}"
+    else
+      s"line ${mark.getLine + 1}, column ${mark.getColumn + 1}"
