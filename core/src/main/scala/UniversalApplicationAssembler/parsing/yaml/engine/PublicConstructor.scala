@@ -1,4 +1,4 @@
-package UniversalApplicationAssembler.parsing.yaml
+package UniversalApplicationAssembler.parsing.yaml.engine
 
 import UniversalApplicationAssembler.helpers.Conversions
 import org.snakeyaml.engine.v2.api.LoadSettings

@@ -1,5 +1,6 @@
 package UniversalApplicationAssembler.parsing.yaml
 
+import UniversalApplicationAssembler.parsing.yaml.engine.PublicConstructor
 import org.snakeyaml.engine.v2.api.LoadSettings
 import org.snakeyaml.engine.v2.api.lowlevel.Compose
 import org.snakeyaml.engine.v2.nodes.Node
