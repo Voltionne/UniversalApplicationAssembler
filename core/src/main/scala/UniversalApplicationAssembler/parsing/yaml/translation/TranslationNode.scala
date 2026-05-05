@@ -8,7 +8,7 @@ case class TranslationNode(var bits: BigInt):
   /**
    * Represents the parent of the node
    */
-  val parent: Option[TranslationNode] = None
+  var parent: Option[TranslationNode] = None
 
   /**
    * Represents all sublevels
@@ -19,6 +19,22 @@ case class TranslationNode(var bits: BigInt):
    * Represents the variables that have changed since the parent
    */
   val changes: mutable.Map[String, TranslationLeaf] = mutable.Map.empty
+
+  /**
+   * Adds a child to this node, which can be either another Node or a Leaf.
+   *
+   * @param child     The child to add.
+   * @param childName The name to identify the child inside the children map.
+   */
+  def addChild(child: TranslationNode, childName: String): Unit =
+    if children.contains(childName) then
+      throw new IllegalArgumentException(s"Duplicate child!: $child. $childName")
+
+    if child.parent.exists(_ != this) then
+      throw new IllegalArgumentException("Child has already a parent!")
+
+    children(childName) = child
+    child.parent = Some(this)
 
   /**
    * Gets all visible Leaves from the scope in this current Node.
