@@ -5,7 +5,7 @@ import org.yaml.snakeyaml.Yaml
 
 import java.io.InputStream
 import UniversalApplicationAssembler.helpers.Conversions
-import UniversalApplicationAssembler.parsing.{InstructionTemplate, Leaf, Node}
+import UniversalApplicationAssembler.parsing.{InstructionTemplate, TranslationLeaf, TranslationNode}
 
 /**
  * Interprets an ISA based on a YAML file.
@@ -27,23 +27,23 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
   if autoParse then
     parse()
 
-  def parse(): Node =
+  def parse(): TranslationNode =
 
     val bits = -1
 
     //The top TranslationContext
-    val currentTranslationContext = Node(bits)
-    
+    val currentTranslationContext = TranslationNode(bits)
+
     //execute the two passes
     parseFirstPass(currentTranslationContext)
     //parseSecondPass(currentTranslationContext)
     currentTranslationContext
-    
+
   //-----------------------------------------
   // FIRST PASS -> Gets all definitions and assignments
-  //-----------------------------------------  
+  //-----------------------------------------
 
-  private def parseFirstPass(currentTranslationContext: Node): Unit =
+  private def parseFirstPass(currentTranslationContext: TranslationNode): Unit =
 
     yamlData match
       case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
@@ -51,26 +51,26 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
         parseRecursivelyFirstPass(map, currentTranslationContext) //start the recursive parsing
       case other =>
         throw new IllegalArgumentException("Expected Map[String, Any]")
-        
+
   //Top-level parsers
-  private def parseRecursivelyFirstPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Unit =
+  private def parseRecursivelyFirstPass(currentLevel: Map[String, Any], currentTranslationContext: TranslationNode): Unit =
 
     val sublevels = parseLevelFirstPass(currentLevel, currentTranslationContext)
 
     for sublevel <- sublevels do
-      
+
       currentLevel(sublevel) match
         case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
 
-          //Create new node to represent the sublevel
-          val newTranslationContext = Node(currentTranslationContext.bits) //bits get propagated down initially
+          //Create new TranslationNode to represent the sublevel
+          val newTranslationContext = TranslationNode(currentTranslationContext.bits) //bits get propagated down initially
           currentTranslationContext.addChild(newTranslationContext, sublevel)
-      
+
           parseRecursivelyFirstPass(m.asInstanceOf[Map[String, Any]], newTranslationContext)
 
         case other => throw new IllegalArgumentException("Expected Map[String, Any]")
 
-  private def parseLevelFirstPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Array[String] =
+  private def parseLevelFirstPass(currentLevel: Map[String, Any], currentTranslationContext: TranslationNode): Array[String] =
 
     var sublevels = Array[String]()
 
@@ -89,7 +89,7 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
             currentTranslationContext.addChild(
               {
                val split = s.split(':')
-               Leaf(BitRange(split(0).toInt, split(1).toInt))
+               TranslationLeaf(BitRange(split(0).toInt, split(1).toInt))
               },
               key
             )
@@ -99,7 +99,7 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
 
             //Add the new definition
             currentTranslationContext.addChild(
-              Leaf(map),
+              TranslationLeaf(map),
               key
             )
 
@@ -126,12 +126,12 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
 
           //Get the reference from the current scope
           currentScope.get(key) match
-            case Some(Leaf(br: BitRange)) =>
+            case Some(TranslationLeaf(br: BitRange)) =>
               br.setFullValue(i)
             case Some(other) => throw new IllegalArgumentException("Not expected format")
             case None => //If reference not found, search from the top
-              currentTranslationContext.getTop.searchLeaf(key) match
-                case Leaf(br: BitRange) =>
+              currentTranslationContext.getTop.searchTranslationLeaf(key) match
+                case TranslationLeaf(br: BitRange) =>
                   br.setFullValue(i)
                 case other => throw new IllegalArgumentException("Trying to set a value to a translation table!")
 
@@ -140,12 +140,12 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
 
           //Get the reference from the current scope
           currentScope.get(key) match
-            case Some(Leaf(br: BitRange)) =>
+            case Some(TranslationLeaf(br: BitRange)) =>
               br.setPartialValue(setMap)
             case Some(other) => throw new IllegalArgumentException("Not expected format")
             case None => //If reference not found, search from the top
-              currentTranslationContext.getTop.searchLeaf(key) match
-                case Leaf(br: BitRange) =>
+              currentTranslationContext.getTop.searchTranslationLeaf(key) match
+                case TranslationLeaf(br: BitRange) =>
                   br.setPartialValue(setMap)
                 case other => throw new IllegalArgumentException("Trying to set a value to a translation table!")
 
@@ -156,8 +156,8 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
   //-----------------------------------------
   // SECOND PASS -> Resolves references
   //-----------------------------------------
-        
-  private def parseSecondPass(currentTranslationContext: Node): Unit =
+
+  private def parseSecondPass(currentTranslationContext: TranslationNode): Unit =
 
     yamlData match
       case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
@@ -166,7 +166,7 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
       case other =>
         throw new IllegalArgumentException("Expected Map[String, Any]")
 
-  private def parseRecursivelySecondPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Unit =
+  private def parseRecursivelySecondPass(currentLevel: Map[String, Any], currentTranslationContext: TranslationNode): Unit =
 
     val sublevels = parseLevelSecondPass(currentLevel, currentTranslationContext)
 
@@ -180,12 +180,12 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
           val newTranslationContext = currentTranslationContext.children(sublevel)
 
           newTranslationContext match
-            case n: Node => parseRecursivelySecondPass(m.asInstanceOf[Map[String, Any]], n)
-            case other => throw new IllegalArgumentException("Tried to enter in a Leaf sublevel!")
+            case n: TranslationNode => parseRecursivelySecondPass(m.asInstanceOf[Map[String, Any]], n)
+            case other => throw new IllegalArgumentException("Tried to enter in a TranslationLeaf sublevel!")
 
         case other => throw new IllegalArgumentException("Expected Map[String, Any]")
 
-  private def parseLevelSecondPass(currentLevel: Map[String, Any], currentTranslationContext: Node): Array[String] =
+  private def parseLevelSecondPass(currentLevel: Map[String, Any], currentTranslationContext: TranslationNode): Array[String] =
 
     var sublevels = Array[String]()
 
@@ -218,12 +218,12 @@ class IsaParser(val yamlConfigInputStream: InputStream, var autoParse: Boolean =
     sublevels
 
   //parse structures
-  private def parseInstruction(instructionLevel: Map[String, Any], currentTranslationContext: Node): Unit =
+  private def parseInstruction(instructionLevel: Map[String, Any], currentTranslationContext: TranslationNode): Unit =
 
     val instructionTemplate = InstructionTemplate(
       currentTranslationContext.bits.toInt,
       currentTranslationContext.getScope.collect {
-        case (k, Leaf(bitRange: BitRange)) => k -> bitRange
+        case (k, TranslationLeaf(bitRange: BitRange)) => k -> bitRange
       },
       Conversions.convertParametersMap {
         instructionLevel.get("parameters") match

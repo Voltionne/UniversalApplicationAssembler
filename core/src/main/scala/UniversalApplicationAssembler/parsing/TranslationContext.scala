@@ -39,7 +39,7 @@ case class TranslationNode(var bits: BigInt) extends TranslationContext:
    * @param referenceString The reference string that identifies the wanted leaf, separated each level with a dot.
    * @return The wanted leaf.
    */
-  def searchLeaf(referenceString: String): TranslationLeaf =
+  def searchTranslationLeaf(referenceString: String): TranslationLeaf =
     val references = referenceString.split(".")
 
     var currentTranslationContext: TranslationContext = this
@@ -58,18 +58,18 @@ case class TranslationNode(var bits: BigInt) extends TranslationContext:
    * Gets all visible Leaves from the scope in this current Node.
    * @return A map with all the leaves
    */
-  def getScope: Map[String, Leaf] =
+  def getScope: Map[String, TranslationLeaf] =
 
     var currentTranslationContext = this
 
     @tailrec
-    def recursiveCall(node: Option[TranslationNode], current: Map[String, Leaf]): Map[String, Leaf] =
+    def recursiveCall(node: Option[TranslationNode], current: Map[String, TranslationLeaf]): Map[String, TranslationLeaf] =
       node match
         case None => current
         case Some(parent) =>
 
           val parentLeaves = parent.children.collect {
-            case (k, leaf: Leaf) => k -> leaf
+            case (k, leaf: TranslationLeaf) => k -> leaf
           }
 
           val updated = parentLeaves ++ current
@@ -77,7 +77,7 @@ case class TranslationNode(var bits: BigInt) extends TranslationContext:
           recursiveCall(parent.parent, updated.toMap)
 
     val thisLeaves = children.collect {
-      case (k, leaf: Leaf) => k -> leaf
+      case (k, leaf: TranslationLeaf) => k -> leaf
     }
 
     recursiveCall(parent, thisLeaves.toMap)

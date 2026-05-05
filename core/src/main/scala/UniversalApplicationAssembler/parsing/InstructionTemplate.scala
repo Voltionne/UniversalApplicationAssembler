@@ -3,7 +3,9 @@ package UniversalApplicationAssembler.parsing
 import UniversalApplicationAssembler.datatypes.BitRange
 import UniversalApplicationAssembler.helpers.Functions.gradientRange
 import UniversalApplicationAssembler.helpers.{Conversions, MultipleParameterMapping, ParametersDefinition, SingleParameterMapping}
-import UniversalApplicationAssembler.parsing.Node
+import UniversalApplicationAssembler.parsing.TranslationNode
+
+type Node = TranslationNode
 
 import scala.math.*
 
@@ -46,7 +48,7 @@ case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], paramet
 
         else //if not, then search it from the top
 
-          translationContextNode.getTop.searchLeaf(this.parameters.datatypes(idx))
+          translationContextNode.getTop.searchTranslationLeaf(this.parameters.datatypes(idx))
 
       //Step 1: The translation
       leafTranslationContext.leaf match
