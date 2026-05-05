@@ -1,5 +1,8 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
+    <ScalaCodeStyleSettings>
+      <option name="USE_SCALA3_INDENTATION_BASED_SYNTAX" value="true" />
+    </ScalaCodeStyleSettings>
     <codeStyleSettings language="Scala">
       <option name="METHOD_ANNOTATION_WRAP" value="0" />
     </codeStyleSettings>
