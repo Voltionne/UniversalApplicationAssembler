@@ -20,6 +20,33 @@ case class TranslationNode(var bits: BigInt):
    */
   val changes: mutable.Map[String, TranslationLeaf] = mutable.Map.empty
 
+  /**
+   * Gets all visible Leaves from the scope in this current Node.
+   * @return A map with all the leaves
+   */
+  def getScope: Map[String, TranslationLeaf] =
+
+    var currentTranslationContext = this
+
+    @tailrec
+    def recursiveCall(node: Option[TranslationNode], current: Map[String, TranslationLeaf]): Map[String, TranslationLeaf] =
+      node match
+        case None => current
+        case Some(parent) =>
+
+          val parentLeaves = parent.changes
+
+          val updated = parentLeaves ++ current
+
+          recursiveCall(parent.parent, updated.toMap)
+
+    recursiveCall(parent, changes.toMap)
+
+  /**
+   * Returns the top node, searching recursively through parents
+   *
+   * @return The top node
+   */
   def getTop: TranslationNode =
 
     @tailrec
@@ -29,5 +56,5 @@ case class TranslationNode(var bits: BigInt):
         case Some(parent) => recursiveCall(parent)
 
     recursiveCall(this)
-    
+
 
