@@ -1,14 +1,10 @@
 package UniversalApplicationAssembler
 
-import UniversalApplicationAssembler.parsing.{Node, Leaf, TranslationContext}
+import UniversalApplicationAssembler.parsing.yaml.translation.TranslationNode
 
-def visualizeNodes(node: Node, identifier: String = ""): Unit =
+def visualizeNodes(node: TranslationNode, identifier: String = ""): Unit =
 
   println(" │" * (identifier.split('.').length - 1) + " ├" + identifier + " " + node.children.toString() + " BITS: " + node.bits.toString)
 
-  val nodeChildren = node.children.collect {
-    case (k, node: Node) => (k, node)
-  }
-
-  for (key, node) <- nodeChildren do
+  for (key, node) <- node.children do
     visualizeNodes(node, identifier + "." + key)
