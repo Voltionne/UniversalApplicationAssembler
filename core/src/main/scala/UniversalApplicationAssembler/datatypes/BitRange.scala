@@ -27,6 +27,9 @@ case class BitRange(a: Int, b: Int):
   var value: String = "?" * bits
   val endianness: String = if a > b then "little" else "big"
 
+  def this(a: Int) =
+    this(a, a)
+
   /**
    * Sets partially the value of the BitRange based on a setMap.
    * @param setMap A map that includes "set" which indicates the value to be set and "bits" which indicates what bits does it affect the set, as a string in format "a:b" (SystemVerilog style)
@@ -112,3 +115,6 @@ case class BitRange(a: Int, b: Int):
       (value + "P" * b).reverse.padTo(bits, 'P').reverse
     else //big
       ("P" * a + value).padTo(bits, 'P')
+
+object BitRange:
+  def apply(a: Int): BitRange = new BitRange(a)
