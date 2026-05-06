@@ -31,6 +31,15 @@ case class BitRange(a: Int, b: Int):
     this(a, a)
 
   /**
+   * Makes a deep copy of the BitRange, including the internal bit states
+   * @return The copy of this BitRange
+   */
+  def deepCopy(): BitRange =
+    val bitRange = this.copy()
+    bitRange.value = value
+    bitRange
+
+  /**
    * Sets partially the value of the BitRange based on a setMap.
    * @param setMap A map that includes "set" which indicates the value to be set and "bits" which indicates what bits does it affect the set, as a string in format "a:b" (SystemVerilog style)
    */
