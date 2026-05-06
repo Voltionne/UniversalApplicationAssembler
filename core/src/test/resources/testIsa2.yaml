@@ -71,17 +71,17 @@ format:
         Imm1: "6"
 
     RR: #000 CCCCC
-        format.definitions.Op8: {set: 0b000, bits: "7:5"}
+        format.definitions.Op8: {set: 0b000, bits_local: "7:5"}
 
         control: #000 00DDD
 
-            format.definitions.Op8: {set: 0b00, bits: "4:3"}
+            format.definitions.Op8: {set: 0b00, bits_local: "4:3"}
 
             instructions:
 
                 - name: "FRET"
                 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-1: 0b00000
                   Rd5: 0b00000
@@ -92,7 +92,7 @@ format:
 
                 - name: "WAIT"
                 
-                  format.definitions.Op8: {set: 0b001, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b001, bits_local: "2:0"}
 
                   Rs5-1: 0b00000
                   Rd5: 0b00000
@@ -103,7 +103,7 @@ format:
 
         math: #000 10DDD
 
-            format.definitions.Op8: {set: 0b10, bits: "4:3"}
+            format.definitions.Op8: {set: 0b10, bits_local: "4:3"}
 
             instructions:
 
@@ -113,7 +113,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b000
                   Sub6: 0b000000
@@ -124,7 +124,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b000
                   Sub6: 0b000001
@@ -135,7 +135,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b001
                   Sub6: 0b000000
@@ -146,7 +146,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b001
                   Sub6: 0b000001
@@ -157,7 +157,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b001
                   Sub6: 0b000010
@@ -168,7 +168,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b010
                   Sub6: 0b000000
@@ -179,7 +179,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b010
                   Sub6: 0b000001
@@ -190,7 +190,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b010
                   Sub6: 0b000010
@@ -201,7 +201,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b010
                   Sub6: 0b000011
@@ -212,7 +212,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b010
                   Sub6: 0b000100
@@ -223,7 +223,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b010
                   Sub6: 0b000101
@@ -234,7 +234,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b011
                   Sub6: 0b000000
@@ -245,7 +245,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b011
                   Sub6: 0b000001
@@ -256,7 +256,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b011
                   Sub6: 0b000010
@@ -267,7 +267,7 @@ format:
                       values: ["registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b00000
 
@@ -280,7 +280,7 @@ format:
                       values: ["registers.integer", "registers.integer"]
                       mapping: ["Rs5-1", "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b00000
 
@@ -289,11 +289,11 @@ format:
 
     SS: #010 CCCCC
 
-        format.definitions.Op8: {set: 0b010, bits: "7:5"}
+        format.definitions.Op8: {set: 0b010, bits_local: "7:5"}
 
         control: #010 00DDD
 
-            format.definitions.Op8: {set: 0b00, bits: "4:3"}
+            format.definitions.Op8: {set: 0b00, bits_local: "4:3"}
 
             instructions:
 
@@ -303,7 +303,7 @@ format:
                       values: ["registers.integer"]
                       mapping: ["Rs5-1"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rd5: 0b00000
                   Rs5-2: 0b00000
@@ -313,7 +313,7 @@ format:
 
         branch: #010 01DDD
 
-            format.definitions.Op8: {set: 0b01, bits: "4:3"}
+            format.definitions.Op8: {set: 0b01, bits_local: "4:3"}
 
             instructions:
 
@@ -323,7 +323,7 @@ format:
                       values: ["registers.integer", "immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b000
 
@@ -333,7 +333,7 @@ format:
                       values: ["registers.integer", "immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b001
 
@@ -343,7 +343,7 @@ format:
                       values: ["registers.integer", "immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b010
 
@@ -353,7 +353,7 @@ format:
                       values: ["registers.integer", "immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b011
 
@@ -363,17 +363,17 @@ format:
                       values: ["registers.integer", "immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b100
 
     SD: #011 CCCCC
 
-        format.definitions.Op8: {set: 0b011, bits: "7:5"}
+        format.definitions.Op8: {set: 0b011, bits_local: "7:5"}
 
         branch: #011 01DDD
 
-            format.definitions.Op8: {set: 0b01, bits: "4:3"}
+            format.definitions.Op8: {set: 0b01, bits_local: "4:3"}
 
             instructions:
 
@@ -383,13 +383,13 @@ format:
                       values: ["registers.integer", "immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b100
 
         width: #011 11DDD
 
-            format.definitions.Op8: {set: 0b11, bits: "4:3"}
+            format.definitions.Op8: {set: 0b11, bits_local: "4:3"}
 
             instructions:
 
@@ -399,7 +399,7 @@ format:
                       values: ["registers.integer", "immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b000
 
@@ -409,17 +409,17 @@ format:
                       values: ["registers.integer", "immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub3: 0b001
 
     "RI+": #100 CCCCC
 
-        format.definitions.Op8: {set: 0b100, bits: "7:5"}
+        format.definitions.Op8: {set: 0b100, bits_local: "7:5"}
 
         control: #100 00DDD
 
-            format.definitions.Op8: {set: 0b00, bits: "4:3"}
+            format.definitions.Op8: {set: 0b00, bits_local: "4:3"}
 
             instructions:
 
@@ -429,7 +429,7 @@ format:
                       values: ["registers.integer", "immediates.imm12"]
                       mapping: ["Rd5", ["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-1: 0b00000
                   
@@ -441,7 +441,7 @@ format:
                       values: ["registers.integer", "immediates.imm12"]
                       mapping: ["Rd5", ["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b001, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b001, bits_local: "2:0"}
 
                   Rs5-1: 0b00000
                   
@@ -453,7 +453,7 @@ format:
                       values: ["registers.integer", "immediates.imm12"]
                       mapping: ["Rd5", ["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b001, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b001, bits_local: "2:0"}
 
                   Rs5-1: 0b00000
                   
@@ -465,7 +465,7 @@ format:
                       values: ["registers.integer", "registers.integer", "immediates.imm12"]
                       mapping: ["Rs5-1", "Rd5", ["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b010, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b010, bits_local: "2:0"}
                   
                   Sub2: 0b00
 
@@ -475,7 +475,7 @@ format:
                       values: ["registers.integer", "registers.integer", "immediates.imm12"]
                       mapping: ["Rs5-1", "Rd5", ["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b010, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b010, bits_local: "2:0"}
                   
                   Sub2: 0b01
 
@@ -485,7 +485,7 @@ format:
                       values: ["registers.integer", "registers.integer", "immediates.imm12"]
                       mapping: ["Rs5-1", "Rd5", ["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b010, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b010, bits_local: "2:0"}
                   
                   Sub2: 0b10
 
@@ -495,7 +495,7 @@ format:
                       values: ["registers.integer"]
                       mapping: ["Rs5-1"]
 
-                  format.definitions.Op8: {set: 0b011, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b011, bits_local: "2:0"}
 
                   Rd5: 0b00000
                   Rs5-2: 0b00000
@@ -510,7 +510,7 @@ format:
                       values: ["immediates.imm12"]
                       mapping: [["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b011, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b011, bits_local: "2:0"}
 
                   Rs5-1: 0b00000
                   Rd5: 0b00000
@@ -523,7 +523,7 @@ format:
                       values: ["registers.integer"]
                       mapping: ["Rd5"]
 
-                  format.definitions.Op8: {set: 0b011, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b011, bits_local: "2:0"}
 
                   Rs5-1: 0b00000
                   Rs5-2: 0b00000
@@ -534,7 +534,7 @@ format:
 
         branch: #100 01DDD
 
-            format.definitions.Op8: {set: 0b01, bits: "4:3"}
+            format.definitions.Op8: {set: 0b01, bits_local: "4:3"}
 
             instructions:
 
@@ -544,13 +544,13 @@ format:
                       values: ["registers.integer", "registers.integer", "immediates.imm12"]
                       mapping: ["Rd5", "Rs5-1", ["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b00
 
         math: #100 10DDD
 
-            format.definitions.Op8: {set: 0b10, bits: "4:3"}
+            format.definitions.Op8: {set: 0b10, bits_local: "4:3"}
 
             instructions:
 
@@ -560,7 +560,7 @@ format:
                       values: ["registers.integer", "immediates.imm12", "registers.integer"]
                       mapping: ["Rs5-1", ["Rs5-2", "Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b00
 
@@ -570,7 +570,7 @@ format:
                       values: ["registers.integer", "immediates.imm12", "registers.integer"]
                       mapping: ["Rs5-1", ["Rs5-2", "Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b01
 
@@ -580,7 +580,7 @@ format:
                       values: ["registers.integer", "immediates.imm12", "registers.integer"]
                       mapping: ["Rs5-1", ["Rs5-2", "Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b10
 
@@ -591,7 +591,7 @@ format:
                       values: ["registers.integer", "immediates.imm7", "registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b00000
                   Sub2: 0b11
@@ -602,7 +602,7 @@ format:
                       values: ["registers.integer", "immediates.imm7", "registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b00001
                   Sub2: 0b11
@@ -613,7 +613,7 @@ format:
                       values: ["registers.integer", "immediates.imm7", "registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b00010
                   Sub2: 0b11
@@ -624,7 +624,7 @@ format:
                       values: ["registers.integer", "immediates.imm7", "registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b00011
                   Sub2: 0b11
@@ -635,7 +635,7 @@ format:
                       values: ["registers.integer", "immediates.imm7", "registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b00100
                   Sub2: 0b11
@@ -646,7 +646,7 @@ format:
                       values: ["registers.integer", "immediates.imm7", "registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b00101
                   Sub2: 0b11
@@ -657,7 +657,7 @@ format:
                       values: ["registers.integer", "immediates.imm7", "registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b00110
                   Sub2: 0b11
@@ -668,7 +668,7 @@ format:
                       values: ["registers.integer", "immediates.imm7", "registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b00111
                   Sub2: 0b11
@@ -679,7 +679,7 @@ format:
                       values: ["registers.integer", "immediates.imm7", "registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b01000
                   Sub2: 0b11
@@ -690,7 +690,7 @@ format:
                       values: ["registers.integer", "immediates.imm7", "registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b01001
                   Sub2: 0b11
@@ -701,14 +701,14 @@ format:
                       values: ["registers.integer", "immediates.imm7", "registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Rs5-2: 0b001010
                   Sub2: 0b11
 
         loads: #100 11DDD
 
-            format.definitions.Op8: {set: 0b11, bits: "4:3"}
+            format.definitions.Op8: {set: 0b11, bits_local: "4:3"}
 
             instructions:
 
@@ -718,7 +718,7 @@ format:
                       values: ["registers.integer", "registers.integer", "immediates.imm12"]
                       mapping: ["Rd5", "Rs5-1", ["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b00
 
@@ -728,7 +728,7 @@ format:
                       values: ["registers.integer", "registers.integer", "immediates.imm12"]
                       mapping: ["Rd5", "Rs5-1", ["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b01
 
@@ -738,7 +738,7 @@ format:
                       values: ["registers.integer", "registers.integer", "immediates.imm12"]
                       mapping: ["Rd5", "Rs5-1", ["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b10
 
@@ -748,7 +748,7 @@ format:
                       values: ["registers.integer", "registers.integer", "immediates.imm12"]
                       mapping: ["Rd5", "Rs5-1", ["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b001, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b001, bits_local: "2:0"}
 
                   Sub2: 0b00
 
@@ -758,17 +758,17 @@ format:
                       values: ["registers.integer", "registers.integer", "immediates.imm12"]
                       mapping: ["Rd5", "Rs5-1", ["Rs5-2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b001, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b001, bits_local: "2:0"}
 
                   Sub2: 0b01
 
     "M+": #101 CCCCC
 
-        format.definitions.Op8: {set: 0b101, bits: "7:5"}
+        format.definitions.Op8: {set: 0b101, bits_local: "7:5"}
 
         branch: #101 01DDD
 
-            format.definitions.Op8: {set: 0b01, bits: "4:3"}
+            format.definitions.Op8: {set: 0b01, bits_local: "4:3"}
 
             instructions:
 
@@ -778,7 +778,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b00
 
@@ -788,7 +788,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b01
 
@@ -798,7 +798,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b10
 
@@ -808,13 +808,13 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b11
 
         stores: #101 11DDD
 
-            format.definitions.Op8: {set: 0b11, bits: "4:3"}
+            format.definitions.Op8: {set: 0b11, bits_local: "4:3"}
 
             instructions:
 
@@ -824,7 +824,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b00
 
@@ -834,7 +834,7 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b01
 
@@ -844,17 +844,17 @@ format:
                       values: ["registers.integer", "registers.integer", "registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                   Sub2: 0b10
 
     "BI#": #110 CCCCC
 
-        format.definitions.Op8: {set: 0b110, bits: "7:5"}
+        format.definitions.Op8: {set: 0b110, bits_local: "7:5"}
 
         control: #110 00DDD
 
-            format.definitions.Op8: {set: 0b00, bits: "4:3"}
+            format.definitions.Op8: {set: 0b00, bits_local: "4:3"}
 
             instructions:
 
@@ -864,7 +864,7 @@ format:
                       values: ["immediates.imm24"]
                       mapping: [["Rs5-1", "Rd5", "Rs5-2", "Sub2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
                 - name: "FENCE"
 
@@ -877,11 +877,11 @@ format:
                   Imm1: 0b0
                   Sub6: 0b000000
 
-                  format.definitions.Op8: {set: 0b001, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b001, bits_local: "2:0"}
 
         branch: #110 01DDD
 
-            format.definitions.Op8: {set: 0b01, bits: "4:3"}
+            format.definitions.Op8: {set: 0b01, bits_local: "4:3"}
 
             instructions:
 
@@ -891,4 +891,4 @@ format:
                       values: ["immediates.imm24"]
                       mapping: [["Rs5-1", "Rd5", "Rs5-2", "Sub2", "Imm1", "Sub6"]]
 
-                  format.definitions.Op8: {set: 0b000, bits: "2:0"}
+                  format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
