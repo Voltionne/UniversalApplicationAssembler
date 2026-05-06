@@ -1,5 +1,7 @@
 ThisBuild / version := "0.2.0"
 
+ThisBuild / organizationName := "com.voltionne"
+
 ThisBuild / scalaVersion := "3.3.7"
 
 lazy val core = (project in file("core"))
