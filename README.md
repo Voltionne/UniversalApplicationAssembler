@@ -1,8 +1,8 @@
 # IMPORTANT!!!: UNMAINTAINED PACKAGE
 
-Currently a massive rewrite in Scala 3 is happening. The original python version will be no longer updated and supported, nevertheless, the releases will be kept up. A final v0.1.2 python version may be released to indicate deprecation.
+Version 0.1.2 is the last version using python and is UNMAINTAINED (no bug fixes nor anything), it will show deprecation warnings when using. After this, newer versions have moved to Scala.
 
-For following the development of the new Scala version, see branch [v0.2-development](https://github.com/Voltionne/UniversalApplicationAssembler/tree/v0.2-development)
+For following the development of the new Scala version, see branch PLACEHOLDER
 
 # UniversalApplicationAssembler
 
