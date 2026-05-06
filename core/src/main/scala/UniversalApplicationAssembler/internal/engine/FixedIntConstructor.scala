@@ -1,4 +1,4 @@
-package UniversalApplicationAssembler.parsing.yaml.engine
+package UniversalApplicationAssembler.internal.engine
 
 import org.snakeyaml.engine.v2.api.ConstructNode
 import org.snakeyaml.engine.v2.nodes.{Node, ScalarNode}

@@ -1,4 +1,4 @@
-package UniversalApplicationAssembler.parsing.yaml.translation
+package UniversalApplicationAssembler.internal.parsing.yaml.translation
 
 import scala.annotation.tailrec
 import scala.collection.mutable

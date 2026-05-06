@@ -1,6 +1,6 @@
-package UniversalApplicationAssembler.parsing.yaml.engine
+package UniversalApplicationAssembler.internal.engine
 
-import UniversalApplicationAssembler.helpers.Conversions
+import UniversalApplicationAssembler.internal.parsing.yaml.Conversions
 import org.snakeyaml.engine.v2.api.LoadSettings
 import org.snakeyaml.engine.v2.constructor.StandardConstructor
 import org.snakeyaml.engine.v2.nodes.Node

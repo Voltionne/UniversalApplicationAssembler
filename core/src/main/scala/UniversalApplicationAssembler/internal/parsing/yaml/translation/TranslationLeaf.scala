@@ -1,6 +1,6 @@
-package UniversalApplicationAssembler.parsing.yaml.translation
+package UniversalApplicationAssembler.internal.parsing.yaml.translation
 
-import UniversalApplicationAssembler.datatypes.BitRange
+import UniversalApplicationAssembler.internal.datatypes.BitRange
 
 /**
  * Represents a Leaf of the TranslationContext tree, it has a parent but no children.

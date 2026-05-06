@@ -1,9 +1,10 @@
-package UniversalApplicationAssembler.parsing.isa
+package UniversalApplicationAssembler.api.parsing
 
-import UniversalApplicationAssembler.datatypes.{BitRange, Utils}
-import UniversalApplicationAssembler.parsing.yaml.YamlReader
-import UniversalApplicationAssembler.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
-import UniversalApplicationAssembler.parsing.isa.helpers.Conversions.toInstructionTemplate
+import UniversalApplicationAssembler.internal.datatypes.{BitRange, Utils}
+import UniversalApplicationAssembler.internal.parsing.isa.Conversions.toInstructionTemplate
+import UniversalApplicationAssembler.internal.parsing.isa.InstructionTemplate
+import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader
+import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
 import org.snakeyaml.engine.v2.nodes.{MappingNode, ScalarNode, SequenceNode}
 
 import java.io.InputStream

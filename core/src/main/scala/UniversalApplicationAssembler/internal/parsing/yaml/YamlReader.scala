@@ -1,11 +1,11 @@
-package UniversalApplicationAssembler.parsing.yaml
+package UniversalApplicationAssembler.internal.parsing.yaml
 
-import UniversalApplicationAssembler.parsing.yaml.engine.{FixedIntConstructor, FixedScalarResolver, PublicConstructor}
-import org.snakeyaml.engine.v2.api.{LoadSettings, ConstructNode}
-import org.snakeyaml.engine.v2.schema.CoreSchema
+import UniversalApplicationAssembler.internal.engine.{FixedIntConstructor, FixedScalarResolver, PublicConstructor}
 import org.snakeyaml.engine.v2.api.lowlevel.Compose
+import org.snakeyaml.engine.v2.api.{ConstructNode, LoadSettings}
 import org.snakeyaml.engine.v2.nodes.{Node, Tag}
 import org.snakeyaml.engine.v2.resolver.ScalarResolver
+import org.snakeyaml.engine.v2.schema.CoreSchema
 
 import java.io.InputStream
 import java.util

@@ -1,6 +1,6 @@
 package UniversalApplicationAssembler
 
-import UniversalApplicationAssembler.parsing.yaml.translation.TranslationNode
+import UniversalApplicationAssembler.internal.parsing.yaml.translation.TranslationNode
 
 def visualizeNodes(node: TranslationNode, identifier: String = ""): Unit =
 

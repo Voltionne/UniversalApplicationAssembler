@@ -1,7 +1,6 @@
 package UniversalApplicationAssembler
 
-import UniversalApplicationAssembler.parsing.isa.IsaParser
-
+import UniversalApplicationAssembler.api.parsing.IsaParser
 import scala.util.Using
 
 class MainTest extends munit.FunSuite:

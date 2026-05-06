@@ -1,9 +1,9 @@
-package UniversalApplicationAssembler.parsing.isa
+package UniversalApplicationAssembler.internal.parsing.isa
 
-import UniversalApplicationAssembler.datatypes.BitRange
-import UniversalApplicationAssembler.helpers.{Conversions, MultipleParameterMapping, ParametersDefinition, SingleParameterMapping}
-import UniversalApplicationAssembler.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
-import UniversalApplicationAssembler.helpers.Functions.gradientRange
+import UniversalApplicationAssembler.internal.helpers.Functions.gradientRange
+import UniversalApplicationAssembler.internal.datatypes.BitRange
+import UniversalApplicationAssembler.internal.parsing.yaml.Conversions
+import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
 
 /**
  * Represents a full ISA instruction. It is meant to be applied over a string that represents an instruction to compile it to binary instantly.

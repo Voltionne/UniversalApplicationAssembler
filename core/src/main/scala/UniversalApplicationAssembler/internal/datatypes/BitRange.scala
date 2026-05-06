@@ -1,6 +1,6 @@
-package UniversalApplicationAssembler.datatypes
+package UniversalApplicationAssembler.internal.datatypes
 
-import UniversalApplicationAssembler.helpers.Functions.gradientRange
+import UniversalApplicationAssembler.internal.helpers.Functions.gradientRange
 
 import scala.math.*
 
