@@ -3,7 +3,8 @@ package UniversalApplicationAssembler.parsing.isa
 import UniversalApplicationAssembler.datatypes.{BitRange, Utils}
 import UniversalApplicationAssembler.parsing.yaml.YamlReader
 import UniversalApplicationAssembler.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
-import org.snakeyaml.engine.v2.nodes.{MappingNode, Node, ScalarNode}
+import UniversalApplicationAssembler.parsing.isa.helpers.Conversions.toInstructionTemplate
+import org.snakeyaml.engine.v2.nodes.{MappingNode, ScalarNode, SequenceNode}
 
 import java.io.InputStream
 
@@ -14,12 +15,15 @@ class IsaParser(val yamlConfigInputStream: InputStream):
       case mappingNode: MappingNode => mappingNode
       case other => throw new IllegalArgumentException(s"Expected top node to be a MappingNode, not ${other.getNodeType}. ${YamlReader.getNodeLocation(other)}")
 
+  private var instructions: List[InstructionTemplate] = List.empty
+
   def parse(): TranslationNode =
 
     val currentTranslationContext = TranslationNode(-1) //create the top translation node
 
     parseFirstPass(yamlTopNode, currentTranslationContext)
     parseSecondPass(yamlTopNode, currentTranslationContext)
+    parseThirdPass(yamlTopNode, currentTranslationContext)
 
     currentTranslationContext
 
@@ -238,6 +242,50 @@ class IsaParser(val yamlConfigInputStream: InputStream):
                 throw new NoSuchElementException(s"Didn't found TranslationContext children with key \"$stringKey\". ${YamlReader.getNodeLocation(mappingNode)}")
 
           case other => throw new IllegalArgumentException(s"Expected all keys to lead to tables (except \"instructions\" key). ${YamlReader.getNodeLocation(other)}")
+    }
+
+  //-----------------------------------------
+  // THIRD PASS -> Resolve instructions
+  //-----------------------------------------
+
+  private def parseThirdPass(currentNode: MappingNode, currentTranslationContext: TranslationNode): Unit =
+
+    currentNode.getValue.forEach { nodeTuple =>
+
+      val stringKey =
+        nodeTuple.getKeyNode match
+          case scalarNode: ScalarNode => scalarNode.getValue
+          case other => throw new IllegalArgumentException(s"Expected key to be a ScalarNode (a string), not ${other.getNodeType}. ${YamlReader.getNodeLocation(other)}")
+
+      if stringKey == "bits" then
+        () //Skip -> Already handled during 1st pass
+      else if stringKey == "instructions" then
+
+        val sequenceNode = nodeTuple.getValueNode match
+          case sequenceNode: SequenceNode => sequenceNode
+          case other => throw new IllegalArgumentException(s"Expected \"instructions\" to be a SequenceNode, not ${other.getNodeType}! ${YamlReader.getNodeLocation(other)}")
+
+        sequenceNode.getValue.forEach {
+          case mappingNode: MappingNode => instructions = instructions :+ toInstructionTemplate(mappingNode, currentTranslationContext)
+          case other => throw new IllegalArgumentException(s"Expected instructions to be a MappingNode, not ${other.getNodeType}! ${YamlReader.getNodeLocation(other)}")
+        }
+
+      else
+
+        //Match based on value, given that all special keys have already been revised. Only done to find sublevels now
+        nodeTuple.getValueNode match
+          case scalarNode: ScalarNode => //This is assignment OR declaration
+            () //Skip -> Already handled in 1st and 2nd pass
+          case mappingNode: MappingNode => //This is sublevel OR assignment OR translation table
+
+            if Helper.isSetMap(mappingNode) then () //Assignment -> Already handled in 2nd pass
+            else if Helper.isTranslationTable(mappingNode) then () //Declaration -> Skip, handled in 1st pass
+            else //Sublevel
+
+              if currentTranslationContext.children.contains(stringKey) then
+                parseThirdPass(mappingNode, currentTranslationContext.children(stringKey))
+              else
+                throw new NoSuchElementException(s"Didn't found TranslationContext children with key \"$stringKey\". ${YamlReader.getNodeLocation(mappingNode)}")
     }
 
 /**
