@@ -14,7 +14,7 @@ object Conversions:
       case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) && m.values.forall(_.isInstanceOf[List[Any]]) =>
         val map = m.asInstanceOf[Map[String, List[Any]]]
 
-        require(map.contains("values") && map.contains("mappings") && map.size == 2) //Check that everything is alright
+        require(map.contains("values") && map.contains("mappings") && map.size == 2, s"Bad parameters MappingNode. ${YamlReader.getNodeLocation(mappingNode)}") //Check that everything is alright
 
         val datatypes = map("values") match
           case l: List[?] if l.forall(_.isInstanceOf[String]) => l.asInstanceOf[List[String]]
