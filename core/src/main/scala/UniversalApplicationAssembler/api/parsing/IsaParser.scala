@@ -9,6 +9,10 @@ import org.snakeyaml.engine.v2.nodes.{MappingNode, ScalarNode, SequenceNode}
 
 import java.io.InputStream
 
+/**
+ * Parses YAML ISA specification files into instructions. Run .parse() and then the list "instructions" will be the result instructions.
+ * @param yamlConfigInputStream The input stream of the YAML file.
+ */
 class IsaParser(val yamlConfigInputStream: InputStream):
 
   private val yamlTopNode: MappingNode =
@@ -18,6 +22,10 @@ class IsaParser(val yamlConfigInputStream: InputStream):
 
   var instructions: List[InstructionTemplate] = List.empty
 
+  /**
+   * Parses the YAML file.
+   * @return The final translation context tree resulted from the parsing. Useful for seeing references and debugging.
+   */
   def parse(): TranslationNode =
 
     val currentTranslationContext = TranslationNode(-1) //create the top translation node
