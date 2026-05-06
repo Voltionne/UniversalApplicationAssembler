@@ -12,12 +12,10 @@ import UniversalApplicationAssembler.helpers.Functions.gradientRange
  * @param parameters A class that represents the parameters of the instruction.
  * @param translationContext The translation context node/scope where this instruction was declared.
  */
-case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], parameters: ParametersDefinition, translationContext: TranslationNode):
-
 case class InstructionTemplate(fields: Map[String, BitRange], parameters: ParametersDefinition, translationContext: TranslationNode):
 
   val bits: Int = translationContext.bits.toInt
-  
+
   //Checks for fields
   require: //Check that no bit collisions
     val usedBits: Array[Boolean] = Array.fill(bits)(false)
@@ -122,14 +120,13 @@ case class InstructionTemplate(fields: Map[String, BitRange], parameters: Parame
   def compileInstruction: String =
     //Not done because already done in BitRange
     //require(checkCompleteness)
-    // HELLO??? SpaceProgrammer from the future: what does this mean?
 
     val compiledInstructionArray = ("?" * bits).toCharArray
 
     val compiledResults: List[String] = List()
 
     for (fieldName, bitRange) <- fields do
-      compiledResults +: bitRange.compile(bits)
+      compiledResults +: bitRange.compile(bits) //This calls checkValue on each BitRange
 
     compiledResults.map(_.toList).transpose.map {
       column => column.find(_ != 'P').getOrElse('P')
