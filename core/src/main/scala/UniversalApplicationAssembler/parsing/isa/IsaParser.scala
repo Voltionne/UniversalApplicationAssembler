@@ -18,7 +18,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
 
     val currentTranslationContext = TranslationNode(-1) //create the top translation node
 
-    parseRecursivelyFirstPass(yamlTopNode, currentTranslationContext)
+    parseFirstPass(yamlTopNode, currentTranslationContext)
 
     currentTranslationContext
 
@@ -26,7 +26,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
   // FIRST PASS -> Resolve declarations
   //-----------------------------------------
 
-  private def parseRecursivelyFirstPass(currentNode: MappingNode, currentTranslationContext: TranslationNode): Unit =
+  private def parseFirstPass(currentNode: MappingNode, currentTranslationContext: TranslationNode): Unit =
 
     currentNode.getValue.forEach { nodeTuple => //Iterate through sublevels
 
@@ -74,13 +74,13 @@ class IsaParser(val yamlConfigInputStream: InputStream):
                   else
                     throw new IllegalArgumentException(s"Expected 1 or 2 bit position indications, not ${split.length}! ${YamlReader.getNodeLocation(scalarNode)}")
 
-              case i: BigInt => () //Assignment -> Ignore (left to second round)
+              case i: BigInt => () //Assignment -> Ignore (left to second pass)
               case other => throw new IllegalArgumentException(s"Found not recognized value for assignment or declaration. ${YamlReader.getNodeLocation(scalarNode)}")
 
           case mappingNode: MappingNode => //This is sublevel OR assignment OR translation table
 
             if Helper.isSetMap(mappingNode) then //Assignment
-              () //Ignore (left to second round)
+              () //Ignore (left to second pass)
             else if Helper.isTranslationTable(mappingNode) then //Translation Table (i.e. declaration)
 
               if currentTranslationContext.getScope.contains(stringKey) then
@@ -98,10 +98,16 @@ class IsaParser(val yamlConfigInputStream: InputStream):
               val newTranslationContext = TranslationNode(currentTranslationContext.bits) //Propagate bits
               currentTranslationContext.addChild(newTranslationContext, stringKey)
 
-              parseRecursivelyFirstPass(mappingNode, newTranslationContext)
+              parseFirstPass(mappingNode, newTranslationContext)
 
           case other => throw new IllegalArgumentException(s"Expected all keys to lead to tables (except \"instructions\" key). ${YamlReader.getNodeLocation(other)}")
     }
+
+  //-----------------------------------------
+  // SECOND PASS -> Resolve assignments
+  //-----------------------------------------
+    
+  private def parseSecondPass(currentNode: MappingNode, currentTranslationContext: TranslationNode): Unit = ???
 
 /**
  * Small helper object that includes some snippets of code for checking fast
