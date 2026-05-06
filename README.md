@@ -2,7 +2,7 @@
 
 Version 0.1.2 is the last version using python and is UNMAINTAINED (no bug fixes nor anything), it will show deprecation warnings when using. After this, newer versions have moved to Scala.
 
-For following the development of the new Scala version, see branch PLACEHOLDER
+For following the development of the new Scala version, see branch "main"
 
 # UniversalApplicationAssembler
 
