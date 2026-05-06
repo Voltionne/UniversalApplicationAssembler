@@ -12,7 +12,7 @@ import UniversalApplicationAssembler.helpers.Functions.gradientRange
  * @param parameters A class that represents the parameters of the instruction.
  * @param translationContext The translation context node/scope where this instruction was declared.
  */
-case class InstructionTemplate(fields: Map[String, BitRange], parameters: ParametersDefinition, translationContext: TranslationNode):
+case class InstructionTemplate(name: String, fields: Map[String, BitRange], parameters: ParametersDefinition, translationContext: TranslationNode):
 
   val bits: Int = translationContext.bits.toInt
 
@@ -40,7 +40,8 @@ case class InstructionTemplate(fields: Map[String, BitRange], parameters: Parame
 
       //Get the leaf translation context. 2 cases:
       //1. In this scope (either in changes of this current context or some parent)
-      //2. Full path
+      //2. Full pathDeleted "bits" argument
+
       val leafTranslation: TranslationLeaf =
         if translationContext.getScope.contains(this.parameters.datatypes(idx)) then //case 1
           translationContext.getScope(this.parameters.datatypes(idx))
