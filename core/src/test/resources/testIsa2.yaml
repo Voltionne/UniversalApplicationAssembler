@@ -110,7 +110,7 @@ format:
                 - name: "ADD"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -121,7 +121,7 @@ format:
                 - name: "SUB"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -132,7 +132,7 @@ format:
                 - name: "LSHIFT"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -143,7 +143,7 @@ format:
                 - name: "RSHIFT"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -154,7 +154,7 @@ format:
                 - name: "ARSHIFT"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -165,7 +165,7 @@ format:
                 - name: "UBIGGER"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -176,7 +176,7 @@ format:
                 - name: "UBIGEQ"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -187,7 +187,7 @@ format:
                 - name: "BIGGER"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -198,7 +198,7 @@ format:
                 - name: "BIGEQ"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -209,7 +209,7 @@ format:
                 - name: "EQUAL"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -220,7 +220,7 @@ format:
                 - name: "UNEQUAL"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -231,7 +231,7 @@ format:
                 - name: "OR"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -242,7 +242,7 @@ format:
                 - name: "AND"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -253,7 +253,7 @@ format:
                 - name: "XOR"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rs5-2", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -264,7 +264,7 @@ format:
                 - name: "NOT"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -277,7 +277,7 @@ format:
                 - name: "COUNT1"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-1", "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -300,7 +300,7 @@ format:
                 - name: "UCALL.REG"
                   
                   parameters:
-                      values: ["registers.integer"]
+                      values: ["parameters.registers.integer"]
                       mapping: ["Rs5-1"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -320,7 +320,7 @@ format:
                 - name: "RJUMP.PC.ZE"
 
                   parameters:
-                      values: ["registers.integer", "immediates.imm16"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -330,7 +330,7 @@ format:
                 - name: "RJUMP.PC.NZ"
 
                   parameters:
-                      values: ["registers.integer", "immediates.imm16"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -340,7 +340,7 @@ format:
                 - name: "RJUMP.PC.NE"
 
                   parameters:
-                      values: ["registers.integer", "immediates.imm16"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -350,7 +350,7 @@ format:
                 - name: "RJUMP.PC.PO"
 
                   parameters:
-                      values: ["registers.integer", "immediates.imm16"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -360,7 +360,7 @@ format:
                 - name: "UJUMP.REG"
 
                   parameters:
-                      values: ["registers.integer", "immediates.imm16"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -380,7 +380,7 @@ format:
                 - name: "CALL.PC"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm16"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -396,7 +396,7 @@ format:
                 - name: "WLOW"
 
                   parameters:
-                      values: ["registers.integer", "immediates.imm16"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -406,7 +406,7 @@ format:
                 - name: "WUPP"
 
                   parameters:
-                      values: ["registers.integer", "immediates.imm16"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm16"]
                       mapping: ["Rs5-1", ["Rd5", "Rs5-2", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -426,7 +426,7 @@ format:
                 - name: "GET"
 
                   parameters:
-                      values: ["registers.integer", "immediates.imm12"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm12"]
                       mapping: ["Rd5", ["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -438,7 +438,7 @@ format:
                 - name: "RCSR"
 
                   parameters:
-                      values: ["registers.integer", "immediates.imm12"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm12"]
                       mapping: ["Rd5", ["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b001, bits_local: "2:0"}
@@ -450,7 +450,7 @@ format:
                 - name: "WCSR"
 
                   parameters:
-                      values: ["registers.integer", "immediates.imm12"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm12"]
                       mapping: ["Rd5", ["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b001, bits_local: "2:0"}
@@ -462,7 +462,7 @@ format:
                 - name: "SWAPCSR"
 
                   parameters:
-                      values: ["registers.integer", "registers.integer", "immediates.imm12"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.immediates.imm12"]
                       mapping: ["Rs5-1", "Rd5", ["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b010, bits_local: "2:0"}
@@ -472,7 +472,7 @@ format:
                 - name: "SCSR"
 
                   parameters:
-                      values: ["registers.integer", "registers.integer", "immediates.imm12"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.immediates.imm12"]
                       mapping: ["Rs5-1", "Rd5", ["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b010, bits_local: "2:0"}
@@ -482,7 +482,7 @@ format:
                 - name: "CCSR"
 
                   parameters:
-                      values: ["registers.integer", "registers.integer", "immediates.imm12"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.immediates.imm12"]
                       mapping: ["Rs5-1", "Rd5", ["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b010, bits_local: "2:0"}
@@ -492,7 +492,7 @@ format:
                 - name: "R0UNLOCK.REG"
 
                   parameters:
-                      values: ["registers.integer"]
+                      values: ["parameters.registers.integer"]
                       mapping: ["Rs5-1"]
 
                   format.definitions.Op8: {set: 0b011, bits_local: "2:0"}
@@ -507,7 +507,7 @@ format:
                 - name: "R0UNLOCK.IMM"
 
                   parameters:
-                      values: ["immediates.imm12"]
+                      values: ["parameters.immediates.imm12"]
                       mapping: [["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b011, bits_local: "2:0"}
@@ -520,7 +520,7 @@ format:
                 - name: "R0LOCK"
 
                   parameters:
-                      values: ["registers.integer"]
+                      values: ["parameters.registers.integer"]
                       mapping: ["Rd5"]
 
                   format.definitions.Op8: {set: 0b011, bits_local: "2:0"}
@@ -541,7 +541,7 @@ format:
                 - name: "CALL.REG"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "immediates.imm12"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.immediates.imm12"]
                       mapping: ["Rd5", "Rs5-1", ["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -557,7 +557,7 @@ format:
                 - name: "ADD"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm12", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm12", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Rs5-2", "Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -567,7 +567,7 @@ format:
                 - name: "OR"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm12", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm12", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Rs5-2", "Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -577,7 +577,7 @@ format:
                 - name: "AND"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm12", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm12", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Rs5-2", "Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -588,7 +588,7 @@ format:
                 - name: "LSHIFT"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm7", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm7", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -599,7 +599,7 @@ format:
                 - name: "RSHIFT"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm7", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm7", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -610,7 +610,7 @@ format:
                 - name: "ARSHIFT"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm7", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm7", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -621,7 +621,7 @@ format:
                 - name: "UBIGGER"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm7", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm7", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -632,7 +632,7 @@ format:
                 - name: "UBIGEQ"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm7", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm7", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -643,7 +643,7 @@ format:
                 - name: "UEQUAL"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm7", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm7", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -654,7 +654,7 @@ format:
                 - name: "UUNEQUAL"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm7", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm7", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -665,7 +665,7 @@ format:
                 - name: "BIGGER"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm7", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm7", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -676,7 +676,7 @@ format:
                 - name: "BIGEQ"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm7", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm7", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -687,7 +687,7 @@ format:
                 - name: "EQUAL"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm7", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm7", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -698,7 +698,7 @@ format:
                 - name: "UNEQUAL"
                   
                   parameters:
-                      values: ["registers.integer", "immediates.imm7", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.immediates.imm7", "parameters.registers.integer"]
                       mapping: ["Rs5-1", ["Imm1", "Sub6"], "Rd5"]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -715,7 +715,7 @@ format:
                 - name: "RRAM.U8"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "immediates.imm12"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.immediates.imm12"]
                       mapping: ["Rd5", "Rs5-1", ["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -725,7 +725,7 @@ format:
                 - name: "RRAM.U16"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "immediates.imm12"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.immediates.imm12"]
                       mapping: ["Rd5", "Rs5-1", ["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -735,7 +735,7 @@ format:
                 - name: "RRAM.U32"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "immediates.imm12"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.immediates.imm12"]
                       mapping: ["Rd5", "Rs5-1", ["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -745,7 +745,7 @@ format:
                 - name: "RRAM.S8"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "immediates.imm12"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.immediates.imm12"]
                       mapping: ["Rd5", "Rs5-1", ["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b001, bits_local: "2:0"}
@@ -755,7 +755,7 @@ format:
                 - name: "RRAM.S16"
                   
                   parameters:
-                      values: ["registers.integer", "registers.integer", "immediates.imm12"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.immediates.imm12"]
                       mapping: ["Rd5", "Rs5-1", ["Rs5-2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b001, bits_local: "2:0"}
@@ -775,7 +775,7 @@ format:
                 - name: "RJUMP.REG.ZE"
 
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -785,7 +785,7 @@ format:
                 - name: "RJUMP.REG.NZ"
 
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -795,7 +795,7 @@ format:
                 - name: "RJUMP.REG.NE"
 
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -805,7 +805,7 @@ format:
                 - name: "RJUMP.REG.PO"
 
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -821,7 +821,7 @@ format:
                 - name: "WRAM.U8"
 
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -831,7 +831,7 @@ format:
                 - name: "WRAM.U16"
 
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -841,7 +841,7 @@ format:
                 - name: "WRAM.U32"
 
                   parameters:
-                      values: ["registers.integer", "registers.integer", "registers.integer"]
+                      values: ["parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer"]
                       mapping: ["Rs5-2", "Rs5-1", ["Rd5", "Imm1", "Sub6"]] #NOTE: SUPPOSES THAT Rs5-1 is used for CALCULATING THE BASE (coherency with loads)
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -861,7 +861,7 @@ format:
                 - name: "UCALL.IMM"
 
                   parameters:
-                      values: ["immediates.imm24"]
+                      values: ["parameters.immediates.imm24"]
                       mapping: [["Rs5-1", "Rd5", "Rs5-2", "Sub2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
@@ -869,7 +869,7 @@ format:
                 - name: "FENCE"
 
                   parameters:
-                      values: ["fence_args", "fence_args"]
+                      values: ["parameters.fence_args", "parameters.fence_args"]
                       mapping: ["Rs5-1", "Rd5"]
 
                   Rs5-2: 0b00000
@@ -888,7 +888,7 @@ format:
                 - name: "UJUMP.PC"
 
                   parameters:
-                      values: ["immediates.imm24"]
+                      values: ["parameters.immediates.imm24"]
                       mapping: [["Rs5-1", "Rd5", "Rs5-2", "Sub2", "Imm1", "Sub6"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
