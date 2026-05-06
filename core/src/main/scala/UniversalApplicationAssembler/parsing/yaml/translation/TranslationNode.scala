@@ -28,7 +28,7 @@ case class TranslationNode(var bits: BigInt):
    */
   def addChild(child: TranslationNode, childName: String): Unit =
     if children.contains(childName) then
-      throw new IllegalArgumentException(s"Duplicate child!: $child. $childName")
+      throw new IllegalArgumentException(s"Duplicate child \"$childName\"!: $child")
 
     if child.parent.exists(_ != this) then
       throw new IllegalArgumentException("Child has already a parent!")
