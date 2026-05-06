@@ -19,6 +19,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
     val currentTranslationContext = TranslationNode(-1) //create the top translation node
 
     parseFirstPass(yamlTopNode, currentTranslationContext)
+    parseSecondPass(yamlTopNode, currentTranslationContext)
 
     currentTranslationContext
 
@@ -107,7 +108,137 @@ class IsaParser(val yamlConfigInputStream: InputStream):
   // SECOND PASS -> Resolve assignments
   //-----------------------------------------
     
-  private def parseSecondPass(currentNode: MappingNode, currentTranslationContext: TranslationNode): Unit = ???
+  private def parseSecondPass(currentNode: MappingNode, currentTranslationContext: TranslationNode): Unit =
+
+    currentNode.getValue.forEach { nodeTuple =>
+
+      val stringKey =
+        nodeTuple.getKeyNode match
+          case scalarNode: ScalarNode => scalarNode.getValue
+          case other => throw new IllegalArgumentException(s"Expected key to be a ScalarNode (a string), not ${other.getNodeType}. ${YamlReader.getNodeLocation(other)}")
+
+      if stringKey == "bits" || stringKey == "instructions" then
+        () //Skip -> "bits" handled in 1st pass. "instructions handled in 3rd pass
+      else
+        //Match based on value, given that all special keys have already been revised
+        nodeTuple.getValueNode match
+          case scalarNode: ScalarNode => //This is assignment OR declaration
+            val value = YamlReader.constructToScala(scalarNode)
+
+            value match
+              case s: String => () //Declaration -> Skip, handled in 1st pass
+              case i: BigInt => //Assignment -> handle right now
+
+                //Three options can happen here:
+                //1. Making reference to a BitRange defined in this TranslationNode -> simply change its value
+                //2. Making reference to a BitRange not defined in this TranslationNode BUT in scope -> add it to changes with the modified value
+                //3. A full path -> add the full path to changes with the modified values
+
+                if currentTranslationContext.changes.contains(stringKey) then //1st case (also can match in 2nd and 3rd case if somehow a re-assignment, this is expected)
+
+                  currentTranslationContext.changes(stringKey).leaf match
+                    case bitRange: BitRange =>
+                      bitRange.setFullValue(i) //Modify directly
+                    case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${YamlReader.getNodeLocation(scalarNode)}")
+
+                else if currentTranslationContext.getScope.contains(stringKey) then //2nd case
+
+                  val bitRange = currentTranslationContext.getScope(stringKey).leaf match
+                    case bitRange: BitRange => bitRange
+                    case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${YamlReader.getNodeLocation(scalarNode)}")
+
+                  //Modify the value (as a copy)
+                  val copyBitRange = bitRange.deepCopy()
+                  copyBitRange.setFullValue(i)
+
+                  //Add to current changes, with the modified value
+                  currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                    copyBitRange
+                  )
+
+                else if currentTranslationContext.getTop.searchTranslationLeaf(stringKey).isDefined then //3rd case
+                  val leaf = currentTranslationContext.getTop.searchTranslationLeaf(stringKey).get //Will 100% work, not the most idiomatic nevertheless
+
+                  val bitRange = leaf.leaf match
+                    case bitRange: BitRange => bitRange
+                    case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${YamlReader.getNodeLocation(scalarNode)}")
+
+                  //Modify the value (as a copy)
+                  val copyBitRange = bitRange.deepCopy()
+                  copyBitRange.setFullValue(i)
+
+                  //Add to current changes, with the modified value
+                  currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                    copyBitRange
+                  )
+
+                else
+                  throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${YamlReader.getNodeLocation(scalarNode)}")
+
+              case other => throw new IllegalArgumentException(s"Found not recognized value for assignment or declaration. ${YamlReader.getNodeLocation(scalarNode)}")
+
+          case mappingNode: MappingNode => //This is sublevel OR assignment OR translation table
+
+            if Helper.isSetMap(mappingNode) then //Assignment
+              val setMap = YamlReader.constructToScala(mappingNode).asInstanceOf[Map[String, Any]] //SHOULD 100% WORK (Not the most idiomatic, nevertheless). May change in the future
+
+
+              //Three options can happen here:
+              //1. Making reference to a BitRange defined in this TranslationNode -> simply change its value
+              //2. Making reference to a BitRange not defined in this TranslationNode BUT in scope -> add it to changes with the modified value
+              //3. A full path -> add the full path to changes with the modified values
+
+              if currentTranslationContext.changes.contains(stringKey) then //1st case (also can match in 2nd and 3rd case if somehow a re-assignment, this is expected)
+
+                currentTranslationContext.changes(stringKey).leaf match
+                  case bitRange: BitRange =>
+                    bitRange.setPartialValue(setMap) //Modify directly
+                  case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${YamlReader.getNodeLocation(mappingNode)}")
+
+              else if currentTranslationContext.getScope.contains(stringKey) then //2nd case
+
+                val bitRange = currentTranslationContext.getScope(stringKey).leaf match
+                  case bitRange: BitRange => bitRange
+                  case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${YamlReader.getNodeLocation(mappingNode)}")
+
+                //Modify the value (as a copy)
+                val copyBitRange = bitRange.deepCopy()
+                copyBitRange.setPartialValue(setMap)
+
+                //Add to current changes, with the modified value
+                currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                  copyBitRange
+                )
+
+              else if currentTranslationContext.getTop.searchTranslationLeaf(stringKey).isDefined then //3rd case
+                val leaf = currentTranslationContext.getTop.searchTranslationLeaf(stringKey).get //Will 100% work, not the most idiomatic nevertheless
+
+                val bitRange = leaf.leaf match
+                  case bitRange: BitRange => bitRange
+                  case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${YamlReader.getNodeLocation(mappingNode)}")
+
+                //Modify the value (as a copy)
+                val copyBitRange = bitRange.deepCopy()
+                copyBitRange.setPartialValue(setMap)
+
+                //Add to current changes, with the modified value
+                currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                  copyBitRange
+                )
+
+              else
+                throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${YamlReader.getNodeLocation(mappingNode)}")
+
+            else if Helper.isTranslationTable(mappingNode) then () //Declaration -> Skip, handled in 1st pass
+            else //Sublevel
+
+              if currentTranslationContext.children.contains(stringKey) then
+                parseSecondPass(mappingNode, currentTranslationContext.children(stringKey))
+              else
+                throw new NoSuchElementException(s"Didn't found TranslationContext children with key \"$stringKey\". ${YamlReader.getNodeLocation(mappingNode)}")
+
+          case other => throw new IllegalArgumentException(s"Expected all keys to lead to tables (except \"instructions\" key). ${YamlReader.getNodeLocation(other)}")
+    }
 
 /**
  * Small helper object that includes some snippets of code for checking fast
