@@ -15,7 +15,9 @@ object Utils:
    * @return Whether is a set map or not
    */
   def isSetMap(setMap: Map[String, Any]): Boolean =
-    (setMap contains "set") && setMap("set").isInstanceOf[BigInt] && (setMap contains "bits") && setMap("bits").isInstanceOf[String] && setMap.size == 2
+    val option1 = (setMap contains "set") && setMap("set").isInstanceOf[BigInt] && (setMap contains "bits") && setMap("bits").isInstanceOf[String] && setMap.size == 2
+    val option2 = (setMap contains "set") && setMap("set").isInstanceOf[BigInt] && (setMap contains "bits_local") && setMap("bits_local").isInstanceOf[String] && setMap.size == 2
+    option1 || option2
 
 /**
  * Represents a range of bits, using SystemVerilog notation. Therefore, it can be little-endian, big-endian, and any size.
@@ -46,55 +48,110 @@ case class BitRange(a: Int, b: Int):
   def setPartialValue(setMap: Map[String, Any]): Unit =
     require(Utils.isSetMap(setMap))
 
-    (setMap("set"), setMap("bits")) match
-      case (set: BigInt, bits: String) =>
-        if bits contains ":" then
+    if setMap.contains("bits") then
 
-          //This means it specifies a whole range
-          val parts = bits.split(":")
+      (setMap("set"), setMap("bits")) match
+        case (set: BigInt, bits: String) =>
+          if bits contains ":" then
 
-          require(parts.length == 2)
-          require(parts(0).forall(p => p.isDigit) && parts(1).forall(p => p.isDigit)) //check that both numbers are numeric
+            //This means it specifies a whole range
+            val parts = bits.split(":")
 
-          val bitsSet = abs(parts(0).toInt - parts(1).toInt) + 1
+            require(parts.length == 2)
+            require(parts(0).forall(p => p.isDigit) && parts(1).forall(p => p.isDigit)) //check that both numbers are numeric
 
-          require(set >= 0 && set < (BigInt(1) << bitsSet))
+            val bitsSet = abs(parts(0).toInt - parts(1).toInt) + 1
 
-          val setValueBinArray: Array[Char] = set.toString(2).reverse.padTo(bitsSet, '0').reverse.toCharArray
+            require(set >= 0 && set < (BigInt(1) << bitsSet))
 
-          var valueAsArray: Array[Char] = value.toCharArray //convert to array temporally (because string is immutable)
+            val setValueBinArray: Array[Char] = set.toString(2).reverse.padTo(bitsSet, '0').reverse.toCharArray
 
-          for (i, idx) <- gradientRange(parts(0).toInt, parts(1).toInt).zipWithIndex do
-            if a > b then //LSB
-              valueAsArray = valueAsArray.reverse
+            var valueAsArray: Array[Char] = value.toCharArray //convert to array temporally (because string is immutable)
 
-              valueAsArray(i - b) = setValueBinArray(idx)
+            for (i, idx) <- gradientRange(parts(0).toInt, parts(1).toInt).zipWithIndex do
+              println(s"$i / $idx -- $a / $b -- ${parts.mkString("Array(", ", ", ")")}")
+              if a > b then //LSB
+                valueAsArray = valueAsArray.reverse
 
-              valueAsArray = valueAsArray.reverse
+                valueAsArray(i - b) = setValueBinArray(idx)
 
-            else
-              valueAsArray(i - a) = setValueBinArray(idx)
-          
-          value = valueAsArray.mkString
+                valueAsArray = valueAsArray.reverse
 
-        else
+              else
+                valueAsArray(i - a) = setValueBinArray(idx)
 
-          require(bits.forall(p => p.isDigit)) //check that bits is a digit
-          require(set == 0 || set == 1) //check that set is a binary digit
+            value = valueAsArray.mkString
 
-          var valueAsArray: Array[Char] = value.toCharArray
-
-          if a > b then //LSB
-
-            valueAsArray = valueAsArray.reverse
-
-            valueAsArray(bits.toInt - b) = set.toString.head
-
-            valueAsArray = valueAsArray.reverse
           else
-            valueAsArray(bits.toInt - a) = set.toString.head
 
-          value = valueAsArray.mkString
+            require(bits.forall(p => p.isDigit)) //check that bits is a digit
+            require(set == 0 || set == 1) //check that set is a binary digit
+
+            var valueAsArray: Array[Char] = value.toCharArray
+
+            if a > b then //LSB
+
+              valueAsArray = valueAsArray.reverse
+
+              valueAsArray(bits.toInt - b) = set.toString.head
+
+              valueAsArray = valueAsArray.reverse
+            else
+              valueAsArray(bits.toInt - a) = set.toString.head
+
+            value = valueAsArray.mkString
+
+    else //must be bits_local
+
+      (setMap("set"), setMap("bits_local")) match
+        case (set: BigInt, bitsLocal: String) =>
+          if bitsLocal contains ":" then
+
+            //This means it specifies a whole range
+            val parts = bitsLocal.split(":")
+
+            require(parts.length == 2)
+            require(parts(0).forall(p => p.isDigit) && parts(1).forall(p => p.isDigit)) //check that both numbers are numeric
+
+            val bitsSet = abs(parts(0).toInt - parts(1).toInt) + 1
+
+            require(set >= 0 && set < (BigInt(1) << bitsSet))
+
+            val setValueBinArray: Array[Char] = set.toString(2).reverse.padTo(bitsSet, '0').reverse.toCharArray
+
+            var valueAsArray: Array[Char] = value.toCharArray //convert to array temporally (because string is immutable)
+
+            for (i, idx) <- gradientRange(parts(0).toInt, parts(1).toInt).zipWithIndex do
+              if a > b then //LSB
+                valueAsArray = valueAsArray.reverse
+
+                valueAsArray(i) = setValueBinArray(idx)
+
+                valueAsArray = valueAsArray.reverse
+
+              else
+                valueAsArray(i) = setValueBinArray(idx)
+
+            value = valueAsArray.mkString
+
+          else
+
+            require(bitsLocal.forall(p => p.isDigit)) //check that bits is a digit
+            require(set == 0 || set == 1) //check that set is a binary digit
+
+            var valueAsArray: Array[Char] = value.toCharArray
+
+            if a > b then //LSB
+
+              valueAsArray = valueAsArray.reverse
+
+              valueAsArray(bitsLocal.toInt) = set.toString.head
+
+              valueAsArray = valueAsArray.reverse
+            else
+              valueAsArray(bitsLocal.toInt) = set.toString.head
+
+            value = valueAsArray.mkString
 
   /**
    * Set the full value of the BitRange
