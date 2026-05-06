@@ -98,7 +98,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
               val newTranslationContext = TranslationNode(currentTranslationContext.bits) //Propagate bits
               currentTranslationContext.addChild(newTranslationContext, stringKey)
 
-              parseRecursivelyFirstPass(mappingNode, currentTranslationContext)
+              parseRecursivelyFirstPass(mappingNode, newTranslationContext)
 
           case other => throw new IllegalArgumentException(s"Expected all keys to lead to tables (except \"instructions\" key). ${YamlReader.getNodeLocation(other)}")
     }
