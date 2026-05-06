@@ -1,6 +1,6 @@
 package UniversalApplicationAssembler.internal.parsing.isa
 
-import UniversalApplicationAssembler.api.parsing.Helper
+import UniversalApplicationAssembler.internal.parsing.isa.Helper
 import UniversalApplicationAssembler.internal.datatypes.BitRange
 import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader
 import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
