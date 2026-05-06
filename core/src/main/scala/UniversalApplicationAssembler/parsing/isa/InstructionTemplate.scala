@@ -8,13 +8,16 @@ import UniversalApplicationAssembler.helpers.Functions.gradientRange
 /**
  * Represents a full ISA instruction. It is meant to be applied over a string that represents an instruction to compile it to binary instantly.
  *
- * @param bits The number of bits the instruction has.
  * @param fields The fields of the instruction, it is a map where each key is the name of the field and a BitRange represents it.
  * @param parameters A class that represents the parameters of the instruction.
  * @param translationContext The translation context node/scope where this instruction was declared.
  */
 case class InstructionTemplate(bits: Int, fields: Map[String, BitRange], parameters: ParametersDefinition, translationContext: TranslationNode):
 
+case class InstructionTemplate(fields: Map[String, BitRange], parameters: ParametersDefinition, translationContext: TranslationNode):
+
+  val bits: Int = translationContext.bits.toInt
+  
   //Checks for fields
   require: //Check that no bit collisions
     val usedBits: Array[Boolean] = Array.fill(bits)(false)
