@@ -15,7 +15,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
       case mappingNode: MappingNode => mappingNode
       case other => throw new IllegalArgumentException(s"Expected top node to be a MappingNode, not ${other.getNodeType}. ${YamlReader.getNodeLocation(other)}")
 
-  private var instructions: List[InstructionTemplate] = List.empty
+  var instructions: List[InstructionTemplate] = List.empty
 
   def parse(): TranslationNode =
 

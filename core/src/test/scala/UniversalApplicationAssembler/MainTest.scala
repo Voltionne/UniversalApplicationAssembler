@@ -14,5 +14,7 @@ class MainTest extends munit.FunSuite:
 
       println("Tree:")
       visualizeNodes(node)
+      
+      println(isaParser.instructions)
     }
   }
