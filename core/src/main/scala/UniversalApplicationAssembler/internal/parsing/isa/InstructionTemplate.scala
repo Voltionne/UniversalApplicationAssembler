@@ -135,7 +135,7 @@ case class InstructionTemplate(name: String, fields: Map[String, BitRange], para
     val result = compiledInstructionArray.zipWithIndex.map { (bit, idx) =>
       bit.find(char => char == '0' || char == '1') match
         case Some(value) => value
-        case None => throw new IllegalArgumentException(s"Bit $idx was not set!")
+        case None => throw new IllegalArgumentException(s"Bit in array idx $idx was not set!")
     }
 
     result.mkString
