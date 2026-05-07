@@ -55,7 +55,8 @@ class InstructionMapping(instructions: List[InstructionTemplate]):
             util.Try(instruction.apply(parsedWrittenInstruction.tail)) match
               case util.Success(value) => Some(instruction)
               case util.Failure(exception) =>
-                println(s"Instruction ${instruction.name} failed: ${exception.getMessage}")
+                print(s"EXCEPTION IN INSTRUCTION ${instruction.name}:")
+                exception.printStackTrace()
                 None
           }
           .collectFirst {
