@@ -3,23 +3,24 @@ package UniversalApplicationAssembler.api.parsing
 import UniversalApplicationAssembler.internal.datatypes.BitRange
 import UniversalApplicationAssembler.internal.parsing.isa.Conversions.toInstructionTemplate
 import UniversalApplicationAssembler.internal.parsing.isa.InstructionTemplate
-import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader
+import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader.{readYamlFile, nodeifyYamlFile, getNodeLocation, constructToScala}
 import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
 import UniversalApplicationAssembler.internal.parsing.isa.Helper
 import org.snakeyaml.engine.v2.nodes.{MappingNode, ScalarNode, SequenceNode}
 
 import java.io.InputStream
+import java.nio.file.Path
 
 /**
  * Parses YAML ISA specification files into instructions. Run .parse() and then the list "instructions" will be the result instructions.
- * @param yamlConfigInputStream The input stream of the YAML file.
+ * @param yamlConfigPath The path of the YAML config file
  */
-class IsaParser(val yamlConfigInputStream: InputStream):
+class IsaParser(val yamlConfigPath: Path):
 
   private val yamlTopNode: MappingNode =
-    YamlReader.readYamlFile(yamlConfigInputStream) match
+    nodeifyYamlFile(readYamlFile(yamlConfigPath)) match
       case mappingNode: MappingNode => mappingNode
-      case other => throw new IllegalArgumentException(s"Expected top node to be a MappingNode, not ${other.getNodeType}. ${YamlReader.getNodeLocation(other)}")
+      case other => throw new IllegalArgumentException(s"Expected top node to be a MappingNode, not ${other.getNodeType}. ${getNodeLocation(other)}")
 
   var instructions: List[InstructionTemplate] = List.empty
 
@@ -48,12 +49,12 @@ class IsaParser(val yamlConfigInputStream: InputStream):
       val stringKey =
         nodeTuple.getKeyNode match
           case scalarNode: ScalarNode => scalarNode.getValue
-          case other => throw new IllegalArgumentException(s"Expected key to be a ScalarNode (a string), not ${other.getNodeType}. ${YamlReader.getNodeLocation(other)}")
+          case other => throw new IllegalArgumentException(s"Expected key to be a ScalarNode (a string), not ${other.getNodeType}. ${getNodeLocation(other)}")
 
       if stringKey == "bits" then
         nodeTuple.getValueNode match
           case scalarNode: ScalarNode => currentTranslationContext.bits = BigInt(scalarNode.getValue) //Sets the number of bits
-          case other => throw new IllegalArgumentException(s"Expected bits to be a ScalarNode (a BigInt), not ${other.getNodeType}. ${YamlReader.getNodeLocation(other)}")
+          case other => throw new IllegalArgumentException(s"Expected bits to be a ScalarNode (a BigInt), not ${other.getNodeType}. ${getNodeLocation(other)}")
 
       else if stringKey == "instructions" then
         () //Skip instructions -> left for second pass
@@ -62,7 +63,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
         //Match based on value, given that all special keys have already been revised
         nodeTuple.getValueNode match
           case scalarNode: ScalarNode => //This is assignment OR declaration
-            val value = YamlReader.constructToScala(scalarNode)
+            val value = constructToScala(scalarNode)
 
             value match
               case s: String => //Declaration
@@ -73,7 +74,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
 
                 //There exists a BitRange in the scope that has the same name
                 if currentTranslationContext.getScope.contains(stringKey) then
-                  throw new IllegalArgumentException(s"Bit Range \"$stringKey\" is already defined!. ${YamlReader.getNodeLocation(scalarNode)}")
+                  throw new IllegalArgumentException(s"Bit Range \"$stringKey\" is already defined!. ${getNodeLocation(scalarNode)}")
                 else
                   //CREATE NEW BITRANGE
                   val split = s.split(':')
@@ -87,10 +88,10 @@ class IsaParser(val yamlConfigInputStream: InputStream):
                       BitRange(split(0).toInt, split(1).toInt)
                     )
                   else
-                    throw new IllegalArgumentException(s"Expected 1 or 2 bit position indications, not ${split.length}! ${YamlReader.getNodeLocation(scalarNode)}")
+                    throw new IllegalArgumentException(s"Expected 1 or 2 bit position indications, not ${split.length}! ${getNodeLocation(scalarNode)}")
 
               case i: BigInt => () //Assignment -> Ignore (left to second pass)
-              case other => throw new IllegalArgumentException(s"Found not recognized value for assignment or declaration. ${YamlReader.getNodeLocation(scalarNode)}")
+              case other => throw new IllegalArgumentException(s"Found not recognized value for assignment or declaration. ${getNodeLocation(scalarNode)}")
 
           case mappingNode: MappingNode => //This is sublevel OR assignment OR translation table
 
@@ -99,10 +100,10 @@ class IsaParser(val yamlConfigInputStream: InputStream):
             else if Helper.isTranslationTable(mappingNode) then //Translation Table (i.e. declaration)
 
               if currentTranslationContext.getScope.contains(stringKey) then
-                throw new IllegalArgumentException(s"Translation Table \"$stringKey\" is already defined!. ${YamlReader.getNodeLocation(mappingNode)}")
+                throw new IllegalArgumentException(s"Translation Table \"$stringKey\" is already defined!. ${getNodeLocation(mappingNode)}")
               else
                 //CREATE NEW TRANSLATION TABLE
-                val translationTable = YamlReader.constructToScala(mappingNode).asInstanceOf[Map[String, BigInt]] //This shouldn't fail because it is a translation table. Though, it is not very secure. May remake in the future
+                val translationTable = constructToScala(mappingNode).asInstanceOf[Map[String, BigInt]] //This shouldn't fail because it is a translation table. Though, it is not very secure. May remake in the future
                 currentTranslationContext.changes(stringKey) = TranslationLeaf(
                   translationTable
                 )
@@ -115,7 +116,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
 
               parseFirstPass(mappingNode, newTranslationContext)
 
-          case other => throw new IllegalArgumentException(s"Expected all keys to lead to tables (except \"instructions\" key). ${YamlReader.getNodeLocation(other)}")
+          case other => throw new IllegalArgumentException(s"Expected all keys to lead to tables (except \"instructions\" key). ${getNodeLocation(other)}")
     }
 
   //-----------------------------------------
@@ -129,7 +130,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
       val stringKey =
         nodeTuple.getKeyNode match
           case scalarNode: ScalarNode => scalarNode.getValue
-          case other => throw new IllegalArgumentException(s"Expected key to be a ScalarNode (a string), not ${other.getNodeType}. ${YamlReader.getNodeLocation(other)}")
+          case other => throw new IllegalArgumentException(s"Expected key to be a ScalarNode (a string), not ${other.getNodeType}. ${getNodeLocation(other)}")
 
       if stringKey == "bits" || stringKey == "instructions" then
         () //Skip -> "bits" handled in 1st pass. "instructions handled in 3rd pass
@@ -137,7 +138,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
         //Match based on value, given that all special keys have already been revised
         nodeTuple.getValueNode match
           case scalarNode: ScalarNode => //This is assignment OR declaration
-            val value = YamlReader.constructToScala(scalarNode)
+            val value = constructToScala(scalarNode)
 
             value match
               case s: String => () //Declaration -> Skip, handled in 1st pass
@@ -153,13 +154,13 @@ class IsaParser(val yamlConfigInputStream: InputStream):
                   currentTranslationContext.changes(stringKey).leaf match
                     case bitRange: BitRange =>
                       bitRange.setFullValue(i) //Modify directly
-                    case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${YamlReader.getNodeLocation(scalarNode)}")
+                    case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${getNodeLocation(scalarNode)}")
 
                 else if currentTranslationContext.getScope.contains(stringKey) then //2nd case
 
                   val bitRange = currentTranslationContext.getScope(stringKey).leaf match
                     case bitRange: BitRange => bitRange
-                    case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${YamlReader.getNodeLocation(scalarNode)}")
+                    case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${getNodeLocation(scalarNode)}")
 
                   //Modify the value (as a copy)
                   val copyBitRange = bitRange.deepCopy()
@@ -175,7 +176,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
 
                   val bitRange = leaf.leaf match
                     case bitRange: BitRange => bitRange
-                    case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${YamlReader.getNodeLocation(scalarNode)}")
+                    case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${getNodeLocation(scalarNode)}")
 
                   //Modify the value (as a copy)
                   val copyBitRange = bitRange.deepCopy()
@@ -187,14 +188,14 @@ class IsaParser(val yamlConfigInputStream: InputStream):
                   )
 
                 else
-                  throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${YamlReader.getNodeLocation(scalarNode)}")
+                  throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(scalarNode)}")
 
-              case other => throw new IllegalArgumentException(s"Found not recognized value for assignment or declaration. ${YamlReader.getNodeLocation(scalarNode)}")
+              case other => throw new IllegalArgumentException(s"Found not recognized value for assignment or declaration. ${getNodeLocation(scalarNode)}")
 
           case mappingNode: MappingNode => //This is sublevel OR assignment OR translation table
 
             if Helper.isSetMap(mappingNode) then //Assignment
-              val setMap = YamlReader.constructToScala(mappingNode).asInstanceOf[Map[String, Any]] //SHOULD 100% WORK (Not the most idiomatic, nevertheless). May change in the future
+              val setMap = constructToScala(mappingNode).asInstanceOf[Map[String, Any]] //SHOULD 100% WORK (Not the most idiomatic, nevertheless). May change in the future
 
 
               //Three options can happen here:
@@ -207,13 +208,13 @@ class IsaParser(val yamlConfigInputStream: InputStream):
                 currentTranslationContext.changes(stringKey).leaf match
                   case bitRange: BitRange =>
                     bitRange.setPartialValue(setMap) //Modify directly
-                  case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${YamlReader.getNodeLocation(mappingNode)}")
+                  case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${getNodeLocation(mappingNode)}")
 
               else if currentTranslationContext.getScope.contains(stringKey) then //2nd case
 
                 val bitRange = currentTranslationContext.getScope(stringKey).leaf match
                   case bitRange: BitRange => bitRange
-                  case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${YamlReader.getNodeLocation(mappingNode)}")
+                  case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${getNodeLocation(mappingNode)}")
 
                 //Modify the value (as a copy)
                 val copyBitRange = bitRange.deepCopy()
@@ -229,7 +230,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
 
                 val bitRange = leaf.leaf match
                   case bitRange: BitRange => bitRange
-                  case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${YamlReader.getNodeLocation(mappingNode)}")
+                  case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${getNodeLocation(mappingNode)}")
 
                 //Modify the value (as a copy)
                 val copyBitRange = bitRange.deepCopy()
@@ -241,7 +242,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
                 )
 
               else
-                throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${YamlReader.getNodeLocation(mappingNode)}")
+                throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(mappingNode)}")
 
             else if Helper.isTranslationTable(mappingNode) then () //Declaration -> Skip, handled in 1st pass
             else //Sublevel
@@ -249,9 +250,9 @@ class IsaParser(val yamlConfigInputStream: InputStream):
               if currentTranslationContext.children.contains(stringKey) then
                 parseSecondPass(mappingNode, currentTranslationContext.children(stringKey))
               else
-                throw new NoSuchElementException(s"Didn't found TranslationContext children with key \"$stringKey\". ${YamlReader.getNodeLocation(mappingNode)}")
+                throw new NoSuchElementException(s"Didn't found TranslationContext children with key \"$stringKey\". ${getNodeLocation(mappingNode)}")
 
-          case other => throw new IllegalArgumentException(s"Expected all keys to lead to tables (except \"instructions\" key). ${YamlReader.getNodeLocation(other)}")
+          case other => throw new IllegalArgumentException(s"Expected all keys to lead to tables (except \"instructions\" key). ${getNodeLocation(other)}")
     }
 
   //-----------------------------------------
@@ -265,7 +266,7 @@ class IsaParser(val yamlConfigInputStream: InputStream):
       val stringKey =
         nodeTuple.getKeyNode match
           case scalarNode: ScalarNode => scalarNode.getValue
-          case other => throw new IllegalArgumentException(s"Expected key to be a ScalarNode (a string), not ${other.getNodeType}. ${YamlReader.getNodeLocation(other)}")
+          case other => throw new IllegalArgumentException(s"Expected key to be a ScalarNode (a string), not ${other.getNodeType}. ${getNodeLocation(other)}")
 
       if stringKey == "bits" then
         () //Skip -> Already handled during 1st pass
@@ -273,11 +274,11 @@ class IsaParser(val yamlConfigInputStream: InputStream):
 
         val sequenceNode = nodeTuple.getValueNode match
           case sequenceNode: SequenceNode => sequenceNode
-          case other => throw new IllegalArgumentException(s"Expected \"instructions\" to be a SequenceNode, not ${other.getNodeType}! ${YamlReader.getNodeLocation(other)}")
+          case other => throw new IllegalArgumentException(s"Expected \"instructions\" to be a SequenceNode, not ${other.getNodeType}! ${getNodeLocation(other)}")
 
         sequenceNode.getValue.forEach {
           case mappingNode: MappingNode => instructions = instructions :+ toInstructionTemplate(mappingNode, currentTranslationContext)
-          case other => throw new IllegalArgumentException(s"Expected instructions to be a MappingNode, not ${other.getNodeType}! ${YamlReader.getNodeLocation(other)}")
+          case other => throw new IllegalArgumentException(s"Expected instructions to be a MappingNode, not ${other.getNodeType}! ${getNodeLocation(other)}")
         }
 
       else
@@ -295,5 +296,5 @@ class IsaParser(val yamlConfigInputStream: InputStream):
               if currentTranslationContext.children.contains(stringKey) then
                 parseThirdPass(mappingNode, currentTranslationContext.children(stringKey))
               else
-                throw new NoSuchElementException(s"Didn't found TranslationContext children with key \"$stringKey\". ${YamlReader.getNodeLocation(mappingNode)}")
+                throw new NoSuchElementException(s"Didn't found TranslationContext children with key \"$stringKey\". ${getNodeLocation(mappingNode)}")
     }
