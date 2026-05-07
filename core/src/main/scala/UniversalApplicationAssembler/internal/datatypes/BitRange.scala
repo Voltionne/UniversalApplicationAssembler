@@ -27,7 +27,7 @@ object Utils:
 case class BitRange(a: Int, b: Int):
   val bits: Int = abs(a - b) + 1
   var value: String = "?" * bits
-  val endianness: String = if a > b then "little" else "big"
+  val endianness: String = if a >= b then "little" else "big" //NOTE: 1 bit defaults to LITTLE ENDIAN. VERY IMPORTANT TODO: fix
 
   def this(a: Int) =
     this(a, a)
