@@ -13,7 +13,7 @@ object AssemblyParser:
     //Instruction format: (May change in the future)
     //[OPERAND] [PARAM1], [PARAM2], [PARAM3] [...]
 
-    val assemblyLines = assemblyFile.split("\n")
+    val assemblyLines = assemblyFile.split("\n").map(_.trim).filter(_.nonEmpty)
     var temp: List[Array[String]] = List.empty
 
     for assemblyLine <- assemblyLines do
