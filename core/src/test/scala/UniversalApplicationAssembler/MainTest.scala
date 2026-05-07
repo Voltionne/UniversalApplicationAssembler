@@ -4,7 +4,6 @@ import UniversalApplicationAssembler.api.parsing.{CustomAssembler, IsaParser}
 import UniversalApplicationAssembler.internal.parsing.assembly.InstructionMapping
 
 import java.nio.file.{Files, Path}
-import scala.util.Using
 
 object Helper:
 
