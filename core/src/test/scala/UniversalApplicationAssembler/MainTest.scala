@@ -26,9 +26,14 @@ class MainTest extends munit.FunSuite:
     println("Tree:")
     visualizeNodes(node)
 
+    val whiteList = List("WUPP", "WLOW", "ADD")
+
     println("Instructions:")
-    for instruction <- isaParser.instructions do
-      println(instruction)
+    for instruction <- isaParser.instructions if whiteList.contains(instruction.name) do
+      println(s"Instruction: ${instruction.name}. Fields: ${instruction.fields}")
+      for idx <- instruction.parameters.datatypes.indices do
+        println(s"  - dt: ${instruction.parameters.datatypes(idx)}")
+        println(s"  - ma: ${instruction.parameters.mappings(idx)}")
 
     //create the mapping:
     val instructionMapping = InstructionMapping(isaParser.instructions)
