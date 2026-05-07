@@ -1,8 +1,10 @@
-ThisBuild / version := "0.2.0"
-
-ThisBuild / organizationName := "com.voltionne"
-
+ThisBuild / organization := "com.voltionne"
+ThisBuild / version := "1.0.0"
 ThisBuild / scalaVersion := "3.3.7"
+
+
+ThisBuild / organizationName := "Voltionne (TM)"
+
 
 lazy val core = (project in file("core"))
   .settings(
