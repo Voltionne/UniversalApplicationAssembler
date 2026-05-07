@@ -1,9 +1,9 @@
 package UniversalApplicationAssembler
 
-import UniversalApplicationAssembler.api.parsing.{IsaParser, CustomAssembler}
+import UniversalApplicationAssembler.api.parsing.{CustomAssembler, IsaParser}
 import UniversalApplicationAssembler.internal.parsing.assembly.InstructionMapping
 
-import java.nio.file.{Path, Files}
+import java.nio.file.{Files, Path}
 import scala.util.Using
 
 object Helper:

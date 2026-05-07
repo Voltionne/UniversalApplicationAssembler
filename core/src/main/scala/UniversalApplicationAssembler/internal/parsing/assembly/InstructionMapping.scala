@@ -12,8 +12,8 @@ class InstructionMapping(instructions: List[InstructionTemplate]):
       if temp.contains(instructionTemplate.name) then //Instruction repeated -> multiple mappings
 
         temp(instructionTemplate.name) match
-          case instructionTemplate: InstructionTemplate =>
-            temp += (instructionTemplate.name -> List(instructionTemplate, instructionTemplate)) //This will overwrite the old key, essentially converting the entry in this list now.
+          case tempInstructionTemplate: InstructionTemplate =>
+            temp += (tempInstructionTemplate.name -> List(tempInstructionTemplate, instructionTemplate)) //This will overwrite the old key, essentially converting the entry in this list now.
           case l: List[?] =>
             val list = l.asInstanceOf[List[InstructionTemplate]] :+ instructionTemplate //Add the element to the end. INSTRUCTIONS DECLARED AFTERWARD WILL GET EVALUATED LATER THAN ITS FIRSTS VARIANTS
             temp += (instructionTemplate.name -> list) //Overwrite the old key
@@ -54,10 +54,7 @@ class InstructionMapping(instructions: List[InstructionTemplate]):
           .map { instruction =>
             util.Try(instruction.apply(parsedWrittenInstruction.tail)) match
               case util.Success(value) => Some(instruction)
-              case util.Failure(exception) =>
-                print(s"EXCEPTION IN INSTRUCTION ${instruction.name}:")
-                exception.printStackTrace()
-                None
+              case util.Failure(exception) => None
           }
           .collectFirst {
             case Some(instructionTemplate: InstructionTemplate) => instructionTemplate
