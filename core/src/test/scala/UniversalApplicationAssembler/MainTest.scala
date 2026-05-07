@@ -17,7 +17,7 @@ object Helper:
 class MainTest extends munit.FunSuite:
 
   test("Full test") {
-    
+
     val path = Helper.getResourcePath("/testIsa2.yaml")
     val isaParser = IsaParser(path)
 
@@ -36,11 +36,12 @@ class MainTest extends munit.FunSuite:
     val customAssembler = CustomAssembler(instructionMapping)
 
     val inputPath = Helper.getResourcePath("/assembly.asm")
-    
+
     val outputDir = Files.createTempDirectory("uaa-results")
+    println(s"Temp path: $outputDir")
     val outputPathString = outputDir.resolve("test-string.text")
     val outputPathBinary = outputDir.resolve("test-binary.txt")
-    
+
     customAssembler.compileToString(inputPath, outputPathString)
     customAssembler.compileToBinary(inputPath, outputPathBinary)
   }
