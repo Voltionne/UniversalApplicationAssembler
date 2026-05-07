@@ -53,11 +53,13 @@ class InstructionMapping(instructions: List[InstructionTemplate]):
         val firstInstruction = listInstructions.iterator //first instruction that does not fail apply (they are in written order of the YAML file, theoretically)
           .map { instruction =>
             util.Try(instruction.apply(parsedWrittenInstruction.tail)) match
-              case util.Success(value) => instruction
-              case other => None
+              case util.Success(value) => Some(instruction)
+              case util.Failure(exception) =>
+                println(s"Instruction ${instruction.name} failed: ${exception.getMessage}")
+                None
           }
           .collectFirst {
-            case instructionTemplate: InstructionTemplate => instructionTemplate
+            case Some(instructionTemplate: InstructionTemplate) => instructionTemplate
           }
 
         firstInstruction match
