@@ -381,7 +381,7 @@ format:
                   
                   parameters:
                       values: ["parameters.registers.integer", "parameters.immediates.imm16"]
-                      mappings: ["format.definitions.Rs5-1", ["format.definitions.Rd5", "format.definitions.Rs5-2", "format.definitions.Sub6"]]
+                      mappings: ["format.definitions.Rd5", ["format.definitions.Sub6", "format.definitions.Rs5-2", "format.definitions.Rs5-1"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
@@ -397,7 +397,7 @@ format:
 
                   parameters:
                       values: ["parameters.registers.integer", "parameters.immediates.imm16"]
-                      mappings: ["format.definitions.Rs5-1", ["format.definitions.Rd5", "format.definitions.Rs5-2", "format.definitions.Sub6"]]
+                      mappings: ["format.definitions.Rd5", ["format.definitions.Sub6", "format.definitions.Rs5-2", "format.definitions.Rs5-1"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
@@ -407,7 +407,7 @@ format:
 
                   parameters:
                       values: ["parameters.registers.integer", "parameters.immediates.imm16"]
-                      mappings: ["format.definitions.Rs5-1", ["format.definitions.Rd5", "format.definitions.Rs5-2", "format.definitions.Sub6"]]
+                      mappings: ["format.definitions.Rd5", ["format.definitions.Sub6", "format.definitions.Rs5-2", "format.definitions.Rs5-1"]]
 
                   format.definitions.Op8: {set: 0b000, bits_local: "2:0"}
 
