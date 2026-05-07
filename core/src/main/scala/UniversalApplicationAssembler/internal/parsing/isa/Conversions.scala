@@ -165,7 +165,7 @@ object Conversions:
 
             //Add as field
             val newBitRange = bitRange.deepCopy()
-            fields + (singleParameterMapping.mappingLocation -> newBitRange)
+            fields = fields + (singleParameterMapping.mappingLocation -> newBitRange)
 
           case other => throw new IllegalArgumentException(s"Mapping of a parameter must be a BitRange, not a Translation Table!")
 
@@ -186,7 +186,7 @@ object Conversions:
 
               //Add as field
               val newBitRange = bitRange.deepCopy()
-              fields + (mappingLocation -> newBitRange)
+              fields = fields + (mappingLocation -> newBitRange)
 
             case other => throw new IllegalArgumentException(s"Mapping of a parameter must be a BitRange, not a Translation Table!")
         }
