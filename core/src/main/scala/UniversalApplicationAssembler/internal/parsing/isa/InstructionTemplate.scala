@@ -4,6 +4,7 @@ import UniversalApplicationAssembler.internal.helpers.Functions.gradientRange
 import UniversalApplicationAssembler.internal.datatypes.BitRange
 import UniversalApplicationAssembler.internal.parsing.yaml.Conversions
 import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
+import org.snakeyaml.engine.v2.nodes.MappingNode
 
 /**
  * Represents a full ISA instruction. It is meant to be applied over a string that represents an instruction to compile it to binary instantly.
@@ -11,8 +12,9 @@ import UniversalApplicationAssembler.internal.parsing.yaml.translation.{Translat
  * @param fields The fields of the instruction, it is a map where each key is the name of the field and a BitRange represents it.
  * @param parameters A class that represents the parameters of the instruction.
  * @param translationContext The translation context node/scope where this instruction was declared.
+ * @param originNode The node where the instruction is defined
  */
-case class InstructionTemplate(name: String, fields: Map[String, BitRange], parameters: ParametersDefinition, translationContext: TranslationNode):
+case class InstructionTemplate(name: String, fields: Map[String, BitRange], parameters: ParametersDefinition, translationContext: TranslationNode, originNode: MappingNode):
 
   val bits: Int = translationContext.bits.toInt
 

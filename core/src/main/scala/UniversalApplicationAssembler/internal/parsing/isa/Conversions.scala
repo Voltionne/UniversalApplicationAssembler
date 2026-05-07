@@ -192,4 +192,4 @@ object Conversions:
         }
     }
 
-    InstructionTemplate(name, fields, parametersDefinition, translationContext)
+    InstructionTemplate(name, fields, parametersDefinition, translationContext, mappingNode)
