@@ -124,14 +124,19 @@ case class InstructionTemplate(name: String, fields: Map[String, BitRange], para
     //Not done because already done in BitRange
     //require(checkCompleteness)
 
-    val compiledInstructionArray = ("?" * bits).toCharArray
-
-    val compiledResults: List[String] = List()
+    var compiledInstructionArray = ("P" * bits).toCharArray.map(_.toString)
 
     for (fieldName, bitRange) <- fields do
-      compiledResults +: bitRange.compile(bits) //This calls checkValue on each BitRange
 
-    compiledResults.map(_.toList).transpose.map {
-      column => column.find(_ != 'P').getOrElse('P')
-    }.mkString
+      val compiledBitRange = bitRange.compile(bits).toCharArray //This calls checkValue on each BitRange
+
+      compiledInstructionArray = compiledInstructionArray.zip(compiledBitRange).map { case (x, y) => s"$x$y"}
+
+    val result = compiledInstructionArray.zipWithIndex.map { (bit, idx) =>
+      bit.find(char => char == '0' || char == '1') match
+        case Some(value) => value
+        case None => throw new IllegalArgumentException(s"Bit $idx was not set!")
+    }
+
+    result.mkString
       
