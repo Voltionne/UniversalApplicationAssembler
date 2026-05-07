@@ -24,12 +24,17 @@ class CustomAssembler(instructionMapping: InstructionMapping):
 
     val instructions = AssemblyParser.parseToList(assemblyFile)
 
-    var compiledCode = ""
+    if instructions.nonEmpty then
 
-    for instruction <- instructions do
-      compiledCode += instructionMapping.compileInstruction(instruction) + "\n"
+      var compiledCode = ""
 
-    Files.writeString(outputFile, compiledCode, StandardCharsets.UTF_8)
+      for instruction <- instructions do
+        compiledCode += instructionMapping.compileInstruction(instruction) + "\n"
+
+      Files.writeString(outputFile, compiledCode, StandardCharsets.UTF_8)
+
+    else
+      Files.writeString(outputFile, "", StandardCharsets.UTF_8) //write empty
 
   /**
    * Compiles a source file to a binary file
@@ -42,10 +47,15 @@ class CustomAssembler(instructionMapping: InstructionMapping):
 
     val instructions = AssemblyParser.parseToList(assemblyFile)
 
-    var compiledCode = ""
+    if instructions.nonEmpty then
 
-    for instruction <- instructions do
-      compiledCode += instructionMapping.compileInstruction(instruction)
+      var compiledCode = ""
 
-    //Write the binary directly
-    Files.write(outputFile, AssemblyParser.bitsToBytes(compiledCode))
+      for instruction <- instructions do
+        compiledCode += instructionMapping.compileInstruction(instruction)
+
+      //Write the binary directly
+      Files.write(outputFile, AssemblyParser.bitsToBytes(compiledCode))
+
+    else
+      Files.writeString(outputFile, "", StandardCharsets.UTF_8) //write empty
