@@ -1,22 +1,46 @@
 package UniversalApplicationAssembler
 
-import UniversalApplicationAssembler.api.parsing.IsaParser
+import UniversalApplicationAssembler.api.parsing.{IsaParser, CustomAssembler}
+import UniversalApplicationAssembler.internal.parsing.assembly.InstructionMapping
+
+import java.nio.file.{Path, Files}
 import scala.util.Using
+
+object Helper:
+
+  def getResourcePath(name: String): Path =
+
+    val url = getClass.getResource(name)
+    java.nio.file.Paths.get(url.toURI)
+
 
 class MainTest extends munit.FunSuite:
 
-  test("First pass test") {
+  test("Full test") {
+    
+    val path = Helper.getResourcePath("/testIsa2.yaml")
+    val isaParser = IsaParser(path)
 
-    Using.resource(getClass.getResourceAsStream("/testIsa2.yaml")) {stream =>
-      val isaParser = IsaParser(stream)
-      val node = isaParser.parse()
+    val node = isaParser.parse()
 
-      println("Tree:")
-      visualizeNodes(node)
+    println("Tree:")
+    visualizeNodes(node)
 
-      println("Instructions:")
-      isaParser.instructions.foreach { instruction =>
-        println(instruction)
-      }
-    }
+    println("Instructions:")
+    for instruction <- isaParser.instructions do
+      println(instruction)
+
+    //create the mapping:
+    val instructionMapping = InstructionMapping(isaParser.instructions)
+
+    val customAssembler = CustomAssembler(instructionMapping)
+
+    val inputPath = Helper.getResourcePath("/assembly.asm")
+    
+    val outputDir = Files.createTempDirectory("uaa-results")
+    val outputPathString = outputDir.resolve("test-string.text")
+    val outputPathBinary = outputDir.resolve("test-binary.txt")
+    
+    customAssembler.compileToString(inputPath, outputPathString)
+    customAssembler.compileToBinary(inputPath, outputPathBinary)
   }
