@@ -1,11 +1,10 @@
-package UniversalApplicationAssembler.api.parsing
+package UniversalApplicationAssembler.api.parsing.isa
 
 import UniversalApplicationAssembler.internal.datatypes.BitRange
 import UniversalApplicationAssembler.internal.parsing.isa.Conversions.toInstructionTemplate
-import UniversalApplicationAssembler.internal.parsing.isa.InstructionTemplate
-import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader.{readYamlFile, nodeifyYamlFile, getNodeLocation, constructToScala}
+import UniversalApplicationAssembler.internal.parsing.isa.{Helper, InstructionTemplate}
+import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader.{constructToScala, getNodeLocation, nodeifyYamlFile, readYamlFile}
 import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
-import UniversalApplicationAssembler.internal.parsing.isa.Helper
 import org.snakeyaml.engine.v2.nodes.{MappingNode, ScalarNode, SequenceNode}
 
 import java.io.InputStream
@@ -22,13 +21,15 @@ class IsaParser(val yamlConfigPath: Path):
       case mappingNode: MappingNode => mappingNode
       case other => throw new IllegalArgumentException(s"Expected top node to be a MappingNode, not ${other.getNodeType}. ${getNodeLocation(other)}")
 
-  var instructions: List[InstructionTemplate] = List.empty
+  private var instructions: List[InstructionTemplate] = List.empty
 
   /**
    * Parses the YAML file.
    * @return The final translation context tree resulted from the parsing. Useful for seeing references and debugging.
    */
-  def parse(): TranslationNode =
+  def parse(): InstructionMapping =
+
+    instructions = List.empty //Clear instructions
 
     val currentTranslationContext = TranslationNode(-1) //create the top translation node
 
@@ -36,7 +37,23 @@ class IsaParser(val yamlConfigPath: Path):
     parseSecondPass(yamlTopNode, currentTranslationContext)
     parseThirdPass(yamlTopNode, currentTranslationContext)
 
-    currentTranslationContext
+    InstructionMapping(instructions)
+
+  /**
+   * Parses the YAML file and also returns the TranslationNode top node for debugging.
+   * @return A tuple with the InstructionMapping and TranslationNode.
+   */
+  def debugParse(): (InstructionMapping, TranslationNode) =
+
+    instructions = List.empty //Clear instructions
+
+    val currentTranslationContext = TranslationNode(-1) //create the top translation node
+
+    parseFirstPass(yamlTopNode, currentTranslationContext)
+    parseSecondPass(yamlTopNode, currentTranslationContext)
+    parseThirdPass(yamlTopNode, currentTranslationContext)
+
+    (InstructionMapping(instructions), currentTranslationContext)
 
   //-----------------------------------------
   // FIRST PASS -> Resolve declarations
