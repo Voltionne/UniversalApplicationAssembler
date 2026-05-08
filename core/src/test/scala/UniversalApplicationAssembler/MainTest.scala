@@ -1,7 +1,7 @@
 package UniversalApplicationAssembler
 
-import UniversalApplicationAssembler.api.parsing.{CustomAssembler, IsaParser}
-import UniversalApplicationAssembler.internal.parsing.assembly.InstructionMapping
+import UniversalApplicationAssembler.api.parsing.assembly.CustomAssembler
+import UniversalApplicationAssembler.api.parsing.isa.{InstructionMapping, IsaParser}
 
 import java.nio.file.{Files, Path}
 
@@ -18,24 +18,11 @@ class MainTest extends munit.FunSuite:
   test("Full test") {
 
     val path = Helper.getResourcePath("/testIsa2.yaml")
-    val isaParser = IsaParser(path)
 
-    val node = isaParser.parse()
+    val (instructionMapping, node) = IsaParser.debugParse(path)
 
     println("Tree:")
     visualizeNodes(node)
-
-    val whiteList = List("WUPP", "WLOW", "ADD")
-
-    println("Instructions:")
-    for instruction <- isaParser.instructions if whiteList.contains(instruction.name) do
-      println(s"Instruction: ${instruction.name}. Fields: ${instruction.fields}")
-      for idx <- instruction.parameters.datatypes.indices do
-        println(s"  - dt: ${instruction.parameters.datatypes(idx)}")
-        println(s"  - ma: ${instruction.parameters.mappings(idx)}")
-
-    //create the mapping:
-    val instructionMapping = InstructionMapping(isaParser.instructions)
 
     val customAssembler = CustomAssembler(instructionMapping)
 
