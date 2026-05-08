@@ -7,51 +7,48 @@ import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader.{construct
 import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
 import org.snakeyaml.engine.v2.nodes.{MappingNode, ScalarNode, SequenceNode}
 
-import java.io.InputStream
 import java.nio.file.Path
 
-/**
- * Parses YAML ISA specification files into instructions. Run .parse() and then the list "instructions" will be the result instructions.
- * @param yamlConfigPath The path of the YAML config file
- */
-class IsaParser(val yamlConfigPath: Path):
 
-  private val yamlTopNode: MappingNode =
-    nodeifyYamlFile(readYamlFile(yamlConfigPath)) match
-      case mappingNode: MappingNode => mappingNode
-      case other => throw new IllegalArgumentException(s"Expected top node to be a MappingNode, not ${other.getNodeType}. ${getNodeLocation(other)}")
-
-  private var instructions: List[InstructionTemplate] = List.empty
+object IsaParser:
 
   /**
    * Parses the YAML file.
-   * @return The final translation context tree resulted from the parsing. Useful for seeing references and debugging.
+   * @param yamlConfigPath The path of the configuration YAML file
+   * @return A representation of the instructions in the ISA
    */
-  def parse(): InstructionMapping =
+  def parse(yamlConfigPath: Path): InstructionMapping =
 
-    instructions = List.empty //Clear instructions
+    val yamlTopNode: MappingNode =
+      nodeifyYamlFile(readYamlFile(yamlConfigPath)) match
+        case mappingNode: MappingNode => mappingNode
+        case other => throw new IllegalArgumentException(s"Expected top node to be a MappingNode, not ${other.getNodeType}. ${getNodeLocation(other)}")
 
     val currentTranslationContext = TranslationNode(-1) //create the top translation node
 
     parseFirstPass(yamlTopNode, currentTranslationContext)
     parseSecondPass(yamlTopNode, currentTranslationContext)
-    parseThirdPass(yamlTopNode, currentTranslationContext)
+    val instructions = parseThirdPass(yamlTopNode, currentTranslationContext, List.empty)
 
     InstructionMapping(instructions)
 
   /**
    * Parses the YAML file and also returns the TranslationNode top node for debugging.
-   * @return A tuple with the InstructionMapping and TranslationNode.
+   * @param yamlConfigPath The path of the configuration YAML file
+   * @return A tuple with a representation of the instructions in the ISA (InstructionMapping) and the top node of the result of building a node tree of variables (TranslationNode)
    */
-  def debugParse(): (InstructionMapping, TranslationNode) =
+  def debugParse(yamlConfigPath: Path): (InstructionMapping, TranslationNode) =
 
-    instructions = List.empty //Clear instructions
+    val yamlTopNode: MappingNode =
+      nodeifyYamlFile(readYamlFile(yamlConfigPath)) match
+        case mappingNode: MappingNode => mappingNode
+        case other => throw new IllegalArgumentException(s"Expected top node to be a MappingNode, not ${other.getNodeType}. ${getNodeLocation(other)}")
 
     val currentTranslationContext = TranslationNode(-1) //create the top translation node
 
     parseFirstPass(yamlTopNode, currentTranslationContext)
     parseSecondPass(yamlTopNode, currentTranslationContext)
-    parseThirdPass(yamlTopNode, currentTranslationContext)
+    val instructions = parseThirdPass(yamlTopNode, currentTranslationContext, List.empty)
 
     (InstructionMapping(instructions), currentTranslationContext)
 
@@ -276,7 +273,9 @@ class IsaParser(val yamlConfigPath: Path):
   // THIRD PASS -> Resolve instructions
   //-----------------------------------------
 
-  private def parseThirdPass(currentNode: MappingNode, currentTranslationContext: TranslationNode): Unit =
+  private def parseThirdPass(currentNode: MappingNode, currentTranslationContext: TranslationNode, currentInstructions: List[InstructionTemplate]): List[InstructionTemplate] =
+    
+    var instructions: List[InstructionTemplate] = currentInstructions
 
     currentNode.getValue.forEach { nodeTuple =>
 
@@ -311,7 +310,9 @@ class IsaParser(val yamlConfigPath: Path):
             else //Sublevel
 
               if currentTranslationContext.children.contains(stringKey) then
-                parseThirdPass(mappingNode, currentTranslationContext.children(stringKey))
+                instructions = parseThirdPass(mappingNode, currentTranslationContext.children(stringKey), instructions)
               else
                 throw new NoSuchElementException(s"Didn't found TranslationContext children with key \"$stringKey\". ${getNodeLocation(mappingNode)}")
     }
+    
+    instructions
