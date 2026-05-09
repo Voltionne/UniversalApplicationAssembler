@@ -182,64 +182,34 @@ object InstructionTemplate:
               case other => throw new IllegalArgumentException(s"Expected parameters of a function to be a map with keys being strings and values be lists, not ${other}. ${YamlReader.getNodeLocation(mappingNode)}")
           else //100% an assignment
 
-            value match
-              case sm: Map[?, ?] if sm.keys.forall(_.isInstanceOf[String]) => //Partial assignment
-                val setMap = sm.asInstanceOf[Map[String, Any]]
+            //Procedure as following
+            //Step 1: Get the BitRange
+            //Step 2: Create a new one with the updated value. DON'T UPDATE THE TRANSLATION CONTEXT (as this is per instruction)
+            //Step 3: The new one is a field
 
-                if Utils.isSetMap(setMap) then
+            //Step 1:
+            val translationLeaf: TranslationLeaf = Translation.searchLeaf(key, translationContext)
+              .getOrElse(throw new IllegalArgumentException(s"Variable \"$key\" is not defined! ${YamlReader.getNodeLocation(mappingNode)}"))
 
-                  //Procedure as following
-                  //Step 1: Get the BitRange
-                  //Step 2: Create a new one with the updated value. DON'T UPDATE THE TRANSLATION CONTEXT (as this is per instruction)
-                  //Step 3: The new one is a field
+            //Step 2 & 3
+            translationLeaf.leaf match
+              case bitRange: BitRange =>
 
-                  //Step 1:
-                  val translationLeaf: TranslationLeaf = Translation.searchLeaf(key, translationContext)
-                    .getOrElse(throw new IllegalArgumentException(s"Variable \"$key\" is not defined! ${YamlReader.getNodeLocation(mappingNode)}"))
-
-                  //Step 2 & 3
-                  translationLeaf.leaf match
-                    case bitRange: BitRange =>
-
-                      //Step 2:
-                      val newBitRange = bitRange.deepCopy()
-                      newBitRange.setPartialValue(setMap)
-
-                      //Step 3:
-                      //Note: using stringKey as the name of the field, this in some cases can be the full path. Should be ok as searching uses also the full path.
-                      fields = fields + (key -> newBitRange)
-
-                    case other => throw new IllegalArgumentException(s"Can only assign values to BitRange, not to ${other.getClass}")
-
-                else
-                  throw new IllegalArgumentException(s"Expected map to be a set map for variable \"$key\". ${YamlReader.getNodeLocation(mappingNode)}")
-
-              case i: BigInt => //Full assignment
-
-                //Procedure as following
-                //Step 1: Get the BitRange
-                //Step 2: Create a new one with the updated value. DON'T UPDATE THE TRANSLATION CONTEXT (as this is per instruction)
-                //Step 3: The new one is a field
-
-                //Step 1:
-                val translationLeaf: TranslationLeaf = Translation.searchLeaf(key, translationContext)
-                  .getOrElse(throw new IllegalArgumentException(s"Variable \"$key\" is not defined! ${YamlReader.getNodeLocation(mappingNode)}"))
-
-                //Step 2 & 3
-                translationLeaf.leaf match
-                  case bitRange: BitRange =>
-
-                    //Step 2:
-                    val newBitRange = bitRange.deepCopy()
+                //Step 2: Check what kind of assignment it is
+                val newBitRange = bitRange.deepCopy()
+                value match
+                  case sm: Map[?, ?] if sm.keys.forall(_.isInstanceOf[String]) => //Partial assignment
+                    val setMap = sm.asInstanceOf[Map[String, Any]]
+                    newBitRange.setPartialValue(setMap)
+                  case i: BigInt =>
                     newBitRange.setFullValue(i)
+                  case other => throw new IllegalArgumentException(s"Only assignments inside instructions! Not $other! ${YamlReader.getNodeLocation(mappingNode)}")
 
-                    //Step 3:
-                    //Note: using stringKey as the name of the field, this in some cases can be the full path. Should be ok as searching uses also the full path.
-                    fields = fields + (key -> newBitRange)
+                //Step 3:
+                //Note: using stringKey as the name of the field, this in some cases can be the full path. Should be ok as searching uses also the full path.
+                fields = fields + (key -> newBitRange)
 
-                  case other => throw new IllegalArgumentException(s"Can only assign values to BitRange, not to ${other.getClass}. ${YamlReader.getNodeLocation(mappingNode)}")
-
-              case other => throw new IllegalArgumentException(s"Only assignments inside instructions! Not $other! ${YamlReader.getNodeLocation(mappingNode)}")
+              case other => throw new IllegalArgumentException(s"Can only assign values to BitRange, not to ${other.getClass}")
 
         InstructionTemplate(name, fields, parametersDefinition, translationContext, mappingNode)
 
