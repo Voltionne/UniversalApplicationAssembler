@@ -206,8 +206,11 @@ object InstructionTemplate:
                   case other => throw new IllegalArgumentException(s"Only assignments inside instructions! Not $other! ${YamlReader.getNodeLocation(mappingNode)}")
 
                 //Step 3:
-                //Note: using stringKey as the name of the field, this in some cases can be the full path. Should be ok as searching uses also the full path.
-                fields = fields + (key -> newBitRange)
+                //Make sure the key is ALWAYS the full path
+                if key.contains('.') then //Full path already
+                  fields += (key -> newBitRange)
+                else //current scope path
+                  fields += (Translation.getFullPath(key, translationContext) -> newBitRange)
 
               case other => throw new IllegalArgumentException(s"Can only assign values to BitRange, not to ${other.getClass}")
 
@@ -251,7 +254,13 @@ object InstructionTemplate:
 
         translationLeaf match
           case TranslationLeaf(leaf: BitRange) =>
-            newFields += (location -> leaf)
+
+            //Make sure the key is ALWAYS the full path
+            if location.contains('.') then //Full path already
+              newFields += (location -> leaf)
+            else //current scope path
+              newFields += (Translation.getFullPath(location, translationContext) -> leaf)
+
           case other => throw new IllegalArgumentException(s"Expected a BitRange as mapping, not ${other.getClass}! ${YamlReader.getNodeLocation(originNode)}")
 
     (parametersDefinition, newFields)
