@@ -1,3 +1,12 @@
+bits: 32
+
+registers:
+  r0: 0
+  r1: 1
+  r2: 2
+  r3: 3
+  r4: 4
+
 nested:
 
   Op8: "31:24"
@@ -16,7 +25,7 @@ nested:
       - name: "ADD"
 
         parameters:
-          values: [ "parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer" ]
+          values: [ "registers", "registers", "registers" ]
           mappings: [ "Rs5-1", "Rs5-2", "Rd5" ]
 
         Op8: { set: 0b000, bits_local: "2:0" }
