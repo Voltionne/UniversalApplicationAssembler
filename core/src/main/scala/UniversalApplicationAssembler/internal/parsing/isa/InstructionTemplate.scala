@@ -269,26 +269,19 @@ object InstructionTemplate:
       else
         throw new NoSuchElementException(s"Didn't found datatype \"$datatype\" specified in parameters. ${YamlReader.getNodeLocation(originNode)}")
 
-      mapping match
-        case SingleParameterMapping(location: String) =>
+      //Get the locations of mapping
+      val locations = mapping match
+        case SingleParameterMapping(location: String) => List(location)
+        case MultipleParameterMapping(locations: List[String]) => locations
 
-          val translationLeaf: TranslationLeaf = Translation.searchLeaf(location, translationContext)
-            .getOrElse(throw new IllegalArgumentException(s"Didn't found mapping location \"$location\" specified in parameters. ${YamlReader.getNodeLocation(originNode)}"))
+      //Check locations exist
+      for location <- locations do
+        val translationLeaf: TranslationLeaf = Translation.searchLeaf(location, translationContext)
+          .getOrElse(throw new IllegalArgumentException(s"Didn't found mapping location \"$location\" specified in parameters. ${YamlReader.getNodeLocation(originNode)}"))
 
-          translationLeaf match
-            case TranslationLeaf(leaf: BitRange) =>
-              newFields += (location -> leaf)
-            case other => throw new IllegalArgumentException(s"Expected a BitRange as mapping, not ${other.getClass}! ${YamlReader.getNodeLocation(originNode)}")
-
-        case MultipleParameterMapping(locations: List[String]) =>
-
-          for location <- locations do
-            val translationLeaf: TranslationLeaf = Translation.searchLeaf(location, translationContext)
-              .getOrElse(throw new IllegalArgumentException(s"Didn't found mapping location \"$location\" specified in parameters. ${YamlReader.getNodeLocation(originNode)}"))
-
-            translationLeaf match
-              case TranslationLeaf(leaf: BitRange) =>
-                newFields += (location -> leaf)
-              case other => throw new IllegalArgumentException(s"Expected a BitRange as mapping, not ${other.getClass}! ${YamlReader.getNodeLocation(originNode)}")
+        translationLeaf match
+          case TranslationLeaf(leaf: BitRange) =>
+            newFields += (location -> leaf)
+          case other => throw new IllegalArgumentException(s"Expected a BitRange as mapping, not ${other.getClass}! ${YamlReader.getNodeLocation(originNode)}")
 
     (parametersDefinition, newFields)
