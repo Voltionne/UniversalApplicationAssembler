@@ -52,7 +52,7 @@ case class BitRange(a: Int, b: Int):
 
       (setMap("set"), setMap("bits")) match
         case (set: BigInt, bits: String) =>
-          if bits contains ":" then
+          if bits.contains(":") then
 
             //This means it specifies a whole range
             val parts = bits.split(":")
@@ -100,12 +100,13 @@ case class BitRange(a: Int, b: Int):
               valueAsArray(bits.toInt - a) = set.toString.head
 
             value = valueAsArray.mkString
+        case (a, b) => throw new IllegalArgumentException(s"Expected key \"set\" of a set map to be an integer and \"bits\" to be an string. Currently it is, respectively ${a.getClass} and ${b.getClass}!")
 
     else //must be bits_local
 
       (setMap("set"), setMap("bits_local")) match
         case (set: BigInt, bitsLocal: String) =>
-          if bitsLocal contains ":" then
+          if bitsLocal.contains(":") then
 
             //This means it specifies a whole range
             val parts = bitsLocal.split(":")
@@ -152,6 +153,7 @@ case class BitRange(a: Int, b: Int):
               valueAsArray(bitsLocal.toInt) = set.toString.head
 
             value = valueAsArray.mkString
+        case (a, b) => throw new IllegalArgumentException(s"Expected key \"set\" of a set map to be an integer and \"bits_local\" to be an string. Currently it is, respectively ${a.getClass} and ${b.getClass}!")
 
   /**
    * Set the full value of the BitRange
@@ -165,7 +167,7 @@ case class BitRange(a: Int, b: Int):
    * Tests if the BitRange has all its bits positions declared correctly as 0 or 1, i.e. no placeholder values.
    * @return true or false depending on the result of the check
    */
-  def checkValue: Boolean = if value contains "?" then false else true
+  def checkValue: Boolean = if value.contains("?") then false else true
 
   /**
    * Puts the BitRange on its placed (based on its indexes "a" and "b") and fills other places with "P" meaning placeholder. It is meant to allow the overlapping and combination of different BitRanges as the same final number.
