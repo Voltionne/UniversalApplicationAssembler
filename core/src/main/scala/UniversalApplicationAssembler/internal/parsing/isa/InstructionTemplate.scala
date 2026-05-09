@@ -3,7 +3,7 @@ package UniversalApplicationAssembler.internal.parsing.isa
 import UniversalApplicationAssembler.internal.helpers.Functions.gradientRange
 import UniversalApplicationAssembler.internal.datatypes.{BitRange, Utils}
 import UniversalApplicationAssembler.internal.parsing.yaml.{Conversions, YamlReader}
-import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
+import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode, Translation}
 import org.snakeyaml.engine.v2.nodes.MappingNode
 
 /**
@@ -198,14 +198,9 @@ object InstructionTemplate:
                   //Step 2: Create a new one with the updated value. DON'T UPDATE THE TRANSLATION CONTEXT (as this is per instruction)
                   //Step 3: The new one is a field
 
-                  //Step 1: Can be either in scope or full path
-                  val translationLeaf: TranslationLeaf =
-                    if translationContext.getScope.contains(key) then
-                      translationContext.getScope(key)
-                    else if translationContext.getTop.searchTranslationLeaf(key).isDefined then
-                      translationContext.getTop.searchTranslationLeaf(key).get
-                    else
-                      throw new IllegalArgumentException(s"Variable \"$key\" is not defined! ${YamlReader.getNodeLocation(mappingNode)}")
+                  //Step 1:
+                  val translationLeaf: TranslationLeaf = Translation.searchLeaf(key, translationContext)
+                    .getOrElse(throw new IllegalArgumentException(s"Variable \"$key\" is not defined! ${YamlReader.getNodeLocation(mappingNode)}"))
 
                   //Step 2 & 3
                   translationLeaf.leaf match
@@ -231,14 +226,9 @@ object InstructionTemplate:
                 //Step 2: Create a new one with the updated value. DON'T UPDATE THE TRANSLATION CONTEXT (as this is per instruction)
                 //Step 3: The new one is a field
 
-                //Step 1: Can be either in scope or full path
-                val translationLeaf: TranslationLeaf =
-                  if translationContext.getScope.contains(key) then
-                    translationContext.getScope(key)
-                  else if translationContext.getTop.searchTranslationLeaf(key).isDefined then
-                    translationContext.getTop.searchTranslationLeaf(key).get
-                  else
-                    throw new IllegalArgumentException(s"Variable \"$key\" is not defined! ${YamlReader.getNodeLocation(mappingNode)}")
+                //Step 1:
+                val translationLeaf: TranslationLeaf = Translation.searchLeaf(key, translationContext)
+                  .getOrElse(throw new IllegalArgumentException(s"Variable \"$key\" is not defined! ${YamlReader.getNodeLocation(mappingNode)}"))
 
                 //Step 2 & 3
                 translationLeaf.leaf match
@@ -287,13 +277,8 @@ object InstructionTemplate:
       mapping match
         case SingleParameterMapping(location: String) =>
 
-          val translationLeaf =
-            if translationContext.getScope.contains(location) then
-              translationContext.getScope(location)
-            else if translationContext.getTop.searchTranslationLeaf(location).isDefined then
-              translationContext.getTop.searchTranslationLeaf(location).get
-            else
-              throw new NoSuchElementException(s"Didn't found mapping location \"$location\" specified in parameters. ${YamlReader.getNodeLocation(originNode)}")
+          val translationLeaf: TranslationLeaf = Translation.searchLeaf(location, translationContext)
+            .getOrElse(throw new IllegalArgumentException(s"Didn't found mapping location \"$location\" specified in parameters. ${YamlReader.getNodeLocation(originNode)}"))
 
           translationLeaf match
             case TranslationLeaf(leaf: BitRange) =>
@@ -303,13 +288,8 @@ object InstructionTemplate:
         case MultipleParameterMapping(locations: List[String]) =>
 
           for location <- locations do
-            val translationLeaf =
-              if translationContext.getScope.contains(location) then
-                translationContext.getScope(location)
-              else if translationContext.getTop.searchTranslationLeaf(location).isDefined then
-                translationContext.getTop.searchTranslationLeaf(location).get
-              else
-                throw new NoSuchElementException(s"Didn't found mapping location \"$location\" specified in parameters. ${YamlReader.getNodeLocation(originNode)}")
+            val translationLeaf: TranslationLeaf = Translation.searchLeaf(location, translationContext)
+              .getOrElse(throw new IllegalArgumentException(s"Didn't found mapping location \"$location\" specified in parameters. ${YamlReader.getNodeLocation(originNode)}"))
 
             translationLeaf match
               case TranslationLeaf(leaf: BitRange) =>
