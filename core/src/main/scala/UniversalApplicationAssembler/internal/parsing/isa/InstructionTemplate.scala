@@ -1,8 +1,8 @@
 package UniversalApplicationAssembler.internal.parsing.isa
 
 import UniversalApplicationAssembler.internal.helpers.Functions.gradientRange
-import UniversalApplicationAssembler.internal.datatypes.BitRange
-import UniversalApplicationAssembler.internal.parsing.yaml.Conversions
+import UniversalApplicationAssembler.internal.datatypes.{BitRange, Utils}
+import UniversalApplicationAssembler.internal.parsing.yaml.{Conversions, YamlReader}
 import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
 import org.snakeyaml.engine.v2.nodes.MappingNode
 
@@ -50,7 +50,7 @@ case class InstructionTemplate(name: String, fields: Map[String, BitRange], para
         else if translationContext.getTop.searchTranslationLeaf(this.parameters.datatypes(idx)).isDefined then //case 2
           translationContext.getTop.searchTranslationLeaf(this.parameters.datatypes(idx)).get
         else
-          throw new NoSuchElementException(s"Didn't found variable ${this.parameters.datatypes(idx)}")
+          throw new NoSuchElementException(s"Didn't found datatype ${this.parameters.datatypes(idx)}")
 
       leafTranslation.leaf match
         case bitRange: BitRange => //It is an immediate specification
@@ -139,4 +139,181 @@ case class InstructionTemplate(name: String, fields: Map[String, BitRange], para
     }
 
     result.mkString
-      
+
+
+/**
+ * Object for fast constructing InstructionObjects from other things
+ */
+object InstructionTemplate:
+
+  /**
+   * Constructs an InstructionTemplate from the MappingNode that defined it and its current translation context
+   * @param mappingNode The MappingNode that defines the InstructionTemplate
+   * @param translationContext The current translation context, where this instruction was defined
+   * @return The constructed InstructionTemplate
+   */
+  def apply(mappingNode: MappingNode, translationContext: TranslationNode): InstructionTemplate =
+
+    require(translationContext.bits > 0, s"Required a defined number of bits that is positive for defining instructions! (Currently bits is set to \"${translationContext.bits}\". ${YamlReader.getNodeLocation(mappingNode)})")
+
+    val instructionAsMap = YamlReader.constructToScala(mappingNode)
+
+    instructionAsMap match
+      case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
+        val map = m.asInstanceOf[Map[String, Any]]
+
+        require(map.contains("name"), s"Instruction MUST have a name! ${YamlReader.getNodeLocation(mappingNode)}")
+
+        //Variables needed for creating the instruction
+        val name = map("name") match
+          case s: String => s
+          case other => throw new IllegalArgumentException(s"Expected name of instruction to be a string. ${YamlReader.getNodeLocation(mappingNode)}")
+
+        var fields: Map[String, BitRange] = Map.empty
+        var parametersDefinition: ParametersDefinition = ParametersDefinition(List.empty, List.empty)
+
+        for (key, value) <- map if key != "name" do
+
+          if key == "parameters" then //The famous parameters
+            value match
+              case params: Map[?, ?] if params.keys.forall(_.isInstanceOf[String]) && params.values.forall(_.isInstanceOf[List[Any]]) =>
+                val parameters = params.asInstanceOf[Map[String, List[Any]]]
+
+                val (parametersConstructed, fieldsConstructed) = constructParameters(parameters, mappingNode, translationContext)
+
+                parametersDefinition = parametersConstructed //Set the parameters
+                fields ++= fieldsConstructed //Add the fields found
+
+              case other => throw new IllegalArgumentException(s"Expected parameters of a function to be a map with keys being strings and values be lists, not ${other}. ${YamlReader.getNodeLocation(mappingNode)}")
+          else //100% an assignment
+
+            value match
+              case sm: Map[?, ?] if sm.keys.forall(_.isInstanceOf[String]) => //Partial assignment
+                val setMap = sm.asInstanceOf[Map[String, Any]]
+
+                if Utils.isSetMap(setMap) then
+
+                  //Procedure as following
+                  //Step 1: Get the BitRange
+                  //Step 2: Create a new one with the updated value. DON'T UPDATE THE TRANSLATION CONTEXT (as this is per instruction)
+                  //Step 3: The new one is a field
+
+                  //Step 1: Can be either in scope or full path
+                  val translationLeaf: TranslationLeaf =
+                    if translationContext.getScope.contains(key) then
+                      translationContext.getScope(key)
+                    else if translationContext.getTop.searchTranslationLeaf(key).isDefined then
+                      translationContext.getTop.searchTranslationLeaf(key).get
+                    else
+                      throw new IllegalArgumentException(s"Variable \"$key\" is not defined! ${YamlReader.getNodeLocation(mappingNode)}")
+
+                  //Step 2 & 3
+                  translationLeaf.leaf match
+                    case bitRange: BitRange =>
+
+                      //Step 2:
+                      val newBitRange = bitRange.deepCopy()
+                      newBitRange.setPartialValue(setMap)
+
+                      //Step 3:
+                      //Note: using stringKey as the name of the field, this in some cases can be the full path. Should be ok as searching uses also the full path.
+                      fields = fields + (key -> newBitRange)
+
+                    case other => throw new IllegalArgumentException(s"Can only assign values to BitRange, not to ${other.getClass}")
+
+                else
+                  throw new IllegalArgumentException(s"Expected map to be a set map for variable \"$key\". ${YamlReader.getNodeLocation(mappingNode)}")
+
+              case i: BigInt => //Full assignment
+
+                //Procedure as following
+                //Step 1: Get the BitRange
+                //Step 2: Create a new one with the updated value. DON'T UPDATE THE TRANSLATION CONTEXT (as this is per instruction)
+                //Step 3: The new one is a field
+
+                //Step 1: Can be either in scope or full path
+                val translationLeaf: TranslationLeaf =
+                  if translationContext.getScope.contains(key) then
+                    translationContext.getScope(key)
+                  else if translationContext.getTop.searchTranslationLeaf(key).isDefined then
+                    translationContext.getTop.searchTranslationLeaf(key).get
+                  else
+                    throw new IllegalArgumentException(s"Variable \"$key\" is not defined! ${YamlReader.getNodeLocation(mappingNode)}")
+
+                //Step 2 & 3
+                translationLeaf.leaf match
+                  case bitRange: BitRange =>
+
+                    //Step 2:
+                    val newBitRange = bitRange.deepCopy()
+                    newBitRange.setFullValue(i)
+
+                    //Step 3:
+                    //Note: using stringKey as the name of the field, this in some cases can be the full path. Should be ok as searching uses also the full path.
+                    fields = fields + (key -> newBitRange)
+
+                  case other => throw new IllegalArgumentException(s"Can only assign values to BitRange, not to ${other.getClass}. ${YamlReader.getNodeLocation(mappingNode)}")
+
+              case other => throw new IllegalArgumentException(s"Only assignments inside instructions! Not $other! ${YamlReader.getNodeLocation(mappingNode)}")
+
+        InstructionTemplate(name, fields, parametersDefinition, translationContext, mappingNode)
+
+      case other => throw new IllegalArgumentException(s"Expected MappingNode to be a Map and also for all keys to be a string. ${YamlReader.getNodeLocation(mappingNode)}")
+
+  private def constructParameters(map: Map[String, List[Any]], originNode: MappingNode, translationContext: TranslationNode): (ParametersDefinition, Map[String, BitRange]) =
+
+    require(map.contains("values") && map.contains("mappings") && map.size == 2, s"Bad parameters MappingNode. ${YamlReader.getNodeLocation(originNode)}") //Check that everything is alright
+
+    val datatypes = map("values") match
+      case l: List[?] if l.forall(_.isInstanceOf[String]) => l.asInstanceOf[List[String]]
+      case other => throw new IllegalArgumentException(s"Expected \"values\" to be a list of strings! ${YamlReader.getNodeLocation(originNode)}")
+
+    val mappings: List[ParameterMapping] = map("mappings").map {
+      case s: String => SingleParameterMapping(s)
+      case l: List[?] if l.forall(_.isInstanceOf[String]) => MultipleParameterMapping(l.asInstanceOf[List[String]])
+      case other => throw new IllegalArgumentException(s"Expected mappings to be either a string or list of strings, not $other!")
+    }
+
+    val parametersDefinition = ParametersDefinition(datatypes, mappings)
+    var newFields: Map[String, BitRange] = Map.empty
+
+    for (datatype, mapping) <- parametersDefinition.datatypes.zip(parametersDefinition.mappings) do
+
+      if translationContext.getScope.contains(datatype) then () //Nice! It exists
+      else if translationContext.getTop.searchTranslationLeaf(datatype).isDefined then () //Nice! It exists
+      else
+        throw new NoSuchElementException(s"Didn't found datatype \"$datatype\" specified in parameters. ${YamlReader.getNodeLocation(originNode)}")
+
+      mapping match
+        case SingleParameterMapping(location: String) =>
+
+          val translationLeaf =
+            if translationContext.getScope.contains(location) then
+              translationContext.getScope(location)
+            else if translationContext.getTop.searchTranslationLeaf(location).isDefined then
+              translationContext.getTop.searchTranslationLeaf(location).get
+            else
+              throw new NoSuchElementException(s"Didn't found mapping location \"$location\" specified in parameters. ${YamlReader.getNodeLocation(originNode)}")
+
+          translationLeaf match
+            case TranslationLeaf(leaf: BitRange) =>
+              newFields += (location -> leaf)
+            case other => throw new IllegalArgumentException(s"Expected a BitRange as mapping, not ${other.getClass}! ${YamlReader.getNodeLocation(originNode)}")
+
+        case MultipleParameterMapping(locations: List[String]) =>
+
+          for location <- locations do
+            val translationLeaf =
+              if translationContext.getScope.contains(location) then
+                translationContext.getScope(location)
+              else if translationContext.getTop.searchTranslationLeaf(location).isDefined then
+                translationContext.getTop.searchTranslationLeaf(location).get
+              else
+                throw new NoSuchElementException(s"Didn't found mapping location \"$location\" specified in parameters. ${YamlReader.getNodeLocation(originNode)}")
+
+            translationLeaf match
+              case TranslationLeaf(leaf: BitRange) =>
+                newFields += (location -> leaf)
+              case other => throw new IllegalArgumentException(s"Expected a BitRange as mapping, not ${other.getClass}! ${YamlReader.getNodeLocation(originNode)}")
+
+    (parametersDefinition, newFields)

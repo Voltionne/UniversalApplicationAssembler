@@ -1,7 +1,6 @@
 package UniversalApplicationAssembler.api.parsing.isa
 
 import UniversalApplicationAssembler.internal.datatypes.BitRange
-import UniversalApplicationAssembler.internal.parsing.isa.Conversions.toInstructionTemplate
 import UniversalApplicationAssembler.internal.parsing.isa.{Helper, InstructionTemplate}
 import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader.{constructToScala, getNodeLocation, nodeifyYamlFile, readYamlFile}
 import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
@@ -293,7 +292,7 @@ object IsaParser:
           case other => throw new IllegalArgumentException(s"Expected \"instructions\" to be a SequenceNode, not ${other.getNodeType}! ${getNodeLocation(other)}")
 
         sequenceNode.getValue.forEach {
-          case mappingNode: MappingNode => instructions = instructions :+ toInstructionTemplate(mappingNode, currentTranslationContext)
+          case mappingNode: MappingNode => instructions = instructions :+ InstructionTemplate(mappingNode, currentTranslationContext)
           case other => throw new IllegalArgumentException(s"Expected instructions to be a MappingNode, not ${other.getNodeType}! ${getNodeLocation(other)}")
         }
 
