@@ -1,7 +1,7 @@
 package UniversalApplicationAssembler.internal.parsing.isa
 
 import UniversalApplicationAssembler.internal.helpers.Functions.gradientRange
-import UniversalApplicationAssembler.internal.datatypes.{BitRange, Utils}
+import UniversalApplicationAssembler.internal.datatypes.BitRange
 import UniversalApplicationAssembler.internal.parsing.yaml.{Conversions, YamlReader}
 import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode, Translation}
 import org.snakeyaml.engine.v2.nodes.MappingNode
@@ -179,7 +179,7 @@ object InstructionTemplate:
                 parametersDefinition = parametersConstructed //Set the parameters
                 fields ++= fieldsConstructed //Add the fields found
 
-              case other => throw new IllegalArgumentException(s"Expected parameters of a function to be a map with keys being strings and values be lists, not ${other}. ${YamlReader.getNodeLocation(mappingNode)}")
+              case other => throw new IllegalArgumentException(s"Expected parameters of a function to be a map with keys being strings and values be lists, not $other. ${YamlReader.getNodeLocation(mappingNode)}")
           else //100% an assignment
 
             //Procedure as following
