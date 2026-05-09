@@ -28,7 +28,29 @@ class MainTest extends munit.FunSuite:
 
     val inputPath = Helper.getResourcePath("/assembly.asm")
 
-    val outputDir = Files.createTempDirectory("uaa-results")
+    val outputDir = Files.createTempDirectory("uaa-results-test1")
+    println(s"Temp path: $outputDir")
+    val outputPathString = outputDir.resolve("test-string.text")
+    val outputPathBinary = outputDir.resolve("test-binary.txt")
+
+    customAssembler.compileToString(inputPath, outputPathString)
+    customAssembler.compileToBinary(inputPath, outputPathBinary)
+  }
+
+  test("Test limits yaml") {
+
+    val path = Helper.getResourcePath("/testIsa3.yaml")
+
+    val (instructionMapping, node) = IsaParser.debugParse(path)
+
+    println("Tree:")
+    visualizeNodes(node)
+
+    val customAssembler = CustomAssembler(instructionMapping)
+
+    val inputPath = Helper.getResourcePath("/assembly.asm")
+
+    val outputDir = Files.createTempDirectory("uaa-results-test1")
     println(s"Temp path: $outputDir")
     val outputPathString = outputDir.resolve("test-string.text")
     val outputPathBinary = outputDir.resolve("test-binary.txt")

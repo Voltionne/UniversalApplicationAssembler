@@ -1,0 +1,25 @@
+nested:
+
+  Op8: "31:24"
+  Rs5-1: "23:19"
+  Rd5: "18:14"
+  Rs5-2: "13:9"
+  Sub3: "8:6"
+  Sub6: "5:0"
+
+  Sub2: "8:7"
+  Imm1: "6"
+
+  nested2:
+
+    instructions:
+      - name: "ADD"
+
+        parameters:
+          values: [ "parameters.registers.integer", "parameters.registers.integer", "parameters.registers.integer" ]
+          mappings: [ "Rs5-1", "Rs5-2", "Rd5" ]
+
+        Op8: { set: 0b000, bits_local: "2:0" }
+
+        Sub3: 0b000
+        Sub6: 0b000000
