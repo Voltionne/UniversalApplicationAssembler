@@ -1,7 +1,7 @@
 package UniversalApplicationAssembler
 
 import UniversalApplicationAssembler.api.parsing.assembly.CustomAssembler
-import UniversalApplicationAssembler.api.parsing.isa.{InstructionMapping, IsaParser}
+import UniversalApplicationAssembler.api.parsing.isa.IsaParser
 
 import java.nio.file.{Files, Path}
 
