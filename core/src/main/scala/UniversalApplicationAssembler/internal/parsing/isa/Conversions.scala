@@ -41,6 +41,8 @@ object Conversions:
    */
   def toInstructionTemplate(mappingNode: MappingNode, translationContext: TranslationNode): InstructionTemplate =
 
+    require(translationContext.bits > 0, s"Required a defined number of bits that is positive for defining instructions! (Currently bits is set to \"${translationContext.bits}\". ${YamlReader.getNodeLocation(mappingNode)})")
+
     //Perform first some interesting checks
     require(mappingNode.getValue.stream().anyMatch { nodeTuple =>
       val stringKey =
@@ -158,7 +160,7 @@ object Conversions:
           else if translationContext.getTop.searchTranslationLeaf(singleParameterMapping.mappingLocation).isDefined then
             translationContext.getTop.searchTranslationLeaf(singleParameterMapping.mappingLocation).get
           else
-            throw new IllegalArgumentException(s"Variable \"$singleParameterMapping.mappingLocation\" is not defined!")
+            throw new IllegalArgumentException(s"Variable \"${singleParameterMapping.mappingLocation}\" is not defined! In parameters of instruction, ${YamlReader.getNodeLocation(mappingNode)}")
 
         translationLeaf.leaf match
           case bitRange: BitRange =>
