@@ -44,13 +44,8 @@ case class InstructionTemplate(name: String, fields: Map[String, BitRange], para
       //1. In this scope (either in changes of this current context or some parent)
       //2. Full pathDeleted "bits" argument
 
-      val leafTranslation: TranslationLeaf =
-        if translationContext.getScope.contains(this.parameters.datatypes(idx)) then //case 1
-          translationContext.getScope(this.parameters.datatypes(idx))
-        else if translationContext.getTop.searchTranslationLeaf(this.parameters.datatypes(idx)).isDefined then //case 2
-          translationContext.getTop.searchTranslationLeaf(this.parameters.datatypes(idx)).get
-        else
-          throw new NoSuchElementException(s"Didn't found datatype ${this.parameters.datatypes(idx)}")
+      val leafTranslation: TranslationLeaf = Translation.searchLeaf(this.parameters.datatypes(idx), translationContext)
+        .getOrElse(throw new NoSuchElementException(s"Didn't found datatype ${this.parameters.datatypes(idx)}"))
 
       leafTranslation.leaf match
         case bitRange: BitRange => //It is an immediate specification
