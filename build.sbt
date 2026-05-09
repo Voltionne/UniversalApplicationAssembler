@@ -1,10 +1,14 @@
 ThisBuild / organization := "com.voltionne"
 ThisBuild / version := "1.0.1"
-ThisBuild / scalaVersion := "3.3.7"
-
+ThisBuild / scalaVersion := "3.8.3"
 
 ThisBuild / organizationName := "Voltionne (TM)"
 
+lazy val root = (project in file("."))
+  .dependsOn(core)
+  .settings(
+    name := "universal-application-assembler"
+  )
 
 lazy val core = (project in file("core"))
   .settings(
