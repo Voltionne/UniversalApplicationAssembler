@@ -4,6 +4,7 @@ import UniversalApplicationAssembler.api.parsing.isa.InstructionMapping
 import UniversalApplicationAssembler.internal.parsing.assembly.AssemblyParser
 import UniversalApplicationAssembler.internal.parsing.isa.InstructionTemplate
 
+import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 
@@ -15,14 +16,12 @@ import java.nio.file.{Files, Path}
 class CustomAssembler(instructionMapping: InstructionMapping):
 
   /**
-   * Compiles a source file to a string representation of "1" and "0", for debugging purposes
-   * @param sourceFile The path of the source file
+   * Compiles an assembly string to a string representation of "1" and "0" for debugging purposes
+   * @param source The string of the source file
    * @param outputFile The path of the output file
    */
-  def compileToString(sourceFile: Path, outputFile: Path): Unit =
-
-    var assemblyFile = Files.readString(sourceFile)
-    assemblyFile = preprocessFile(assemblyFile) //Preprocess: i.e. delete comments
+  def compileToString(source: String, outputFile: Path): Unit =
+    val assemblyFile = preprocessFile(source) //Preprocess: i.e. delete comments
 
     val instructions = AssemblyParser.parseToList(assemblyFile)
 
@@ -39,14 +38,31 @@ class CustomAssembler(instructionMapping: InstructionMapping):
       Files.writeString(outputFile, "", StandardCharsets.UTF_8) //write empty
 
   /**
-   * Compiles a source file to a binary file
+   * Compiles a source file to a string representation of "1" and "0", for debugging purposes
+   *
    * @param sourceFile The path of the source file
    * @param outputFile The path of the output file
    */
-  def compileToBinary(sourceFile: Path, outputFile: Path): Unit =
+  def compileToString(sourceFile: Path, outputFile: Path): Unit =
+    compileToString(Files.readString(sourceFile), outputFile)
 
-    var assemblyFile = Files.readString(sourceFile)
-    assemblyFile = preprocessFile(assemblyFile) //Preprocess: i.e. delete comments
+  /**
+   * Compiles a source assembly input stream to a string representation of "1" and "0", for debugging purposes
+   *
+   * @param sourceInputStream The input stream of the source file
+   * @param outputFile The path of the output file
+   */
+  def compileToString(sourceInputStream: InputStream, outputFile: Path): Unit =
+    compileToString(String(sourceInputStream.readAllBytes()), outputFile)
+
+  /**
+   * Compiles an assembly string to a binary file
+   *
+   * @param source The string of the source file
+   * @param outputFile The path of the output file
+   */
+  def compileToBinary(source: String, outputFile: Path): Unit =
+    val assemblyFile = preprocessFile(source) //Preprocess: i.e. delete comments
 
     val instructions = AssemblyParser.parseToList(assemblyFile)
 
@@ -62,6 +78,23 @@ class CustomAssembler(instructionMapping: InstructionMapping):
 
     else
       Files.writeString(outputFile, "", StandardCharsets.UTF_8) //write empty
+
+  /**
+   * Compiles a source file to a binary file
+   * @param sourceFile The path of the source file
+   * @param outputFile The path of the output file
+   */
+  def compileToBinary(sourceFile: Path, outputFile: Path): Unit =
+    compileToBinary(Files.readString(sourceFile), outputFile)
+
+  /**
+   * Compiles a source assembly input stream to a binary file
+   *
+   * @param sourceInputStream The input stream of the source file
+   * @param outputFile The path of the output file
+   */
+  def compileToBinary(sourceInputStream: InputStream, outputFile: Path): Unit =
+    compileToBinary(String(sourceInputStream.readAllBytes()), outputFile)
 
   private def preprocessFile(assemblyFile: String): String =
     val singleComment = "//.*"

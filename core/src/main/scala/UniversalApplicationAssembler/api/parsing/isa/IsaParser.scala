@@ -2,24 +2,25 @@ package UniversalApplicationAssembler.api.parsing.isa
 
 import UniversalApplicationAssembler.internal.datatypes.BitRange
 import UniversalApplicationAssembler.internal.parsing.isa.{Helper, InstructionTemplate}
-import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader.{constructToScala, getNodeLocation, nodeifyYamlFile, readYamlFile}
+import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader.{constructToScala, getNodeLocation, getStringFromInputStream, getStringFromPath, nodeifyYamlFile}
 import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
 import org.snakeyaml.engine.v2.nodes.{MappingNode, ScalarNode, SequenceNode}
 
+import java.io.InputStream
 import java.nio.file.Path
 
 
 object IsaParser:
 
   /**
-   * Parses the YAML file.
-   * @param yamlConfigPath The path of the configuration YAML file
-   * @return A representation of the instructions in the ISA
+   * Parses the YAML configuration as a string
+   * @param yamlConfig The YAML configuration string
+   * @return A representation of the instructions in the ISA.
    */
-  def parse(yamlConfigPath: Path): InstructionMapping =
+  def parse(yamlConfig: String): InstructionMapping =
 
     val yamlTopNode: MappingNode =
-      nodeifyYamlFile(readYamlFile(yamlConfigPath)) match
+      nodeifyYamlFile(yamlConfig) match
         case mappingNode: MappingNode => mappingNode
         case other => throw new IllegalArgumentException(s"Expected top node to be a MappingNode, not ${other.getNodeType}. ${getNodeLocation(other)}")
 
@@ -32,14 +33,33 @@ object IsaParser:
     InstructionMapping(instructions)
 
   /**
-   * Parses the YAML file and also returns the TranslationNode top node for debugging.
+   * Parses the YAML as file path.
+   *
    * @param yamlConfigPath The path of the configuration YAML file
+   * @return A representation of the instructions in the ISA.
+   */
+  def parse(yamlConfigPath: Path): InstructionMapping =
+    parse(getStringFromPath(yamlConfigPath))
+
+  /**
+   * Parses the YAML as an input stream.
+   *
+   * @param yamlConfigInputStream The input stream of the YAML
+   * @return A representation of the instructions in the ISA.
+   */
+  def parse(yamlConfigInputStream: InputStream): InstructionMapping =
+    parse(getStringFromInputStream(yamlConfigInputStream))
+
+  /**
+   * Parses the YAML configuration as a string and also returns the TranslationNode top node for debugging.
+   *
+   * @param yamlConfig The YAML configuration string
    * @return A tuple with a representation of the instructions in the ISA (InstructionMapping) and the top node of the result of building a node tree of variables (TranslationNode)
    */
-  def debugParse(yamlConfigPath: Path): (InstructionMapping, TranslationNode) =
+  def debugParse(yamlConfig: String): (InstructionMapping, TranslationNode) =
 
     val yamlTopNode: MappingNode =
-      nodeifyYamlFile(readYamlFile(yamlConfigPath)) match
+      nodeifyYamlFile(yamlConfig) match
         case mappingNode: MappingNode => mappingNode
         case other => throw new IllegalArgumentException(s"Expected top node to be a MappingNode, not ${other.getNodeType}. ${getNodeLocation(other)}")
 
@@ -50,6 +70,24 @@ object IsaParser:
     val instructions = parseThirdPass(yamlTopNode, currentTranslationContext, List.empty)
 
     (InstructionMapping(instructions), currentTranslationContext)
+
+  /**
+   * Parses the YAML as file path and also returns the TranslationNode top node for debugging.
+   *
+   * @param yamlConfigPath The path of the configuration YAML file
+   * @return A tuple with a representation of the instructions in the ISA (InstructionMapping) and the top node of the result of building a node tree of variables (TranslationNode)
+   */
+  def debugParse(yamlConfigPath: Path): (InstructionMapping, TranslationNode) =
+    debugParse(getStringFromPath(yamlConfigPath))
+
+  /**
+   * Parses the YAML as an input stream and also returns the TranslationNode top node for debugging.
+   *
+   * @param yamlConfigInputStream The input stream of the YAML
+   * @return A tuple with a representation of the instructions in the ISA (InstructionMapping) and the top node of the result of building a node tree of variables (TranslationNode)
+   */
+  def debugParse(yamlConfigInputStream: InputStream): (InstructionMapping, TranslationNode) =
+    debugParse(getStringFromInputStream(yamlConfigInputStream))
 
   //-----------------------------------------
   // FIRST PASS -> Resolve declarations

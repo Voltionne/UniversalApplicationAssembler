@@ -7,6 +7,7 @@ import org.snakeyaml.engine.v2.nodes.{Node, Tag}
 import org.snakeyaml.engine.v2.resolver.ScalarResolver
 import org.snakeyaml.engine.v2.schema.CoreSchema
 
+import java.io.InputStream
 import java.nio.file.{Files, Path}
 import java.nio.charset.StandardCharsets
 import java.util
@@ -31,12 +32,20 @@ object YamlReader:
   private val publicConstructor: PublicConstructor = PublicConstructor(settings)
 
   /**
-   * Reads a YAML file and returns a string.
+   * Returns a string from a Path
    * @param yamlPath The path of the file
    * @return The string representing the file
    */
-  def readYamlFile(yamlPath: Path): String =
+  def getStringFromPath(yamlPath: Path): String =
     Files.readString(yamlPath, StandardCharsets.UTF_8)
+
+  /**
+   * Returns a string from an InputStream
+   * @param yamlInputStream The InputStream representing the file
+   * @return The string representing the file
+   */
+  def getStringFromInputStream(yamlInputStream: InputStream): String =
+    String(yamlInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
   /**
    * Converts a YAML file as a string to a tree of nodes.
