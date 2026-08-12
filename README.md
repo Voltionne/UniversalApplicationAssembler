@@ -1,10 +1,10 @@
 # UniversalApplicationAssembler
 
-The Universal Application Assembler (UAA) is a totally configurable assembler that let's you target any ISA specification by simply writing a config YAML file defining the characteristics of each instruction. The idea is of have a universal assembler that is trivial to port to any ISA.
+The Universal Application Assembler (UAA) is a totally configurable assembler that lets you target any ISA specification by simply writing a config YAML file defining the characteristics of each instruction. The idea is of have a universal assembler that is trivial to port to any ISA.
 
 ## Scala rewrite
 
-For those coming from v0.1.x, v1.0 UAA has transitioned to Scala 3 instead of Python. Older python versions won't be supported anymore and is highly recommended to use the Scala rewrite. Currently, but, at the time of updating this README the rewrite has not been completed yet, therefore only the python versions can be used taking into account this warning.
+For those coming from v0.1.x, v1.0 and later UAA has transitioned to Scala 3 instead of Python. Older python versions won't be supported anymore and is highly recommended to use the Scala rewrite. At time of writing the transition has been finished!
 
 ## Documentation
 
