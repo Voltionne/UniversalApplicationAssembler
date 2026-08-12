@@ -23,7 +23,6 @@ class CustomAssembler(instructionMapping: InstructionMapping):
 
     var assemblyFile = Files.readString(sourceFile)
     assemblyFile = preprocessFile(assemblyFile) //Preprocess: i.e. delete comments
-    println(assemblyFile)
 
     val instructions = AssemblyParser.parseToList(assemblyFile)
 
@@ -46,7 +45,8 @@ class CustomAssembler(instructionMapping: InstructionMapping):
    */
   def compileToBinary(sourceFile: Path, outputFile: Path): Unit =
 
-    val assemblyFile = Files.readString(sourceFile)
+    var assemblyFile = Files.readString(sourceFile)
+    assemblyFile = preprocessFile(assemblyFile) //Preprocess: i.e. delete comments
 
     val instructions = AssemblyParser.parseToList(assemblyFile)
 
