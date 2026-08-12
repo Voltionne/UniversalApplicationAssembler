@@ -22,9 +22,23 @@ object PartialAssignment:
   private val BITS_LOCAL_KEY = "bits_local"
 
   /**
+   * Checks if a certain mapping node follows the format of a partial assignment map or not
+   * @param mappingNode The mapping node to check
+   * @return True if it follows the format, false if not
+   */
+  def isPartialAssignment(mappingNode: MappingNode): Boolean =
+    val nodeAsScala = YamlReader.constructToScala(mappingNode)
+
+    nodeAsScala match
+      case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
+        val map = m.asInstanceOf[Map[String, Any]]
+        isPartialAssignment(map)
+      case other => false
+
+  /**
    * Checks if a certain map follows the format of a partial assignment map or not
    * @param assignmentMap The map to check
-   * @return True if it follows the format, false if not.
+   * @return True if it follows the format, false if not
    */
   def isPartialAssignment(assignmentMap: Map[String, Any]): Boolean =
     val option1 = (assignmentMap contains VALUE_KEY) && assignmentMap(VALUE_KEY).isInstanceOf[BigInt] && (assignmentMap contains BITS_KEY) && assignmentMap(BITS_KEY).isInstanceOf[String] && assignmentMap.size == 2

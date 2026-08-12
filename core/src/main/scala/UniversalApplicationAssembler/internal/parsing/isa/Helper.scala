@@ -10,21 +10,6 @@ import org.snakeyaml.engine.v2.nodes.MappingNode
 object Helper:
 
   /**
-   * Checks if a MappingNode is a set map (or assignment map)
-   * @param mappingNode The mapping node to check
-   * @return True or false depending on if it is or not a set map
-   */
-  def isSetMap(mappingNode: MappingNode): Boolean =
-
-    val nodeAsScala = YamlReader.constructToScala(mappingNode)
-
-    nodeAsScala match
-      case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
-        val map = m.asInstanceOf[Map[String, Any]]
-        PartialAssignment.isPartialAssignment(map)
-      case other => false
-
-  /**
    * Checks if a MappingNode is a translation table
    * @param mappingNode The mapping node to check
    * @return True or false depending on if ti is or not a translation table

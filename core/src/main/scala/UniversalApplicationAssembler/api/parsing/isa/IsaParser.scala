@@ -1,6 +1,6 @@
 package UniversalApplicationAssembler.api.parsing.isa
 
-import UniversalApplicationAssembler.internal.datatypes.BitRange
+import UniversalApplicationAssembler.internal.datatypes.{BitRange, PartialAssignment}
 import UniversalApplicationAssembler.internal.parsing.isa.{Helper, InstructionTemplate}
 import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader.{constructToScala, getNodeLocation, getStringFromInputStream, getStringFromPath, nodeifyYamlFile}
 import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
@@ -146,7 +146,7 @@ object IsaParser:
 
           case mappingNode: MappingNode => //This is sublevel OR assignment OR translation table
 
-            if Helper.isSetMap(mappingNode) then //Assignment
+            if PartialAssignment.isPartialAssignment(mappingNode) then //Assignment
               () //Ignore (left to second pass)
             else if Helper.isTranslationTable(mappingNode) then //Translation Table (i.e. declaration)
 
@@ -245,7 +245,7 @@ object IsaParser:
 
           case mappingNode: MappingNode => //This is sublevel OR assignment OR translation table
 
-            if Helper.isSetMap(mappingNode) then //Assignment
+            if PartialAssignment.isPartialAssignment(mappingNode) then //Assignment
               val setMap = constructToScala(mappingNode).asInstanceOf[Map[String, Any]] //SHOULD 100% WORK (Not the most idiomatic, nevertheless). May change in the future
 
 
@@ -342,7 +342,7 @@ object IsaParser:
             () //Skip -> Already handled in 1st and 2nd pass
           case mappingNode: MappingNode => //This is sublevel OR assignment OR translation table
 
-            if Helper.isSetMap(mappingNode) then () //Assignment -> Already handled in 2nd pass
+            if PartialAssignment.isPartialAssignment(mappingNode) then () //Assignment -> Already handled in 2nd pass
             else if Helper.isTranslationTable(mappingNode) then () //Declaration -> Skip, handled in 1st pass
             else //Sublevel
 
