@@ -1,7 +1,7 @@
 package UniversalApplicationAssembler.api.parsing.isa
 
-import UniversalApplicationAssembler.internal.datatypes.{BitRange, PartialAssignment}
-import UniversalApplicationAssembler.internal.parsing.isa.{Helper, InstructionTemplate}
+import UniversalApplicationAssembler.internal.datatypes.{BitRange, PartialAssignment, SymbolMap}
+import UniversalApplicationAssembler.internal.parsing.isa.InstructionTemplate
 import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader.{constructToScala, getNodeLocation, getStringFromInputStream, getStringFromPath, nodeifyYamlFile}
 import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
 import org.snakeyaml.engine.v2.nodes.{MappingNode, ScalarNode, SequenceNode}
@@ -108,7 +108,7 @@ object IsaParser:
           case other => throw new IllegalArgumentException(s"Expected bits to be a ScalarNode (a BigInt), not ${other.getNodeType}. ${getNodeLocation(other)}")
 
       else if stringKey == "instructions" then
-        () //Skip instructions -> left for second pass
+        () //Skip instructions -> left for third pass
 
       else
         //Match based on value, given that all special keys have already been revised
@@ -121,7 +121,7 @@ object IsaParser:
 
                 //Important checks to be performed to verify this is a good definition:
                 //1. Is not a full path (definitions are always local) -> check if no dots in the name
-                require(!stringKey.contains('.'))
+                require(!stringKey.contains('.'), s"Declarations cannot be full path, only local path!. ${getNodeLocation(scalarNode)}")
 
                 //There exists a BitRange in the scope that has the same name
                 if currentTranslationContext.getScope.contains(stringKey) then
@@ -148,7 +148,7 @@ object IsaParser:
 
             if PartialAssignment.isPartialAssignment(mappingNode) then //Assignment
               () //Ignore (left to second pass)
-            else if Helper.isTranslationTable(mappingNode) then //Translation Table (i.e. declaration)
+            else if SymbolMap.isSymbolMap(mappingNode) then //Translation Table (i.e. declaration)
 
               if currentTranslationContext.getScope.contains(stringKey) then
                 throw new IllegalArgumentException(s"Translation Table \"$stringKey\" is already defined!. ${getNodeLocation(mappingNode)}")
@@ -295,7 +295,7 @@ object IsaParser:
               else
                 throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(mappingNode)}")
 
-            else if Helper.isTranslationTable(mappingNode) then () //Declaration -> Skip, handled in 1st pass
+            else if SymbolMap.isSymbolMap(mappingNode) then () //Declaration -> Skip, handled in 1st pass
             else //Sublevel
 
               if currentTranslationContext.children.contains(stringKey) then
@@ -343,7 +343,7 @@ object IsaParser:
           case mappingNode: MappingNode => //This is sublevel OR assignment OR translation table
 
             if PartialAssignment.isPartialAssignment(mappingNode) then () //Assignment -> Already handled in 2nd pass
-            else if Helper.isTranslationTable(mappingNode) then () //Declaration -> Skip, handled in 1st pass
+            else if SymbolMap.isSymbolMap(mappingNode) then () //Declaration -> Skip, handled in 1st pass
             else //Sublevel
 
               if currentTranslationContext.children.contains(stringKey) then
