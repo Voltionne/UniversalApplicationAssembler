@@ -23,6 +23,7 @@ class CustomAssembler(instructionMapping: InstructionMapping):
 
     var assemblyFile = Files.readString(sourceFile)
     assemblyFile = preprocessFile(assemblyFile) //Preprocess: i.e. delete comments
+    println(assemblyFile)
 
     val instructions = AssemblyParser.parseToList(assemblyFile)
 
@@ -66,7 +67,7 @@ class CustomAssembler(instructionMapping: InstructionMapping):
     val singleComment = "//.*"
     val fixed = assemblyFile.replaceAll(singleComment, "")
 
-    val multilineComment = "/\\*[.\\n]*\\*/"
+    val multilineComment = "/\\*[\\S\\s]*\\*/"
     fixed.replaceAll(multilineComment, "")
 
   private def compileInstruction(parsedWrittenInstruction: Array[String]): String =
