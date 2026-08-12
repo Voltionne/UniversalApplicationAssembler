@@ -1,6 +1,6 @@
 ThisBuild / organization := "com.voltionne"
-ThisBuild / version := "1.0.1"
-ThisBuild / scalaVersion := "3.8.3"
+ThisBuild / version := "1.1.0"
+ThisBuild / scalaVersion := "3.8.4"
 
 ThisBuild / organizationName := "Voltionne (TM)"
 
