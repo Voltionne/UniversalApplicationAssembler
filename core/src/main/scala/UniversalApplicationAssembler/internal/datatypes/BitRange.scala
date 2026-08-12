@@ -5,21 +5,6 @@ import UniversalApplicationAssembler.internal.helpers.Functions.gradientRange
 import scala.math.*
 
 /**
- * Helpers for when working with BitRange
- */
-object Utils:
-
-  /**
-   * Checks if a certain Scala Map is a set map or not
-   * @param setMap The Scala map to check
-   * @return Whether is a set map or not
-   */
-  def isSetMap(setMap: Map[String, Any]): Boolean =
-    val option1 = (setMap contains "set") && setMap("set").isInstanceOf[BigInt] && (setMap contains "bits") && setMap("bits").isInstanceOf[String] && setMap.size == 2
-    val option2 = (setMap contains "set") && setMap("set").isInstanceOf[BigInt] && (setMap contains "bits_local") && setMap("bits_local").isInstanceOf[String] && setMap.size == 2
-    option1 || option2
-
-/**
  * Represents a range of bits, using SystemVerilog notation. Therefore, it can be little-endian, big-endian, and any size.
  * @param a The left-most digit index
  * @param b The right-most digit index
@@ -45,12 +30,12 @@ case class BitRange(a: Int, b: Int):
    * Sets partially the value of the BitRange based on a setMap.
    * @param setMap A map that includes "set" which indicates the value to be set and "bits" which indicates what bits does it affect the set, as a string in format "a:b" (SystemVerilog style)
    */
-  def setPartialValue(setMap: Map[String, Any]): Unit =
-    require(Utils.isSetMap(setMap))
+  def setPartialValue(assignmentMap: Map[String, Any]): Unit =
+    require(PartialAssignment.isPartialAssignment(assignmentMap))
 
-    if setMap.contains("bits") then
+    if assignmentMap.contains("bits") then
 
-      (setMap("set"), setMap("bits")) match
+      (assignmentMap("set"), assignmentMap("bits")) match
         case (set: BigInt, bits: String) =>
           if bits.contains(":") then
 
@@ -104,7 +89,7 @@ case class BitRange(a: Int, b: Int):
 
     else //must be bits_local
 
-      (setMap("set"), setMap("bits_local")) match
+      (assignmentMap("set"), assignmentMap("bits_local")) match
         case (set: BigInt, bitsLocal: String) =>
           if bitsLocal.contains(":") then
 

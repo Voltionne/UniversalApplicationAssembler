@@ -1,6 +1,6 @@
 package UniversalApplicationAssembler.internal.parsing.isa
 
-import UniversalApplicationAssembler.internal.datatypes.Utils
+import UniversalApplicationAssembler.internal.datatypes.PartialAssignment
 import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader
 import org.snakeyaml.engine.v2.nodes.MappingNode
 
@@ -21,7 +21,7 @@ object Helper:
     nodeAsScala match
       case m: Map[?, ?] if m.keys.forall(_.isInstanceOf[String]) =>
         val map = m.asInstanceOf[Map[String, Any]]
-        Utils.isSetMap(map)
+        PartialAssignment.isPartialAssignment(map)
       case other => false
 
   /**
