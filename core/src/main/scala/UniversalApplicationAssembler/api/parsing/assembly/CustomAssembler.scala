@@ -21,7 +21,8 @@ class CustomAssembler(instructionMapping: InstructionMapping):
    */
   def compileToString(sourceFile: Path, outputFile: Path): Unit =
 
-    val assemblyFile = Files.readString(sourceFile)
+    var assemblyFile = Files.readString(sourceFile)
+    assemblyFile = preprocessFile(assemblyFile) //Preprocess: i.e. delete comments
 
     val instructions = AssemblyParser.parseToList(assemblyFile)
 
@@ -60,6 +61,13 @@ class CustomAssembler(instructionMapping: InstructionMapping):
 
     else
       Files.writeString(outputFile, "", StandardCharsets.UTF_8) //write empty
+
+  private def preprocessFile(assemblyFile: String): String =
+    val singleComment = "//.*"
+    val fixed = assemblyFile.replaceAll(singleComment, "")
+
+    val multilineComment = "/\\*[.\\n]*\\*/"
+    fixed.replaceAll(multilineComment, "")
 
   private def compileInstruction(parsedWrittenInstruction: Array[String]): String =
 
