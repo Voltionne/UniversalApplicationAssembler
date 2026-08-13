@@ -21,6 +21,11 @@ case class TranslationNode(var bits: BigInt):
   val changes: mutable.Map[String, TranslationLeaf] = mutable.Map.empty
 
   /**
+   * Represents the name of the node
+   */
+  var name: String = ""
+
+  /**
    * Adds a child to this node, which can be either another Node or a Leaf.
    *
    * @param child     The child to add.
@@ -35,12 +40,13 @@ case class TranslationNode(var bits: BigInt):
 
     children(childName) = child
     child.parent = Some(this)
+    child.name = childName
 
   /**
-   * Searches a certain Leaf between all the children, recursively.
+   * Searches a certain Leaf between all the children, recursively, using a path from this node
    *
-   * @param path The reference string that identifies the wanted leaf, separated each level with a dot.
-   * @return The wanted leaf.
+   * @param path The path that identifies the child, each level separated with a dot
+   * @return The wanted leaf
    */
   def searchTranslationLeaf(path: String): Option[TranslationLeaf] =
     val pathSplit = path.split('.')
@@ -88,4 +94,13 @@ case class TranslationNode(var bits: BigInt):
 
     recursiveCall(this)
 
+  /**
+   * Returns the full path of this node from the top node
+   * @return the full path of this node
+   */
+  def getPath: String =
 
+    parent match
+      case None => ""
+      case Some(parent) =>
+        parent.getPath + "." + name

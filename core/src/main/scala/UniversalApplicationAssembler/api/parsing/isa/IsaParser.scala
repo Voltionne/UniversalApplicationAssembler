@@ -123,41 +123,40 @@ object IsaParser:
                 //1. Is not a full path (definitions are always local) -> check if no dots in the name
                 require(!stringKey.contains('.'), s"Declarations cannot be full path, only local path!. ${getNodeLocation(scalarNode)}")
 
-                //There exists a BitRange in the scope that has the same name
-                if currentTranslationContext.getScope.contains(stringKey) then
-                  throw new IllegalArgumentException(s"Bit Range \"$stringKey\" is already defined!. ${getNodeLocation(scalarNode)}")
-                else
-                  //CREATE NEW BITRANGE
-                  val split = s.split(':')
+                //2. There doesn't exist a BitRange in the scope that has the same name
+                require(!currentTranslationContext.getScope.contains(stringKey), s"Bit Range \"$stringKey\" is already defined!. ${getNodeLocation(scalarNode)}")
 
-                  if split.length == 1 then
-                    currentTranslationContext.changes(stringKey) = TranslationLeaf(
-                      BitRange(split(0).toInt)
-                    )
-                  else if split.length == 2 then
-                    currentTranslationContext.changes(stringKey) = TranslationLeaf(
-                      BitRange(split(0).toInt, split(1).toInt)
-                    )
-                  else
-                    throw new IllegalArgumentException(s"Expected 1 or 2 bit position indications, not ${split.length}! ${getNodeLocation(scalarNode)}")
+                //CREATE NEW BITRANGE
+                val split = s.split(':')
+
+                if split.length == 1 then
+                  currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                    BitRange(split(0).toInt)
+                  )
+                else if split.length == 2 then
+                  currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                    BitRange(split(0).toInt, split(1).toInt)
+                  )
+                else
+                  throw new IllegalArgumentException(s"Expected 1 or 2 bit position indications, not ${split.length}! ${getNodeLocation(scalarNode)}")
 
               case i: BigInt => () //Assignment -> Ignore (left to second pass)
               case other => throw new IllegalArgumentException(s"Found not recognized value for assignment or declaration. ${getNodeLocation(scalarNode)}")
 
-          case mappingNode: MappingNode => //This is sublevel OR assignment OR translation table
+          case mappingNode: MappingNode => //This is sublevel OR assignment OR symbol map
 
             if PartialAssignment.isPartialAssignment(mappingNode) then //Assignment
               () //Ignore (left to second pass)
             else if SymbolMap.isSymbolMap(mappingNode) then //Translation Table (i.e. declaration)
 
-              if currentTranslationContext.getScope.contains(stringKey) then
-                throw new IllegalArgumentException(s"Translation Table \"$stringKey\" is already defined!. ${getNodeLocation(mappingNode)}")
-              else
-                //CREATE NEW TRANSLATION TABLE
-                val translationTable = constructToScala(mappingNode).asInstanceOf[Map[String, BigInt]] //This shouldn't fail because it is a translation table. Though, it is not very secure. May remake in the future
-                currentTranslationContext.changes(stringKey) = TranslationLeaf(
-                  translationTable
-                )
+              //Check that it isn't defined already
+              require(!currentTranslationContext.getScope.contains(stringKey), s"Translation Table \"$stringKey\" is already defined!. ${getNodeLocation(mappingNode)}")
+
+              //CREATE NEW TRANSLATION TABLE
+              val translationTable = constructToScala(mappingNode).asInstanceOf[Map[String, BigInt]] //This shouldn't fail because it is a translation table. Though, it is not very secure. May remake in the future
+              currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                translationTable
+              )
 
             else //Sublevel
 
