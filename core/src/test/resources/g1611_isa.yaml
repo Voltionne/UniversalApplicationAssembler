@@ -58,7 +58,7 @@ writes:
 
       parameters:
         values: ["registers", "immediates.imm8"]
-        mappings: ["params.Rs1", "writes.imm"]
+        mappings: ["params.Rs1", "imm"]
 
       params.Op4: 0b0001
 
@@ -66,7 +66,7 @@ writes:
 
       parameters:
         values: ["registers", "immediates.imm8"]
-        mappings: ["params.Rs1", "writes.imm"]
+        mappings: ["params.Rs1", "imm"]
 
       params.Op4: 0b0010
 
