@@ -1,0 +1,140 @@
+bits: 16
+
+registers:
+  r0: 0
+  r1: 1
+  r2: 2
+  r3: 3
+  r4: 4
+  r5: 5
+  r6: 6
+  r7: 7
+  r8: 8
+  r9: 9
+  alu-a: 10
+  alu-b: 11
+  alu-r: 12
+  pc: 13
+  ir: 14
+  p0: 15
+
+immediates:
+  imm8: "7:0"
+  imm1: "0"
+
+alu-operations:
+  add: 0
+  sub: 1
+  mul: 2
+  div: 3
+  shift-left: 4
+  shift-right: 5
+  rot-left: 6
+  rot-right: 7
+  more: 8
+  equal: 9
+  less: 10
+  not: 11
+  and: 12
+  or: 13
+  xor: 14
+
+cjump-operations:
+  more: 0
+  equal: 1
+  less: 2
+  equalZero: 3
+  negative: 4
+
+params:
+  Op4: "15:12"
+  Rs1: "11:8"
+
+writes:
+  imm: "7:0"
+
+  instructions:
+    - name: "WUPP"
+
+      parameters:
+        values: ["registers", "immediates.imm8"]
+        mappings: ["params.Rs1", "writes.imm"]
+
+      params.Op4: 0b0001
+
+    - name: "WLOW"
+
+      parameters:
+        values: ["registers", "immediates.imm8"]
+        mappings: ["params.Rs1", "writes.imm"]
+
+      params.Op4: 0b0010
+
+two-registers:
+  Rs2: "7:4"
+  other: "3:0"
+
+  instructions:
+    - name: "WRAM"
+
+      parameters:
+        values: ["registers", "registers"]
+        mappings: ["params.Rs1", "two-registers.Rs2"]
+
+      params.Op4: 0b0011
+      two-registers.other: 0b0000
+
+    - name: "RRAM"
+
+      parameters:
+        values: ["registers", "registers"]
+        mappings: ["params.Rs1", "two-registers.Rs2"]
+
+      params.Op4: 0b0100
+      two-registers.other: 0b0000
+
+    - name: "COPY"
+
+      parameters:
+        values: ["registers", "registers"]
+        mappings: ["params.Rs1", "two-registers.Rs2"]
+
+      params.Op4: 0b0111
+      two-registers.other: 0b0000
+
+alu:
+  operation: "11:8"
+  other: "7:0"
+
+  instructions:
+    - name: "ALU"
+
+      parameters:
+        values: ["alu-operations"]
+        mappings: ["alu.operation"]
+
+      params.Op4: 0b0110
+      alu.other: 0b00000000
+
+halt:
+  other: "11:0"
+
+  instructions:
+    - name: "HALT"
+
+      params.Op4: 0b0000
+      halt.other: 0
+
+cjump:
+  mode: "7:5"
+  Rs2: "4:1"
+  invert: "0"
+
+  instructions:
+    - name: "CJUMP"
+
+      parameters:
+        values: ["registers", "cjump-operations", "registers", "immediates.imm1"]
+        mappings: ["params.Rs1", "cjump.mode", "cjump.Rs2", "cjump.invert"]
+
+      params.Op4: 0b0101
