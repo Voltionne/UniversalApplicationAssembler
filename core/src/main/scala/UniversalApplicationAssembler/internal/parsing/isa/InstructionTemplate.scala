@@ -54,6 +54,8 @@ case class InstructionTemplate(name: String, fields: Map[String, BitRange], para
 
           this.parameters.mappings(idx) match
             case SingleParameterMapping(s: String) =>
+              //Convert from possible local path to full path
+
               setFullField(s, immediateValue)
             case MultipleParameterMapping(mappings: List[String]) =>
 
@@ -88,7 +90,13 @@ case class InstructionTemplate(name: String, fields: Map[String, BitRange], para
    * @param fieldName The name of the field
    * @param setMap    A map that includes "set" which indicates the value to be set and "bits" which indicates what bits does it affect the set, as a string in format "a:b" (SystemVerilog style)
    */
-  def setPartialField(fieldName: String, setMap: Map[String, Any]): Unit = fields(fieldName).setPartialValue(setMap)
+  def setPartialField(fieldName: String, setMap: Map[String, Any]): Unit =
+
+    //Make sure the fieldName is ALWAYS the full path
+    if fieldName.contains('.') then //Full path already
+      fields(fieldName).setPartialValue(setMap)
+    else
+      fields(Translation.getFullPath(fieldName, translationContext)).setPartialValue(setMap)
 
   /**
    * Sets the whole value of a certain field
@@ -96,7 +104,13 @@ case class InstructionTemplate(name: String, fields: Map[String, BitRange], para
    * @param fieldName The name of the field
    * @param value     The value to be set
    */
-  def setFullField(fieldName: String, value: BigInt): Unit = fields(fieldName).setFullValue(value)
+  def setFullField(fieldName: String, value: BigInt): Unit =
+
+    //Make sure the fieldName is ALWAYS the full path
+    if fieldName.contains('.') then //Full path already
+      fields(fieldName).setFullValue(value)
+    else
+      fields(Translation.getFullPath(fieldName, translationContext)).setFullValue(value)
 
   /**
    * Check whether all the bits of the instruction are set to a certain defined value and not a placeholder value.
