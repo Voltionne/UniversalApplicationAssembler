@@ -79,28 +79,28 @@ two-registers:
 
       parameters:
         values: ["registers", "registers"]
-        mappings: ["params.Rs1", "two-registers.Rs2"]
+        mappings: ["params.Rs1", "Rs2"]
 
       params.Op4: 0b0011
-      two-registers.other: 0b0000
+      other: 0b0000
 
     - name: "RRAM"
 
       parameters:
         values: ["registers", "registers"]
-        mappings: ["params.Rs1", "two-registers.Rs2"]
+        mappings: ["params.Rs1", "Rs2"]
 
       params.Op4: 0b0100
-      two-registers.other: 0b0000
+      other: 0b0000
 
     - name: "COPY"
 
       parameters:
         values: ["registers", "registers"]
-        mappings: ["params.Rs1", "two-registers.Rs2"]
+        mappings: ["params.Rs1", "Rs2"]
 
       params.Op4: 0b0111
-      two-registers.other: 0b0000
+      other: 0b0000
 
 alu:
   operation: "11:8"
@@ -111,10 +111,10 @@ alu:
 
       parameters:
         values: ["alu-operations"]
-        mappings: ["alu.operation"]
+        mappings: ["operation"]
 
       params.Op4: 0b0110
-      alu.other: 0b00000000
+      other: 0b00000000
 
 halt:
   other: "11:0"
@@ -123,7 +123,7 @@ halt:
     - name: "HALT"
 
       params.Op4: 0b0000
-      halt.other: 0
+      other: 0
 
 cjump:
   mode: "7:5"
@@ -135,6 +135,6 @@ cjump:
 
       parameters:
         values: ["registers", "cjump-operations", "registers", "immediates.imm1"]
-        mappings: ["params.Rs1", "cjump.mode", "cjump.Rs2", "cjump.invert"]
+        mappings: ["params.Rs1", "mode", "Rs2", "invert"]
 
       params.Op4: 0b0101
