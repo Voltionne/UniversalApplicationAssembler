@@ -150,12 +150,11 @@ object IsaParser:
             else if SymbolMap.isSymbolMap(mappingNode) then //Translation Table (i.e. declaration)
 
               //Check that it isn't defined already
-              require(!currentTranslationContext.getScope.contains(stringKey), s"Translation Table \"$stringKey\" is already defined!. ${getNodeLocation(mappingNode)}")
+              require(!currentTranslationContext.getScope.contains(stringKey), s"Symbol map \"$stringKey\" is already defined!. ${getNodeLocation(mappingNode)}")
 
-              //CREATE NEW TRANSLATION TABLE
-              val translationTable = constructToScala(mappingNode).asInstanceOf[Map[String, BigInt]] //This shouldn't fail because it is a translation table. Though, it is not very secure. May remake in the future
+              //CREATE NEW SYMBOL MAP
               currentTranslationContext.changes(stringKey) = TranslationLeaf(
-                translationTable
+                SymbolMap(mappingNode)
               )
 
             else //Sublevel
@@ -204,13 +203,13 @@ object IsaParser:
                   currentTranslationContext.changes(stringKey).leaf match
                     case bitRange: BitRange =>
                       bitRange.setFullValue(i) //Modify directly
-                    case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${getNodeLocation(scalarNode)}")
+                    case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(scalarNode)}")
 
                 else if currentTranslationContext.getScope.contains(stringKey) then //2nd case
 
                   val bitRange = currentTranslationContext.getScope(stringKey).leaf match
                     case bitRange: BitRange => bitRange
-                    case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${getNodeLocation(scalarNode)}")
+                    case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(scalarNode)}")
 
                   //Modify the value (as a copy)
                   val copyBitRange = bitRange.deepCopy()
@@ -226,7 +225,7 @@ object IsaParser:
 
                   val bitRange = leaf.leaf match
                     case bitRange: BitRange => bitRange
-                    case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${getNodeLocation(scalarNode)}")
+                    case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(scalarNode)}")
 
                   //Modify the value (as a copy)
                   val copyBitRange = bitRange.deepCopy()
@@ -258,13 +257,13 @@ object IsaParser:
                 currentTranslationContext.changes(stringKey).leaf match
                   case bitRange: BitRange =>
                     bitRange.setPartialValue(setMap) //Modify directly
-                  case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${getNodeLocation(mappingNode)}")
+                  case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(mappingNode)}")
 
               else if currentTranslationContext.getScope.contains(stringKey) then //2nd case
 
                 val bitRange = currentTranslationContext.getScope(stringKey).leaf match
                   case bitRange: BitRange => bitRange
-                  case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${getNodeLocation(mappingNode)}")
+                  case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(mappingNode)}")
 
                 //Modify the value (as a copy)
                 val copyBitRange = bitRange.deepCopy()
@@ -280,7 +279,7 @@ object IsaParser:
 
                 val bitRange = leaf.leaf match
                   case bitRange: BitRange => bitRange
-                  case m: Map[?, ?] => throw new IllegalArgumentException(s"Cannot assign a value to a Translation Table! ${getNodeLocation(mappingNode)}")
+                  case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(mappingNode)}")
 
                 //Modify the value (as a copy)
                 val copyBitRange = bitRange.deepCopy()

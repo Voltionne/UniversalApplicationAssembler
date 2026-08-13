@@ -46,15 +46,15 @@ object PartialAssignment:
     option1 || option2
 
   /**
-   * Convert from a MappingNode to PartialAssignment.
+   * Convert from a MappingNode to PartialAssignment
    * @param mappingNode The mapping node
    * @return The partial assignment that the mapping node represents
    */
   def apply(mappingNode: MappingNode): PartialAssignment =
-    val node = YamlReader.constructToScala(mappingNode)
+    val nodeAsScala = YamlReader.constructToScala(mappingNode)
 
     //Yeah, very hell of long if-else
-    node match
+    nodeAsScala match
       case m: Map[?, ?] =>
 
         require(m.keys.forall(_.isInstanceOf[String]), s"Expected all keys to be strings in partial assignment map. ${YamlReader.getNodeLocation(mappingNode)}")

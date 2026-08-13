@@ -1,7 +1,7 @@
 package UniversalApplicationAssembler.internal.parsing.isa
 
 import UniversalApplicationAssembler.internal.helpers.Functions.gradientRange
-import UniversalApplicationAssembler.internal.datatypes.BitRange
+import UniversalApplicationAssembler.internal.datatypes.{BitRange, SymbolMap}
 import UniversalApplicationAssembler.internal.parsing.yaml.{Conversions, YamlReader}
 import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode, Translation}
 import org.snakeyaml.engine.v2.nodes.MappingNode
@@ -72,16 +72,15 @@ case class InstructionTemplate(name: String, fields: Map[String, BitRange], para
                 //increase the bits done to do the other iterations correctly
                 bitsDone += mappingBits
 
-        case m: Map[?, ?] => //It is a map translation
-          val map = m.asInstanceOf[Map[String, BigInt]] //Should 100% work
+        case symbolMap: SymbolMap => //It is a symbol map
 
-          val translatedBigInt = map(parameters(idx))
+          val translatedBigInt = symbolMap(parameters(idx))
 
           this.parameters.mappings(idx) match
 
             case SingleParameterMapping(s: String) =>
               setFullField(s, translatedBigInt)
-            case MultipleParameterMapping(l: List[String]) => throw new IllegalArgumentException("Currently don't support multiple mappings in case of translation table!")
+            case MultipleParameterMapping(l: List[String]) => throw new IllegalArgumentException("Currently don't support multiple mappings in case of symbol map!")
 
   /**
    * Sets a value partially of a certain field

@@ -38,3 +38,19 @@ object SymbolMap:
       true
     else
       false
+
+  /**
+   * Convert from a MappingNode to a SymbolMap
+   * @param mappingNode The mapping node
+   * @return The symbol map that the mapping node represents
+   */
+  def apply(mappingNode: MappingNode): SymbolMap =
+    val nodeAsScala = YamlReader.constructToScala(mappingNode)
+
+    nodeAsScala match
+      case m: Map[?, ?] =>
+        require(m.keys.forall(_.isInstanceOf[String]), s"Expected all keys to be strings in symbol map. ${YamlReader.getNodeLocation(mappingNode)}")
+        require(m.values.forall(_.isInstanceOf[BigInt]), s"Expected all values to be BigInt in symbol map. ${YamlReader.getNodeLocation(mappingNode)}")
+        SymbolMap(m.asInstanceOf[Map[String, BigInt]]) //Should work directly
+      case other =>
+        throw new IllegalArgumentException(s"Expected symbol map to be a map, not ${mappingNode.getNodeType}. ${YamlReader.getNodeLocation(mappingNode)}")
