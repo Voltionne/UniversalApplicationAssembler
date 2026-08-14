@@ -4,7 +4,7 @@ import UniversalApplicationAssembler.internal.parsing.isa.InstructionTemplate
 
 class InstructionMapping private[parsing] (instructions: List[InstructionTemplate]):
 
-  private[parsing] val mapInstructions: Map[String, InstructionTemplate | List[InstructionTemplate]] =
+  private val mapInstructions: Map[String, InstructionTemplate | List[InstructionTemplate]] =
 
     var temp: Map[String, InstructionTemplate | List[InstructionTemplate]] = Map.empty
 
@@ -23,3 +23,6 @@ class InstructionMapping private[parsing] (instructions: List[InstructionTemplat
     }
 
     temp
+
+  private[parsing] def apply(nameInstruction: String): InstructionTemplate | List[InstructionTemplate] =
+    mapInstructions(nameInstruction)

@@ -36,7 +36,7 @@ case class InstructionTemplate(name: String, fields: Map[String, BitRange], para
    * @param parameters A list that includes the parameters used.
    */
   def apply(parameters: Array[String]): Unit =
-    require(parameters.length == this.parameters.length)
+    require(parameters.length == this.parameters.length, s"Expected ${this.parameters.length} parameters, got ${parameters.length} for instruction $name.")
     
     for idx <- parameters.indices do
 

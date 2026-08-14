@@ -23,13 +23,20 @@ class CustomAssembler(instructionMapping: InstructionMapping):
   def compileToString(source: String, outputFile: Path): Unit =
     val assemblyFile = preprocessFile(source) //Preprocess: i.e. delete comments
 
-    val instructions = AssemblyParser.parseToList(assemblyFile)
+    val (tags, finalAssemblyFile) = getTags(assemblyFile)
+
+    val instructions = AssemblyParser.parseToList(finalAssemblyFile)
 
     if instructions.nonEmpty then
 
       var compiledCode = ""
 
       for instruction <- instructions do
+
+        for idx <- instruction.indices do
+          if instruction(idx).head == '@' then //This is a tag
+            instruction(idx) = tags(instruction(idx)).toString
+
         compiledCode += compileInstruction(instruction) + "\n"
 
       Files.writeString(outputFile, compiledCode, StandardCharsets.UTF_8)
@@ -64,13 +71,20 @@ class CustomAssembler(instructionMapping: InstructionMapping):
   def compileToBinary(source: String, outputFile: Path): Unit =
     val assemblyFile = preprocessFile(source) //Preprocess: i.e. delete comments
 
-    val instructions = AssemblyParser.parseToList(assemblyFile)
+    val (tags, finalAssemblyFile) = getTags(assemblyFile)
+
+    val instructions = AssemblyParser.parseToList(finalAssemblyFile)
 
     if instructions.nonEmpty then
 
       var compiledCode = ""
 
       for instruction <- instructions do
+
+        for idx <- instruction.indices do
+          if instruction(idx).head == '@' then //This is a tag
+            instruction(idx) = tags(instruction(idx)).toString
+
         compiledCode += compileInstruction(instruction)
 
       //Write the binary directly
@@ -103,6 +117,29 @@ class CustomAssembler(instructionMapping: InstructionMapping):
     val multilineComment = "/\\*[\\S\\s]*\\*/"
     fixed.replaceAll(multilineComment, "")
 
+  /**
+   * Gets the tags of the assembly file
+   * @param assemblyFile The assembly file string
+   * @return The tags extracted and the assembly file with the tags extracted
+   */
+  private def getTags(assemblyFile: String): (Map[String, BigInt], String) =
+
+    val assemblyLines = assemblyFile.split("\n").map(_.trim).filter(_.nonEmpty)
+
+    var instructionCount: BigInt = 0
+    var tags = Map.empty[String, BigInt]
+
+    //If a line starts by "@" it is a tag
+    for assemblyLine <- assemblyLines do
+      if assemblyLine.head == '@' then
+        tags += (assemblyLine -> instructionCount)
+      else
+        instructionCount += 1
+
+    val tagsRemover = "\n@.*"
+    (tags, assemblyFile.replaceAll(tagsRemover, "\n"))
+
+
   private def compileInstruction(parsedWrittenInstruction: Array[String]): String =
 
     /*
@@ -119,7 +156,7 @@ class CustomAssembler(instructionMapping: InstructionMapping):
 
     //Calls to .apply always works because if no parameters, simply the for loop is skipped in InstructionTemplate
 
-    val instruction = instructionMapping.mapInstructions(parsedWrittenInstruction.head)
+    val instruction = instructionMapping(parsedWrittenInstruction.head)
 
     instruction match
       case instructionTemplate: InstructionTemplate => //Single instruction
