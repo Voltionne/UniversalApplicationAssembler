@@ -1,10 +1,10 @@
 package UniversalApplicationAssembler.internal.parsing.isa
 
 import UniversalApplicationAssembler.internal.helpers.Functions.gradientRange
-import UniversalApplicationAssembler.internal.datatypes.{BitRange, SymbolMap}
+import UniversalApplicationAssembler.internal.datatypes.{BitRange, PartialAssignment, SymbolMap}
 import UniversalApplicationAssembler.internal.parsing.yaml.{Conversions, YamlReader}
-import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode, Translation}
-import org.snakeyaml.engine.v2.nodes.MappingNode
+import UniversalApplicationAssembler.internal.parsing.yaml.translation.{Translation, TranslationLeaf, TranslationNode}
+import org.snakeyaml.engine.v2.nodes.{MappingNode, ScalarNode}
 
 /**
  * Represents a full ISA instruction. It is meant to be applied over a string that represents an instruction to compile it to binary instantly.
@@ -88,15 +88,15 @@ case class InstructionTemplate(name: String, fields: Map[String, BitRange], para
    * Sets a value partially of a certain field
    *
    * @param fieldName The name of the field
-   * @param setMap    A map that includes "set" which indicates the value to be set and "bits" which indicates what bits does it affect the set, as a string in format "a:b" (SystemVerilog style)
+   * @param partialAssignment The partial assignment to use
    */
-  def setPartialField(fieldName: String, setMap: Map[String, Any]): Unit =
+  def setPartialField(fieldName: String, partialAssignment: PartialAssignment): Unit =
 
     //Make sure the fieldName is ALWAYS the full path
     if fieldName.contains('.') then //Full path already
-      fields(fieldName).setPartialValue(setMap)
+      fields(fieldName).setPartialValue(partialAssignment)
     else
-      fields(Translation.getFullPath(fieldName, translationContext)).setPartialValue(setMap)
+      fields(Translation.getFullPath(fieldName, translationContext)).setPartialValue(partialAssignment)
 
   /**
    * Sets the whole value of a certain field
@@ -213,7 +213,7 @@ object InstructionTemplate:
                 value match
                   case sm: Map[?, ?] if sm.keys.forall(_.isInstanceOf[String]) => //Partial assignment
                     val setMap = sm.asInstanceOf[Map[String, Any]]
-                    newBitRange.setPartialValue(setMap)
+                    newBitRange.setPartialValue(PartialAssignment(setMap))
                   case i: BigInt =>
                     newBitRange.setFullValue(i)
                   case other => throw new IllegalArgumentException(s"Only assignments inside instructions! Not $other! ${YamlReader.getNodeLocation(mappingNode)}")

@@ -244,7 +244,7 @@ object IsaParser:
           case mappingNode: MappingNode => //This is sublevel OR assignment OR translation table
 
             if PartialAssignment.isPartialAssignment(mappingNode) then //Assignment
-              val setMap = constructToScala(mappingNode).asInstanceOf[Map[String, Any]] //SHOULD 100% WORK (Not the most idiomatic, nevertheless). May change in the future
+              val partialAssignment = PartialAssignment(mappingNode)
 
 
               //Three options can happen here:
@@ -256,7 +256,7 @@ object IsaParser:
 
                 currentTranslationContext.changes(stringKey).leaf match
                   case bitRange: BitRange =>
-                    bitRange.setPartialValue(setMap) //Modify directly
+                    bitRange.setPartialValue(partialAssignment) //Modify directly
                   case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(mappingNode)}")
 
               else if currentTranslationContext.getScope.contains(stringKey) then //2nd case
@@ -267,7 +267,7 @@ object IsaParser:
 
                 //Modify the value (as a copy)
                 val copyBitRange = bitRange.deepCopy()
-                copyBitRange.setPartialValue(setMap)
+                copyBitRange.setPartialValue(partialAssignment)
 
                 //Add to current changes, with the modified value
                 currentTranslationContext.changes(stringKey) = TranslationLeaf(
@@ -283,7 +283,7 @@ object IsaParser:
 
                 //Modify the value (as a copy)
                 val copyBitRange = bitRange.deepCopy()
-                copyBitRange.setPartialValue(setMap)
+                copyBitRange.setPartialValue(partialAssignment)
 
                 //Add to current changes, with the modified value
                 currentTranslationContext.changes(stringKey) = TranslationLeaf(
