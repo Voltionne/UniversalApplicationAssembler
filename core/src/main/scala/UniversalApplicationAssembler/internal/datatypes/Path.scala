@@ -38,6 +38,13 @@ case class Path(identifiers: List[String], base: List[String]):
     !isAbsolute && !isLocal
 
   /**
+   * Converts the whole path to a base
+   * @return The path as a base
+   */
+  def rebase: Path =
+    Path(List.empty, base ++ identifiers)
+
+  /**
    * Returns the path but one scope lower
    * @return The path one scope lower
    */
@@ -51,6 +58,16 @@ case class Path(identifiers: List[String], base: List[String]):
 
   def :+(other: String): Path =
     Path(identifiers :+ other, base)
+
+  override def equals(other: Any): Boolean =
+
+    other match
+      case other: Path =>
+        rebase.base == other.rebase.base
+      case _ => false
+
+  override def hashCode(): Int =
+    rebase.base.hashCode()
 
 object Path:
 
