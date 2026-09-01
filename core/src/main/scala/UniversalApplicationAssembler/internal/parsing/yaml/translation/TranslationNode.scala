@@ -1,5 +1,7 @@
 package UniversalApplicationAssembler.internal.parsing.yaml.translation
 
+import UniversalApplicationAssembler.internal.datatypes.Path
+
 import scala.annotation.tailrec
 import scala.collection.mutable
 
@@ -13,12 +15,12 @@ case class TranslationNode(var bits: BigInt):
   /**
    * Represents all sublevels
    */
-  val children: mutable.Map[String, TranslationNode] = mutable.Map.empty
+  val children: mutable.Map[Path, TranslationNode] = mutable.Map.empty
 
   /**
    * Represents the variables that have changed since the parent
    */
-  val changes: mutable.Map[String, TranslationLeaf] = mutable.Map.empty
+  val changes: mutable.Map[Path, TranslationLeaf] = mutable.Map.empty
 
   /**
    * Represents the name of the node
@@ -32,13 +34,13 @@ case class TranslationNode(var bits: BigInt):
    * @param childName The name to identify the child inside the children map.
    */
   def addChild(child: TranslationNode, childName: String): Unit =
-    if children.contains(childName) then
+    if children.contains(getPath :+ childName) then
       throw new IllegalArgumentException(s"Duplicate child \"$childName\"!: $child")
 
     if child.parent.exists(_ != this) then
       throw new IllegalArgumentException("Child has already a parent!")
 
-    children(childName) = child
+    children(getPath :+ childName) = child
     child.parent = Some(this)
     child.name = childName
 
@@ -48,25 +50,41 @@ case class TranslationNode(var bits: BigInt):
    * @param path The path that identifies the child, each level separated with a dot
    * @return The wanted leaf
    */
-  def searchTranslationLeaf(path: String): Option[TranslationLeaf] =
-    val pathSplit = path.split('.')
+  def searchTranslationLeaf(path: Path): Option[TranslationLeaf] =
 
-    val optionTranslationNode = pathSplit.init.foldLeft(Option(this)) { (current, key) =>
+    require(getPath.rebase.base == path.base, "Expected path to have as base this node!")
+
+    val optionTranslationNode = path.identifiers.init.foldLeft(Option(this)) { (current, key) =>
+      current.flatMap(node => node.children.get(Path(key, node)))
+    }
+
+    optionTranslationNode.flatMap(node => node.changes.get(Path(path.identifiers.last, node)))
+
+  /**
+   * Searches a certain Leaf between all the children, recursively, using a path from this node.
+   * A FullPath is used which is rebased to this current node
+   *
+   * @param fullPath The full path that identifies the child
+   * @return The wanted leaf
+   */
+  /*def searchTranslationLeaf(fullPath: FullPath): Option[TranslationLeaf] =
+
+    val optionTranslationNode = fullPath.identifiers.init.foldLeft(Option(this)) { (current, key) =>
       current.flatMap(node => node.children.get(key))
     }
 
-    optionTranslationNode.flatMap(node => node.changes.get(pathSplit.last))
+    optionTranslationNode.flatMap(node => node.changes.get(fullPath.identifiers.last))*/
 
   /**
    * Gets all visible Leaves from the scope in this current Node.
    * @return A map with all the leaves
    */
-  def getScope: Map[String, TranslationLeaf] =
+  def getScope: Map[Path, TranslationLeaf] =
 
     var currentTranslationContext = this
 
     @tailrec
-    def recursiveCall(node: Option[TranslationNode], current: Map[String, TranslationLeaf]): Map[String, TranslationLeaf] =
+    def recursiveCall(node: Option[TranslationNode], current: Map[Path, TranslationLeaf]): Map[Path, TranslationLeaf] =
       node match
         case None => current
         case Some(parent) =>
@@ -95,12 +113,12 @@ case class TranslationNode(var bits: BigInt):
     recursiveCall(this)
 
   /**
-   * Returns the full path of this node from the top node
-   * @return the full path of this node
+   * Returns the absolute path of this node from the top node
+   * @return the absolute path of this node
    */
-  def getPath: String =
+  def getPath: Path =
 
     parent match
-      case None => ""
+      case None => Path.empty
       case Some(parent) =>
-        parent.getPath + "." + name
+        parent.getPath :+ name
