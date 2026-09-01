@@ -11,11 +11,31 @@ case class Path(identifiers: List[String], base: List[String]):
   def isAbsolute: Boolean = base.isEmpty
 
   /**
-   * Returns the path as absolute
+   * Converts the path to absolute
    * @return The path as absolute
    */
   def getAbsolute: Path =
     Path(base ++ identifiers, List.empty)
+
+  /**
+   * Checks if the path is fully local
+   * @return True if local
+   */
+  def isLocal: Boolean = identifiers.length == 1
+
+  /**
+   * Converts the path to local
+   * @return The path as local
+   */
+  def getLocal: Path =
+    Path(List(identifiers.last), base ++ identifiers.init)
+
+  /**
+   * Checks if the path is relative
+   * @return True if relative
+   */
+  def isRelative: Boolean =
+    !isAbsolute && !isLocal
 
   /**
    * Returns the path but one scope lower
@@ -33,6 +53,14 @@ case class Path(identifiers: List[String], base: List[String]):
     Path(identifiers :+ other, base)
 
 object Path:
+
+  /**
+   * Builds a Path from a string path and the current translation context. Conserves the base of the path (i.e. if the path was absolute
+   * it will continue to be it, the same if local).
+   * @param stringPath The string that represents the path
+   * @param currentTranslationContext The current translation context, used as base
+   * @return The path the String path represents
+   */
   def apply(stringPath: String, currentTranslationContext: TranslationNode): Path =
 
     /*
