@@ -13,12 +13,13 @@ case class TranslationNode(var bits: BigInt):
   var parent: Option[TranslationNode] = None
 
   /**
-   * Represents all sublevels
+   * Represents all sublevels. Paths are in canonical form
    */
-  val children: mutable.Map[String, TranslationNode] = mutable.Map.empty
+  val children: mutable.Map[Path, TranslationNode] = mutable.Map.empty
 
   /**
-   * Represents the variables that have changed since the parent
+   * Represents the variables that have changed since the parent. It only has the
+   * name as key
    */
   val changes: mutable.Map[String, TranslationLeaf] = mutable.Map.empty
 
@@ -34,52 +35,29 @@ case class TranslationNode(var bits: BigInt):
    * @param childName The name to identify the child inside the children map.
    */
   def addChild(child: TranslationNode, childName: String): Unit =
-    if children.contains(childName) then
+
+    val childPath = Path(childName, this).toCanonical
+
+    if children.contains(childPath) then
       throw new IllegalArgumentException(s"Duplicate child \"$childName\"!: $child")
 
     if child.parent.exists(_ != this) then
       throw new IllegalArgumentException("Child has already a parent!")
 
-    children(childName) = child
+    children(childPath) = child
     child.parent = Some(this)
     child.name = childName
 
   /**
-   * Searches a certain Leaf between all the children, recursively, using a path from this node
-   *
-   * @param path The path that identifies the child, each level separated with a dot
-   * @return The wanted leaf
+   * Tries to get a certain child, by name
+   * @param childName The name of the child
+   * @return True if it has that child
    */
-  def searchTranslationLeaf(path: String): Option[TranslationLeaf] =
-    val pathSplit = path.split('.')
+  def getChild(childName: String): Option[TranslationNode] =
 
-    val optionTranslationNode = pathSplit.init.foldLeft(Option(this)) { (current, key) =>
-      current.flatMap(node => node.children.get(key))
-    }
+    val childPath = Path(childName, this).toCanonical
 
-    optionTranslationNode.flatMap(node => node.changes.get(pathSplit.last))
-
-  /**
-   * Gets all visible Leaves from the scope in this current Node.
-   * @return A map with all the leaves
-   */
-  def getScope: Map[String, TranslationLeaf] =
-
-    var currentTranslationContext = this
-
-    @tailrec
-    def recursiveCall(node: Option[TranslationNode], current: Map[String, TranslationLeaf]): Map[String, TranslationLeaf] =
-      node match
-        case None => current
-        case Some(parent) =>
-
-          val parentLeaves = parent.changes
-
-          val updated = parentLeaves ++ current
-
-          recursiveCall(parent.parent, updated.toMap)
-
-    recursiveCall(parent, changes.toMap)
+    children.get(childPath)
 
   /**
    * Returns the top node, searching recursively through parents

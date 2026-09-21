@@ -10,47 +10,6 @@ import scala.annotation.tailrec
 object Translation:
 
   /**
-   * Searches a variable in current scope or from path and returns it optionally.
-   * @param nameOrPath The name of the variable or its path
-   * @param translationContext The current translation context
-   * @return The TranslationLeaf that contains the variable
-   */
-  def searchLeaf(nameOrPath: String, translationContext: TranslationNode): Option[TranslationLeaf] =
-
-    if translationContext.getScope.contains(nameOrPath) then
-      Some(translationContext.getScope(nameOrPath))
-    else
-      translationContext.getTop.searchTranslationLeaf(nameOrPath)
-
-  /**
-   * Returns the full path, from top to bottom, of a certain variable in a certain translation context. NOTE: such variable is not checked if it is contained in the translation context.
-   * @param name The name of the variable
-   * @param translationContext The current translation context
-   * @return The full path, a string separated with dots.
-   */
-  def getFullPath(name: String, translationContext: TranslationNode): String =
-
-    var listPath: List[String] = List(name)
-
-    @tailrec
-    def recursiveCall(node: TranslationNode): Unit =
-      val key = node.parent.flatMap { parent =>
-        parent.children.collectFirst {
-          case (key, child) if child eq node => key
-        }
-      }
-
-      key match
-        case Some(string) =>
-          listPath = string :: listPath
-          recursiveCall(node.parent.get) //SHOULD 100% RETURN, as if there is key, that means there is parent
-        case None => () //Do nothing
-
-    recursiveCall(translationContext)
-
-    listPath.mkString(".")
-
-  /**
    * Tries to search a certain leaf given its path. It takes into account the relation between the path and the current
    * translation context. That is, if the path is absolute, it searches from top node. If local, it searches from current
    * scope.
@@ -68,8 +27,32 @@ object Translation:
   def search(path: Path, translationContext: TranslationNode): Option[TranslationLeaf] =
 
     if path.isAbsolute then //Search from the top node
-      ???
+
+      val finalContext = path.identifiers.init.foldLeft(Option(translationContext.getTop)) {
+        (current, childName) => current.flatMap(_.getChild(childName))
+      }
+      
+      finalContext.flatMap(_.changes.get(path.identifiers.last))
+
     else if path.isLocal then //Search from current scope
-      ???
+
+      var currentTranslationContext = this
+
+      @tailrec
+      def recursiveCall(node: Option[TranslationNode], current: Map[String, TranslationLeaf]): Map[String, TranslationLeaf] =
+        node match
+          case None => current
+          case Some(parent) =>
+
+            val parentLeaves = parent.changes
+
+            val updated = parentLeaves ++ current
+
+            recursiveCall(parent.parent, updated.toMap)
+
+      val visibleChildren = recursiveCall(translationContext.parent, translationContext.changes.toMap)
+
+      visibleChildren.get(path.identifiers.last)
+
     else //Is relative -> None
       None

@@ -90,7 +90,7 @@ case class BitRange(a: Int, b: Int):
    * @return A string representing the final representation of the BitRange
    */
   def compile(bits: Int): String =
-    require(checkValue, s"$value")
+    require(checkValue, s"Value is not fully set: $value")
 
     //"P" stands for placeholder
 

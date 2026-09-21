@@ -1,9 +1,9 @@
 package UniversalApplicationAssembler.api.parsing.isa
 
-import UniversalApplicationAssembler.internal.datatypes.{BitRange, PartialAssignment, SymbolMap}
+import UniversalApplicationAssembler.internal.datatypes.{BitRange, PartialAssignment, SymbolMap, Path => TranslationPath}
 import UniversalApplicationAssembler.internal.parsing.isa.InstructionTemplate
 import UniversalApplicationAssembler.internal.parsing.yaml.YamlReader.{constructToScala, getNodeLocation, getStringFromInputStream, getStringFromPath, nodeifyYamlFile}
-import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode}
+import UniversalApplicationAssembler.internal.parsing.yaml.translation.{TranslationLeaf, TranslationNode, Translation}
 import org.snakeyaml.engine.v2.nodes.{MappingNode, ScalarNode, SequenceNode}
 
 import java.io.InputStream
@@ -102,6 +102,9 @@ object IsaParser:
           case scalarNode: ScalarNode => scalarNode.getValue
           case other => throw new IllegalArgumentException(s"Expected key to be a ScalarNode (a string), not ${other.getNodeType}. ${getNodeLocation(other)}")
 
+      //Convert key to path
+      val currentPath = TranslationPath(stringKey, currentTranslationContext)
+
       if stringKey == "bits" then
         nodeTuple.getValueNode match
           case scalarNode: ScalarNode => currentTranslationContext.bits = BigInt(scalarNode.getValue) //Sets the number of bits
@@ -111,6 +114,7 @@ object IsaParser:
         () //Skip instructions -> left for third pass
 
       else
+
         //Match based on value, given that all special keys have already been revised
         nodeTuple.getValueNode match
           case scalarNode: ScalarNode => //This is assignment OR declaration
@@ -120,11 +124,11 @@ object IsaParser:
               case s: String => //Declaration
 
                 //Important checks to be performed to verify this is a good definition:
-                //1. Is not a full path (definitions are always local) -> check if no dots in the name
-                require(!stringKey.contains('.'), s"Declarations cannot be full path, only local path!. ${getNodeLocation(scalarNode)}")
+                //1. Is not an absolute or relative path (definitions are always local)
+                require(currentPath.isLocal, s"Declarations cannot be absolute or relative path, only local path! Path: $currentPath. ${getNodeLocation(scalarNode)}")
 
-                //2. There doesn't exist a BitRange in the scope that has the same name
-                require(!currentTranslationContext.getScope.contains(stringKey), s"Bit Range \"$stringKey\" is already defined!. ${getNodeLocation(scalarNode)}")
+                //2. There doesn't exist a BitRange in the scope that has the same name -> let the magic Translation object handle it
+                require(Translation.search(currentPath, currentTranslationContext).isEmpty, s"Bit Range \"$stringKey\" is already defined!. ${getNodeLocation(scalarNode)}")
 
                 //CREATE NEW BITRANGE
                 val split = s.split(':')
@@ -149,8 +153,12 @@ object IsaParser:
               () //Ignore (left to second pass)
             else if SymbolMap.isSymbolMap(mappingNode) then //Translation Table (i.e. declaration)
 
-              //Check that it isn't defined already
-              require(!currentTranslationContext.getScope.contains(stringKey), s"Symbol map \"$stringKey\" is already defined!. ${getNodeLocation(mappingNode)}")
+              //Important checks to be performed to verify this is a good definition:
+              //1. Is not an absolute or relative path (definitions are always local)
+              require(currentPath.isLocal, s"Declarations cannot be absolute or relative path, only local path! Path: $currentPath. ${getNodeLocation(mappingNode)}")
+
+              //2. There doesn't exist a BitRange in the scope that has the same name -> let the magic Translation object handle it
+              require(Translation.search(currentPath, currentTranslationContext).isEmpty, s"Symbol Map \"$stringKey\" is already defined!. ${getNodeLocation(mappingNode)}")
 
               //CREATE NEW SYMBOL MAP
               currentTranslationContext.changes(stringKey) = TranslationLeaf(
@@ -181,6 +189,8 @@ object IsaParser:
           case scalarNode: ScalarNode => scalarNode.getValue
           case other => throw new IllegalArgumentException(s"Expected key to be a ScalarNode (a string), not ${other.getNodeType}. ${getNodeLocation(other)}")
 
+      val currentPath = TranslationPath(stringKey, currentTranslationContext)
+
       if stringKey == "bits" || stringKey == "instructions" then
         () //Skip -> "bits" handled in 1st pass. "instructions handled in 3rd pass
       else
@@ -193,12 +203,29 @@ object IsaParser:
               case s: String => () //Declaration -> Skip, handled in 1st pass
               case i: BigInt => //Assignment -> handle right now
 
-                //Three options can happen here:
                 //1. Making reference to a BitRange defined in this TranslationNode -> simply change its value
                 //2. Making reference to a BitRange not defined in this TranslationNode BUT in scope -> add it to changes with the modified value
-                //3. A full path -> add the full path to changes with the modified values
+                //3. An absolute path -> add the full path to changes with the modified values
 
-                if currentTranslationContext.changes.contains(stringKey) then //1st case (also can match in 2nd and 3rd case if somehow a re-assignment, this is expected)
+                Translation.search(currentPath, currentTranslationContext) match
+                  case Some(leaf: TranslationLeaf) => //Path exists -> assign
+
+                    val bitRange = leaf.leaf match
+                      case bitRange: BitRange => bitRange
+                      case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(scalarNode)}")
+
+                    //In case the change did already exist, this will overwrite it. PERFECTION!
+                    val copyBitRange = bitRange.deepCopy()
+                    copyBitRange.setFullValue(i)
+
+                    currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                      copyBitRange
+                    )
+
+                  case None => //Leaf doesn't exist -> fail
+                    throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(scalarNode)}")
+
+                /*if currentTranslationContext.changes.contains(stringKey) then //1st case (also can match in 2nd and 3rd case if somehow a re-assignment, this is expected)
 
                   currentTranslationContext.changes(stringKey).leaf match
                     case bitRange: BitRange =>
@@ -237,7 +264,7 @@ object IsaParser:
                   )
 
                 else
-                  throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(scalarNode)}")
+                  throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(scalarNode)}")*/
 
               case other => throw new IllegalArgumentException(s"Found not recognized value for assignment or declaration. ${getNodeLocation(scalarNode)}")
 
@@ -252,7 +279,25 @@ object IsaParser:
               //2. Making reference to a BitRange not defined in this TranslationNode BUT in scope -> add it to changes with the modified value
               //3. A full path -> add the full path to changes with the modified values
 
-              if currentTranslationContext.changes.contains(stringKey) then //1st case (also can match in 2nd and 3rd case if somehow a re-assignment, this is expected)
+              Translation.search(currentPath, currentTranslationContext) match
+                case Some(leaf: TranslationLeaf) => //Path exists -> assign
+
+                  val bitRange = leaf.leaf match
+                    case bitRange: BitRange => bitRange
+                    case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(mappingNode)}")
+
+                  //In case the change did already exist, this will overwrite it. PERFECTION!
+                  val copyBitRange = bitRange.deepCopy()
+                  copyBitRange.setPartialValue(partialAssignment)
+
+                  currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                    copyBitRange
+                  )
+
+                case None => //Leaf doesn't exist -> fail
+                  throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(mappingNode)}")
+
+              /*if currentTranslationContext.changes.contains(stringKey) then //1st case (also can match in 2nd and 3rd case if somehow a re-assignment, this is expected)
 
                 currentTranslationContext.changes(stringKey).leaf match
                   case bitRange: BitRange =>
@@ -291,15 +336,15 @@ object IsaParser:
                 )
 
               else
-                throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(mappingNode)}")
+                throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(mappingNode)}")*/
 
             else if SymbolMap.isSymbolMap(mappingNode) then () //Declaration -> Skip, handled in 1st pass
             else //Sublevel
 
-              if currentTranslationContext.children.contains(stringKey) then
-                parseSecondPass(mappingNode, currentTranslationContext.children(stringKey))
-              else
-                throw new NoSuchElementException(s"Didn't found TranslationContext children with key \"$stringKey\". ${getNodeLocation(mappingNode)}")
+              val sublevel = currentTranslationContext.getChild(stringKey)
+                .getOrElse(throw new NoSuchElementException(s"Didn't found TranslationContext children with key \"$stringKey\". ${getNodeLocation(mappingNode)}"))
+
+              parseSecondPass(mappingNode, sublevel)
 
           case other => throw new IllegalArgumentException(s"Expected all keys to lead to tables (except \"instructions\" key). ${getNodeLocation(other)}")
     }
@@ -318,6 +363,9 @@ object IsaParser:
         nodeTuple.getKeyNode match
           case scalarNode: ScalarNode => scalarNode.getValue
           case other => throw new IllegalArgumentException(s"Expected key to be a ScalarNode (a string), not ${other.getNodeType}. ${getNodeLocation(other)}")
+
+      //Not used in the third pass
+      //val currentPath = TranslationPath(stringKey, currentTranslationContext)
 
       if stringKey == "bits" then
         () //Skip -> Already handled during 1st pass
@@ -344,10 +392,10 @@ object IsaParser:
             else if SymbolMap.isSymbolMap(mappingNode) then () //Declaration -> Skip, handled in 1st pass
             else //Sublevel
 
-              if currentTranslationContext.children.contains(stringKey) then
-                instructions = parseThirdPass(mappingNode, currentTranslationContext.children(stringKey), instructions)
-              else
-                throw new NoSuchElementException(s"Didn't found TranslationContext children with key \"$stringKey\". ${getNodeLocation(mappingNode)}")
+              val sublevel = currentTranslationContext.getChild(stringKey)
+                .getOrElse(throw new NoSuchElementException(s"Didn't found TranslationContext children with key \"$stringKey\". ${getNodeLocation(mappingNode)}"))
+
+              instructions = parseThirdPass(mappingNode, sublevel, instructions)
     }
     
     instructions
