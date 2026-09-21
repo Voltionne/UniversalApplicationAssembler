@@ -1,5 +1,7 @@
 package UniversalApplicationAssembler.internal.parsing.yaml.translation
 
+import UniversalApplicationAssembler.internal.datatypes.Path
+
 import scala.annotation.tailrec
 import scala.collection.mutable
 
@@ -95,12 +97,12 @@ case class TranslationNode(var bits: BigInt):
     recursiveCall(this)
 
   /**
-   * Returns the full path of this node from the top node
-   * @return the full path of this node
+   * Returns the canonical path from the top node to this node
+   * @return the canonical path
    */
-  def getPath: String =
+  def getPath: Path =
 
     parent match
-      case None => ""
+      case None => Path.empty
       case Some(parent) =>
-        parent.getPath + "." + name
+        parent.getPath :+ name
