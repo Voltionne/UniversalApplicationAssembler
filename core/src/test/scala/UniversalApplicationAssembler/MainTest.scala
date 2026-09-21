@@ -7,7 +7,7 @@ import java.nio.file.Files
 
 class MainTest extends munit.FunSuite:
 
-  test("Full test") {
+  test("Test Isa 2") {
 
     val stream = getClass.getResourceAsStream("/testIsa2.yaml")
 
@@ -29,7 +29,7 @@ class MainTest extends munit.FunSuite:
     customAssembler.compileToBinary(inputStream, outputPathBinary)
   }
 
-  test("Test limits yaml") {
+  test("Test Isa 3") {
 
     val stream = getClass.getResourceAsStream("/testIsa3.yaml")
 
