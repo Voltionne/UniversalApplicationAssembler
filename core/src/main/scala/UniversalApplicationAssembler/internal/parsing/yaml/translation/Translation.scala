@@ -1,5 +1,7 @@
 package UniversalApplicationAssembler.internal.parsing.yaml.translation
 
+import UniversalApplicationAssembler.internal.datatypes.Path
+
 import scala.annotation.tailrec
 
 /**
@@ -47,3 +49,27 @@ object Translation:
     recursiveCall(translationContext)
 
     listPath.mkString(".")
+
+  /**
+   * Tries to search a certain leaf given its path. It takes into account the relation between the path and the current
+   * translation context. That is, if the path is absolute, it searches from top node. If local, it searches from current
+   * scope.
+   *
+   * Currently, relative paths are not supported (this is a UAA-wide limitation)
+   *
+   * If the leaf is not found (i.e. returns None) it should be considered UNREACHABLE from current context and given
+   * that particular path. That means this function is also the authority on visibility. Nevertheless, in case of not
+   * finding and even if introduced a relative path (which will fail 100%) it returns None without throwing error. The
+   * caller is responsible for any necessary handling.
+   * @param path The path to the leaf
+   * @param translationContext The leaf requested, if found.
+   * @return
+   */
+  def search(path: Path, translationContext: TranslationNode): Option[TranslationLeaf] =
+
+    if path.isAbsolute then //Search from the top node
+      ???
+    else if path.isLocal then //Search from current scope
+      ???
+    else //Is relative -> None
+      None
