@@ -225,47 +225,6 @@ object IsaParser:
                   case None => //Leaf doesn't exist -> fail
                     throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(scalarNode)}")
 
-                /*if currentTranslationContext.changes.contains(stringKey) then //1st case (also can match in 2nd and 3rd case if somehow a re-assignment, this is expected)
-
-                  currentTranslationContext.changes(stringKey).leaf match
-                    case bitRange: BitRange =>
-                      bitRange.setFullValue(i) //Modify directly
-                    case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(scalarNode)}")
-
-                else if currentTranslationContext.getScope.contains(stringKey) then //2nd case
-
-                  val bitRange = currentTranslationContext.getScope(stringKey).leaf match
-                    case bitRange: BitRange => bitRange
-                    case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(scalarNode)}")
-
-                  //Modify the value (as a copy)
-                  val copyBitRange = bitRange.deepCopy()
-                  copyBitRange.setFullValue(i)
-
-                  //Add to current changes, with the modified value
-                  currentTranslationContext.changes(stringKey) = TranslationLeaf(
-                    copyBitRange
-                  )
-
-                else if currentTranslationContext.getTop.searchTranslationLeaf(stringKey).isDefined then //3rd case
-                  val leaf = currentTranslationContext.getTop.searchTranslationLeaf(stringKey).get //Will 100% work, not the most idiomatic nevertheless
-
-                  val bitRange = leaf.leaf match
-                    case bitRange: BitRange => bitRange
-                    case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(scalarNode)}")
-
-                  //Modify the value (as a copy)
-                  val copyBitRange = bitRange.deepCopy()
-                  copyBitRange.setFullValue(i)
-
-                  //Add to current changes, with the modified value
-                  currentTranslationContext.changes(stringKey) = TranslationLeaf(
-                    copyBitRange
-                  )
-
-                else
-                  throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(scalarNode)}")*/
-
               case other => throw new IllegalArgumentException(s"Found not recognized value for assignment or declaration. ${getNodeLocation(scalarNode)}")
 
           case mappingNode: MappingNode => //This is sublevel OR assignment OR translation table
@@ -296,47 +255,6 @@ object IsaParser:
 
                 case None => //Leaf doesn't exist -> fail
                   throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(mappingNode)}")
-
-              /*if currentTranslationContext.changes.contains(stringKey) then //1st case (also can match in 2nd and 3rd case if somehow a re-assignment, this is expected)
-
-                currentTranslationContext.changes(stringKey).leaf match
-                  case bitRange: BitRange =>
-                    bitRange.setPartialValue(partialAssignment) //Modify directly
-                  case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(mappingNode)}")
-
-              else if currentTranslationContext.getScope.contains(stringKey) then //2nd case
-
-                val bitRange = currentTranslationContext.getScope(stringKey).leaf match
-                  case bitRange: BitRange => bitRange
-                  case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(mappingNode)}")
-
-                //Modify the value (as a copy)
-                val copyBitRange = bitRange.deepCopy()
-                copyBitRange.setPartialValue(partialAssignment)
-
-                //Add to current changes, with the modified value
-                currentTranslationContext.changes(stringKey) = TranslationLeaf(
-                  copyBitRange
-                )
-
-              else if currentTranslationContext.getTop.searchTranslationLeaf(stringKey).isDefined then //3rd case
-                val leaf = currentTranslationContext.getTop.searchTranslationLeaf(stringKey).get //Will 100% work, not the most idiomatic nevertheless
-
-                val bitRange = leaf.leaf match
-                  case bitRange: BitRange => bitRange
-                  case symbolMap: SymbolMap => throw new IllegalArgumentException(s"Cannot assign a value to a symbol map! ${getNodeLocation(mappingNode)}")
-
-                //Modify the value (as a copy)
-                val copyBitRange = bitRange.deepCopy()
-                copyBitRange.setPartialValue(partialAssignment)
-
-                //Add to current changes, with the modified value
-                currentTranslationContext.changes(stringKey) = TranslationLeaf(
-                  copyBitRange
-                )
-
-              else
-                throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(mappingNode)}")*/
 
             else if SymbolMap.isSymbolMap(mappingNode) then () //Declaration -> Skip, handled in 1st pass
             else //Sublevel
