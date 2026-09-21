@@ -104,7 +104,7 @@ object Path:
       Path(scopes.toList, List.empty)
     else //100% local
 
-      Path(List(stringPath), currentTranslationContext.getPath.identifiers)
+      Path(currentTranslationContext.getPath.identifiers, List(stringPath))
 
   /**
    * Returns an empty path
