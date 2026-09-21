@@ -78,6 +78,10 @@ case class Path(base: List[String], identifiers: List[String]):
   override def hashCode(): Int =
     toCanonical.base.hashCode()
 
+  override def toString: String =
+
+    "\"" + base.mkString(".") + "|" + identifiers.mkString(".") + "\""
+
 object Path:
 
   /**
@@ -90,10 +94,10 @@ object Path:
   def apply(stringPath: String, currentTranslationContext: TranslationNode): Path =
 
     /*
-        2 cases:
-        1. The path is absolute
-        2. The path is local
-         */
+    2 cases:
+    1. The path is absolute
+    2. The path is local
+     */
 
     if stringPath contains '.' then //100% absolute
 
@@ -101,7 +105,7 @@ object Path:
 
       val scopes = stringPath.split('.')
 
-      Path(scopes.toList, List.empty)
+      Path(List.empty, scopes.toList)
     else //100% local
 
       Path(currentTranslationContext.getPath.identifiers, List(stringPath))
