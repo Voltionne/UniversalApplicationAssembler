@@ -56,3 +56,15 @@ object Translation:
 
     else //Is relative -> None
       None
+
+  /**
+   * Converts a string key from path to the variable name
+   * @param stringPath The path as string
+   * @param translationContext The current translation context
+   * @return
+   */
+  def getReferenceName(stringPath: String, translationContext: TranslationNode): String =
+
+    val path = Path(stringPath, translationContext)
+
+    path.toCanonical.base.last
