@@ -129,6 +129,9 @@ case class InstructionTemplate(name: String, fields: Map[Path, BitRange], parame
 
     for (fieldName, bitRange) <- fields do
 
+      if !bitRange.checkValue then
+        throw new IllegalArgumentException(s"Field $fieldName is not fully set for instruction $name! Value: ${bitRange.value}")
+
       val compiledBitRange = bitRange.compile(bits).toCharArray //This calls checkValue on each BitRange
 
       compiledInstructionArray = compiledInstructionArray.zip(compiledBitRange).map { case (x, y) => s"$x$y"}
