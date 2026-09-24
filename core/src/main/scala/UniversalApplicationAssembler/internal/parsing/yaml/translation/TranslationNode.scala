@@ -18,10 +18,9 @@ case class TranslationNode(var bits: BigInt):
   val children: mutable.Map[Path, TranslationNode] = mutable.Map.empty
 
   /**
-   * Represents the variables that have changed since the parent. It only has the
-   * name as key
+   * Represents the variables that have changed since the parent. Paths are in canonical form
    */
-  val changes: mutable.Map[String, TranslationLeaf] = mutable.Map.empty
+  val changes: mutable.Map[Path, TranslationLeaf] = mutable.Map.empty
 
   /**
    * Represents the name of the node

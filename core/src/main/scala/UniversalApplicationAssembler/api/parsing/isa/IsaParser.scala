@@ -134,11 +134,11 @@ object IsaParser:
                 val split = s.split(':')
 
                 if split.length == 1 then
-                  currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                  currentTranslationContext.changes(currentPath) = TranslationLeaf(
                     BitRange(split(0).toInt)
                   )
                 else if split.length == 2 then
-                  currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                  currentTranslationContext.changes(currentPath) = TranslationLeaf(
                     BitRange(split(0).toInt, split(1).toInt)
                   )
                 else
@@ -161,7 +161,7 @@ object IsaParser:
               require(Translation.search(currentPath, currentTranslationContext).isEmpty, s"Symbol Map \"$stringKey\" is already defined!. ${getNodeLocation(mappingNode)}")
 
               //CREATE NEW SYMBOL MAP
-              currentTranslationContext.changes(stringKey) = TranslationLeaf(
+              currentTranslationContext.changes(currentPath) = TranslationLeaf(
                 SymbolMap(mappingNode)
               )
 
@@ -218,7 +218,7 @@ object IsaParser:
                     val copyBitRange = bitRange.deepCopy()
                     copyBitRange.setFullValue(i)
 
-                    currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                    currentTranslationContext.changes(currentPath) = TranslationLeaf(
                       copyBitRange
                     )
 
@@ -249,9 +249,11 @@ object IsaParser:
                   val copyBitRange = bitRange.deepCopy()
                   copyBitRange.setPartialValue(partialAssignment)
 
-                  currentTranslationContext.changes(stringKey) = TranslationLeaf(
+                  println(s"ON PATH $currentPath, before: ${bitRange.value}")
+                  currentTranslationContext.changes(currentPath) = TranslationLeaf(
                     copyBitRange
                   )
+                  println(s"ON PATH $currentPath, after: ${copyBitRange.value}")
 
                 case None => //Leaf doesn't exist -> fail
                   throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(mappingNode)}")
