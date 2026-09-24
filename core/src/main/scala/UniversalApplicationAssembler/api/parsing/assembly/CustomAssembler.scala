@@ -1,19 +1,26 @@
 package UniversalApplicationAssembler.api.parsing.assembly
 
+import UniversalApplicationAssembler.api.config.assembly.AssemblerConfig
 import UniversalApplicationAssembler.api.parsing.isa.InstructionMapping
-import UniversalApplicationAssembler.internal.parsing.assembly.AssemblyParser
 import UniversalApplicationAssembler.internal.parsing.isa.InstructionTemplate
 
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 
-
 /**
  * Represents a custom assembler that acts over certain instructions
- * @param instructionMapping Represents the instructions supported on this ISA.
+ * @param instructionMapping Represents the instructions supported on this ISA
+ * @param assemblerConfig The configuration of the assembler (see the class for documentation)
  */
-class CustomAssembler(instructionMapping: InstructionMapping):
+class CustomAssembler(instructionMapping: InstructionMapping, assemblerConfig: AssemblerConfig):
+
+  /**
+   * Represents a custom assembler that acts over certain instructions. This constructor uses default configuration
+   * @param instructionMapping Represents the instructions supported on this ISA
+   */
+  def this(instructionMapping: InstructionMapping) =
+    this(instructionMapping, AssemblerConfig())
 
   /**
    * Compiles an assembly string to a string representation of "1" and "0" for debugging purposes
@@ -21,11 +28,11 @@ class CustomAssembler(instructionMapping: InstructionMapping):
    * @param outputFile The path of the output file
    */
   def compileToString(source: String, outputFile: Path): Unit =
-    val assemblyFile = preprocessFile(source) //Preprocess: i.e. delete comments
+    val assemblyFile = CustomAssembler.preprocessFile(source) //Preprocess: i.e. delete comments
 
     val (tags, finalAssemblyFile) = getTags(assemblyFile)
 
-    val instructions = AssemblyParser.parseToList(finalAssemblyFile)
+    val instructions = CustomAssembler.parseToList(finalAssemblyFile)
 
     if instructions.nonEmpty then
 
@@ -69,11 +76,11 @@ class CustomAssembler(instructionMapping: InstructionMapping):
    * @param outputFile The path of the output file
    */
   def compileToBinary(source: String, outputFile: Path): Unit =
-    val assemblyFile = preprocessFile(source) //Preprocess: i.e. delete comments
+    val assemblyFile = CustomAssembler.preprocessFile(source) //Preprocess: i.e. delete comments
 
     val (tags, finalAssemblyFile) = getTags(assemblyFile)
 
-    val instructions = AssemblyParser.parseToList(finalAssemblyFile)
+    val instructions = CustomAssembler.parseToList(finalAssemblyFile)
 
     if instructions.nonEmpty then
 
@@ -88,7 +95,7 @@ class CustomAssembler(instructionMapping: InstructionMapping):
         compiledCode += compileInstruction(instruction)
 
       //Write the binary directly
-      Files.write(outputFile, AssemblyParser.bitsToBytes(compiledCode))
+      Files.write(outputFile, CustomAssembler.bitsToBytes(compiledCode))
 
     else
       Files.writeString(outputFile, "", StandardCharsets.UTF_8) //write empty
@@ -109,13 +116,6 @@ class CustomAssembler(instructionMapping: InstructionMapping):
    */
   def compileToBinary(sourceInputStream: InputStream, outputFile: Path): Unit =
     compileToBinary(String(sourceInputStream.readAllBytes()), outputFile)
-
-  private def preprocessFile(assemblyFile: String): String =
-    val singleComment = "//.*"
-    val fixed = assemblyFile.replaceAll(singleComment, "")
-
-    val multilineComment = "/\\*[\\S\\s]*?\\*/"
-    fixed.replaceAll(multilineComment, "")
 
   /**
    * Gets the tags of the assembly file
@@ -179,3 +179,63 @@ class CustomAssembler(instructionMapping: InstructionMapping):
         firstInstruction match
           case Some(instruction) => instruction.compileInstruction
           case None => throw new NoSuchElementException(s"Instruction \"${parsedWrittenInstruction.head}\" doesn't coincide with any format of such instruction!")
+
+/**
+ * Helper functions of CustomAssembler
+ */
+private object CustomAssembler:
+
+  private def preprocessFile(assemblyFile: String): String =
+    val singleComment = "//.*"
+    val fixed = assemblyFile.replaceAll(singleComment, "")
+
+    val multilineComment = "/\\*[\\S\\s]*?\\*/"
+    fixed.replaceAll(multilineComment, "")
+
+  /**
+   * Separates instructions and operands of an assembly file represented as a String.
+   *
+   * @param assemblyFile The string representing the assembly file
+   * @return Each instruction separated into opcode and operands.
+   */
+  private def parseToList(assemblyFile: String): List[Array[String]] =
+
+    //Instruction format: (May change in the future)
+    //[OPERAND] [PARAM1], [PARAM2], [PARAM3] [...]
+
+    val assemblyLines = assemblyFile.split("\n").map(_.trim).filter(_.nonEmpty)
+    var temp: List[Array[String]] = List.empty
+
+    for assemblyLine <- assemblyLines do
+      val parts = assemblyLine.split("\\s+", 2)
+
+      if parts.length == 1 then
+        temp = parts :: temp
+      else
+        val opcode = parts(0)
+        val operands = parts(1).split(",").map(_.trim)
+        temp = (opcode +: operands) :: temp
+
+    //Prepends everything for performance, now reverse. This is O(n)
+    temp.reverse
+
+  /**
+   * Converts a string representing a sequence of 0s and 1s to an array of bytes.
+   *
+   * @param bits The string representing the single bits
+   * @return An array of bytes
+   */
+  private def bitsToBytes(bits: String): Array[Byte] =
+
+    //Right-padding for multiple of 8, for bytes.
+    val padded =
+      val mod = bits.length % 8
+      if mod == 0 then bits
+      else "0" * (8 - mod) + bits
+
+    padded.grouped(8)
+      .map { byteStr =>
+        Integer.parseInt(byteStr, 2).toByte
+      }
+      .toArray
+
