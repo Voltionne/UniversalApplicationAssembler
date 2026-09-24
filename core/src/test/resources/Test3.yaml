@@ -1,0 +1,266 @@
+# SISA UPC
+
+bits: 16
+
+register:
+  r0: 0
+  r1: 1
+  r2: 2
+  r3: 3
+  r4: 4
+  r5: 5
+  r6: 6
+  r7: 7
+
+immediate:
+  N6: "5:0"
+  N8: "7:0"
+
+formats:
+  Op4: "15:12" #Opcode shared for all formats
+
+  3R:
+    Ra: "11:9" #source register 1
+    Rb: "8:6" #source register 2
+    Rd: "5:3" #destination register
+    f: "2:0" #"function" selector bits
+
+    group0:
+
+      instructions:
+        - name: "AND"
+
+          parameters:
+            values: [ "register", "register", "register" ]
+            mappings: [ "Rd", "Ra", "Rb" ]
+
+          f: 0b000
+          Op4: 0b0000
+
+        - name: "OR"
+
+          parameters:
+            values: [ "register", "register", "register" ]
+            mappings: [ "Rd", "Ra", "Rb" ]
+
+          f: 0b001
+          Op4: 0b0000
+
+        - name: "XOR"
+
+          parameters:
+            values: [ "register", "register", "register" ]
+            mappings: [ "Rd", "Ra", "Rb" ]
+
+          f: 0b010
+          Op4: 0b0000
+
+        - name: "NOT"
+
+          parameters:
+            values: [ "register", "register" ]
+            mappings: [ "Rd", "Ra" ]
+
+          Rb: 0b000 #Setting this to a dummy value
+
+          f: 0b011
+          Op4: 0b0000
+
+        - name: "ADD"
+
+          parameters:
+            values: [ "register", "register", "register" ]
+            mappings: [ "Rd", "Ra", "Rb" ]
+
+          f: 0b100
+          Op4: 0b0000
+
+        - name: "SUB"
+
+          parameters:
+            values: [ "register", "register", "register" ]
+            mappings: [ "Rd", "Ra", "Rb" ]
+
+          f: 0b101
+          Op4: 0b0000
+
+        - name: "SHA"
+
+          parameters:
+            values: [ "register", "register", "register" ]
+            mappings: [ "Rd", "Ra", "Rb" ]
+
+          f: 0b110
+          Op4: 0b0000
+
+        - name: "SHL"
+
+          parameters:
+            values: [ "register", "register", "register" ]
+            mappings: [ "Rd", "Ra", "Rb" ]
+
+          f: 0b111
+          Op4: 0b0000
+
+    group1:
+
+      instructions:
+        - name: "CMPLT"
+
+          parameters:
+            values: [ "register", "register", "register" ]
+            mappings: [ "Rd", "Ra", "Rb" ]
+
+          f: 0b000
+          Op4: 0b0001
+
+        - name: "CMPLE"
+
+          parameters:
+            values: [ "register", "register", "register" ]
+            mappings: [ "Rd", "Ra", "Rb" ]
+
+          f: 0b001
+          Op4: 0b0001
+
+        - name: "CMPEQ"
+
+          parameters:
+            values: [ "register", "register", "register" ]
+            mappings: [ "Rd", "Ra", "Rb" ]
+
+          f: 0b011
+          Op4: 0b0001
+
+        - name: "CMPLTU"
+
+          parameters:
+            values: [ "register", "register", "register" ]
+            mappings: [ "Rd", "Ra", "Rb" ]
+
+          f: 0b100
+          Op4: 0b0001
+
+        - name: "CMPLEU"
+
+          parameters:
+            values: [ "register", "register", "register" ]
+            mappings: [ "Rd", "Ra", "Rb" ]
+
+          f: 0b101
+          Op4: 0b0001
+
+  2R:
+    Ra: "11:9"
+    Rbd: "8:6"
+    n: "5:0"
+
+    instructions:
+      - name: "ADDI"
+
+        parameters:
+          values: [ "register", "register", "immediate.N6" ]
+          mappings: [ "Rbd", "Ra", "n"]
+
+        Op4: 0b0010
+
+      - name: "LD"
+
+        parameters:
+          values: [ "register", "immediate.N6", "register" ]
+          mappings: [ "Rbd", "n", "Ra" ]
+
+        Op4: 0b0011
+
+      - name: "ST"
+
+        parameters:
+          values: [ "immediate.N6", "register", "register" ]
+          mappings: [ "n", "Ra", "Rbd" ]
+
+        Op4: 0b0100
+
+      - name: "LDB"
+
+        parameters:
+          values: [ "register", "immediate.N6", "register" ]
+          mappings: [ "Rbd", "n", "Ra" ]
+
+        Op4: 0b0101
+
+      - name: "STB"
+
+        parameters:
+          values: [ "immediate.N6", "register", "register" ]
+          mappings: [ "n", "Ra", "Rbd" ]
+
+        Op4: 0b0110
+
+      - name: "JALR"
+
+        parameters:
+          values: [ "register", "register" ]
+          mappings: [ "Rbd", "Ra" ]
+
+        Op4: 0b0111
+        n: 0
+
+  1R:
+    Rad: "11:9"
+    e: "8"
+    n: "7:0"
+
+    instructions:
+      - name: "BZ"
+
+        parameters:
+          values: [ "register", "immediate.N8" ]
+          mappings: [ "Rad", "n"]
+
+        Op4: 0b1000
+        e: 0
+
+      - name: "BNZ"
+
+        parameters:
+          values: [ "register", "immediate.N8" ]
+          mappings: [ "Rad", "n" ]
+
+        Op4: 0b1000
+        e: 1
+
+      - name: "MOVI"
+
+        parameters:
+          values: [ "register", "immediate.N8" ]
+          mappings: [ "Rad", "n" ]
+
+        Op4: 0b1001
+        e: 0
+
+      - name: "MOVHI"
+
+        parameters:
+          values: [ "register", "immediate.N8" ]
+          mappings: [ "Rad", "n" ]
+
+        Op4: 0b1001
+        e: 1
+
+      - name: "IN"
+
+        parameters:
+          values: [ "register", "immediate.N8" ]
+          mappings: [ "Rad", "n" ]
+
+        Op4: 0b1010
+        e: 0
+
+      - name: "OUT"
+
+        parameters:
+          values: [ "immediate.N8", "register" ]
+          mappings: [ "n", "Rad" ]
+
+        Op4: 0b1010
+        e: 1
