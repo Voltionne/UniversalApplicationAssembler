@@ -30,7 +30,7 @@ class CustomAssembler(instructionMapping: InstructionMapping, assemblerConfig: A
   def compileToString(source: String, outputFile: Path): Unit =
     val assemblyFile = CustomAssembler.preprocessFile(source) //Preprocess: i.e. delete comments
 
-    val (tags, finalAssemblyFile) = getTags(assemblyFile)
+    val (tags, finalAssemblyFile) = CustomAssembler.getTags(assemblyFile)
 
     val instructions = CustomAssembler.parseToList(finalAssemblyFile)
 
@@ -38,11 +38,15 @@ class CustomAssembler(instructionMapping: InstructionMapping, assemblerConfig: A
 
       var compiledCode = ""
 
-      for instruction <- instructions do
+      for (instruction, instructionIdx) <- instructions.zipWithIndex do
 
         for idx <- instruction.indices do
           if instruction(idx).head == '@' then //This is a tag
-            instruction(idx) = tags(instruction(idx)).toString
+
+            if assemblerConfig.useRelativeAddresses then
+              instruction(idx) = (tags(instruction(idx)) - instructionIdx).toString
+            else
+              instruction(idx) = (tags(instruction(idx)) + assemblerConfig.startAddress).toString
 
         compiledCode += compileInstruction(instruction) + "\n"
 
@@ -78,7 +82,7 @@ class CustomAssembler(instructionMapping: InstructionMapping, assemblerConfig: A
   def compileToBinary(source: String, outputFile: Path): Unit =
     val assemblyFile = CustomAssembler.preprocessFile(source) //Preprocess: i.e. delete comments
 
-    val (tags, finalAssemblyFile) = getTags(assemblyFile)
+    val (tags, finalAssemblyFile) = CustomAssembler.getTags(assemblyFile)
 
     val instructions = CustomAssembler.parseToList(finalAssemblyFile)
 
@@ -86,11 +90,15 @@ class CustomAssembler(instructionMapping: InstructionMapping, assemblerConfig: A
 
       var compiledCode = ""
 
-      for instruction <- instructions do
+      for (instruction, instructionIdx) <- instructions.zipWithIndex do
 
         for idx <- instruction.indices do
           if instruction(idx).head == '@' then //This is a tag
-            instruction(idx) = tags(instruction(idx)).toString
+
+            if assemblerConfig.useRelativeAddresses then
+              instruction(idx) = (tags(instruction(idx)) - instructionIdx).toString
+            else
+              instruction(idx) = (tags(instruction(idx)) + assemblerConfig.startAddress).toString
 
         compiledCode += compileInstruction(instruction)
 
@@ -116,29 +124,6 @@ class CustomAssembler(instructionMapping: InstructionMapping, assemblerConfig: A
    */
   def compileToBinary(sourceInputStream: InputStream, outputFile: Path): Unit =
     compileToBinary(String(sourceInputStream.readAllBytes()), outputFile)
-
-  /**
-   * Gets the tags of the assembly file
-   * @param assemblyFile The assembly file string
-   * @return The tags extracted and the assembly file with the tags extracted
-   */
-  private def getTags(assemblyFile: String): (Map[String, BigInt], String) =
-
-    val assemblyLines = assemblyFile.split("\n").map(_.trim).filter(_.nonEmpty)
-
-    var instructionCount: BigInt = 0
-    var tags = Map.empty[String, BigInt]
-
-    //If a line starts by "@" it is a tag
-    for assemblyLine <- assemblyLines do
-      if assemblyLine.head == '@' then
-        tags += (assemblyLine -> instructionCount)
-      else
-        instructionCount += 1
-
-    val tagsRemover = "\n@.*"
-    (tags, assemblyFile.replaceAll(tagsRemover, "\n"))
-
 
   private def compileInstruction(parsedWrittenInstruction: Array[String]): String =
 
@@ -218,6 +203,29 @@ private object CustomAssembler:
 
     //Prepends everything for performance, now reverse. This is O(n)
     temp.reverse
+
+  /**
+   * Gets the tags of the assembly file
+   *
+   * @param assemblyFile The assembly file string
+   * @return The tags extracted and the assembly file with the tags extracted
+   */
+  private def getTags(assemblyFile: String): (Map[String, BigInt], String) =
+
+    val assemblyLines = assemblyFile.split("\n").map(_.trim).filter(_.nonEmpty)
+
+    var instructionCount: BigInt = 0
+    var tags = Map.empty[String, BigInt]
+
+    //If a line starts by "@" it is a tag
+    for assemblyLine <- assemblyLines do
+      if assemblyLine.head == '@' then
+        tags += (assemblyLine -> instructionCount)
+      else
+        instructionCount += 1
+
+    val tagsRemover = "\n@.*"
+    (tags, assemblyFile.replaceAll(tagsRemover, "\n"))
 
   /**
    * Converts a string representing a sequence of 0s and 1s to an array of bytes.
