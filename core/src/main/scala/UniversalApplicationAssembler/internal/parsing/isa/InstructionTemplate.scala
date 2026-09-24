@@ -136,10 +136,11 @@ case class InstructionTemplate(name: String, fields: Map[Path, BitRange], parame
 
       compiledInstructionArray = compiledInstructionArray.zip(compiledBitRange).map { case (x, y) => s"$x$y"}
 
+    //Sets the first bit that has been written there
     val result = compiledInstructionArray.zipWithIndex.map { (bit, idx) =>
       bit.find(char => char == '0' || char == '1') match
         case Some(value) => value
-        case None => throw new IllegalArgumentException(s"Bit in array idx $idx was not set!")
+        case None => throw new IllegalArgumentException(s"Bit in array idx $idx was not set for instruction $name. Fields: $fields!")
     }
 
     result.mkString

@@ -75,8 +75,15 @@ case class BitRange(a: Int, b: Int):
    * @param value the value to be set
    */
   def setFullValue(value: BigInt): Unit =
-    require(value >= 0 && value < (BigInt(1) << bits))
-    this.value = value.toString(2).reverse.padTo(bits, '0').reverse
+
+    if value < 0 then
+      val fixed = (BigInt(1) << bits) + value
+      println(s"Detected negative value of $value for setting $this. Converting to two's complement: $fixed!")
+      require(fixed > 0, s"Negative value out of range for $bits bits!")
+      this.value = fixed.toString(2).reverse.padTo(bits, '0').reverse
+    else
+      require(value < (BigInt(1) << bits), s"Positive value of $value out of range for $this ($bits bits)!")
+      this.value = value.toString(2).reverse.padTo(bits, '0').reverse
 
   /**
    * Tests if the BitRange has all its bits positions declared correctly as 0 or 1, i.e. no placeholder values.
