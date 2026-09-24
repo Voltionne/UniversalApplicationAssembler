@@ -7,9 +7,19 @@ import java.nio.file.Files
 
 class MainTest extends munit.FunSuite:
 
-  test("Test Isa 2") {
+  test("Test0") {
 
-    val stream = getClass.getResourceAsStream("/testIsa2.yaml")
+    val stream = getClass.getResourceAsStream("/Test0.yaml")
+
+    val (instructionMapping, node) = IsaParser.debugParse(stream)
+
+    println("Tree:")
+    visualizeNodes(node)
+  }
+
+  test("Test1") {
+
+    val stream = getClass.getResourceAsStream("/Test1.yaml")
 
     val (instructionMapping, node) = IsaParser.debugParse(stream)
 
@@ -18,10 +28,10 @@ class MainTest extends munit.FunSuite:
 
     val customAssembler = CustomAssembler(instructionMapping)
 
-    val inputStream = getClass.getResourceAsStream("/assembly.asm")
+    val inputStream = getClass.getResourceAsStream("/Test1.asm")
 
-    val outputDir = Files.createTempDirectory("uaa-results-test1")
-    println(s"Temp path: $outputDir")
+    val outputDir = Files.createTempDirectory("uaa-test1-results")
+    println(s"Temp path Test1: $outputDir")
     val outputPathString = outputDir.resolve("test-string.txt")
     val outputPathBinary = outputDir.resolve("test-binary.txt")
 
@@ -29,23 +39,13 @@ class MainTest extends munit.FunSuite:
     customAssembler.compileToBinary(inputStream, outputPathBinary)
   }
 
-  test("Test Isa 3") {
-
-    val stream = getClass.getResourceAsStream("/testIsa3.yaml")
-
-    val (instructionMapping, node) = IsaParser.debugParse(stream)
-
-    println("Tree:")
-    visualizeNodes(node)
-  }
-
-  test("Galaicum16v1_1 ISA") {
+  test("Test2") {
     /*
     Test of parsing the YAML of the Galaicum16v1_1 ISA (of the Gala I CPU).
     This ISA is extremely simple yet very irregular, which is great for testing the compiler.
      */
 
-    val stream = getClass.getResourceAsStream("/g1611_isa.yaml")
+    val stream = getClass.getResourceAsStream("/Test2.yaml")
 
     val (instructionMapping, node) = IsaParser.debugParse(stream)
 
@@ -54,10 +54,10 @@ class MainTest extends munit.FunSuite:
 
     val customAssembler = CustomAssembler(instructionMapping)
 
-    val inputStream = getClass.getResourceAsStream("/g1611_assembly.asm")
+    val inputStream = getClass.getResourceAsStream("/Test2.asm")
 
-    val outputDir = Files.createTempDirectory("uaa-results-test3")
-    println(s"Temp path G1611: $outputDir")
+    val outputDir = Files.createTempDirectory("uaa-test2-results")
+    println(s"Temp path Test2: $outputDir")
 
     val outputPathString = outputDir.resolve("test-string.txt")
     val outputPathBinary = outputDir.resolve("test-binary.txt")

@@ -1,3 +1,5 @@
+# Testing parsing and basic definitions
+
 bits: 32
 
 registers:
