@@ -114,7 +114,7 @@ class CustomAssembler(instructionMapping: InstructionMapping):
     val singleComment = "//.*"
     val fixed = assemblyFile.replaceAll(singleComment, "")
 
-    val multilineComment = "/\\*[\\S\\s]*\\*/"
+    val multilineComment = "/\\*[\\S\\s]*?\\*/"
     fixed.replaceAll(multilineComment, "")
 
   /**
