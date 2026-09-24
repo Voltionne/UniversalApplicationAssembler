@@ -9,7 +9,6 @@ import org.snakeyaml.engine.v2.nodes.{MappingNode, ScalarNode, SequenceNode}
 import java.io.InputStream
 import java.nio.file.Path
 
-
 object IsaParser:
 
   /**
@@ -249,11 +248,9 @@ object IsaParser:
                   val copyBitRange = bitRange.deepCopy()
                   copyBitRange.setPartialValue(partialAssignment)
 
-                  println(s"ON PATH $currentPath, before: ${bitRange.value}")
                   currentTranslationContext.changes(currentPath) = TranslationLeaf(
                     copyBitRange
                   )
-                  println(s"ON PATH $currentPath, after: ${copyBitRange.value}")
 
                 case None => //Leaf doesn't exist -> fail
                   throw new IllegalArgumentException(s"Making reference to a non-existent variable \"$stringKey\". ${getNodeLocation(mappingNode)}")
