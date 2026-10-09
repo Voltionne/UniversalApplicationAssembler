@@ -1,0 +1,68 @@
+#There was an attempt, I SWEAR
+bits: 8
+
+upper4a: "7:4"
+lower4a: "3:0"
+
+upper4b: "7:4"
+lower4b: "3:0"
+
+upper4c: "7:4"
+lower4c: "3:0"
+
+test:
+  upper4a: 0b0000
+  lower4a: 0b0000
+
+  upper4b: 0b0000
+  lower4b: 0b0000
+
+  upper4c: 0b0000
+  lower4c: 0b0000
+
+  instructions:
+    - name: "A"
+
+      parameters:
+        values: ["upper4a"]
+        mappings: ["upper4a"]
+
+      lower4a: {set: 0b1, bits_local: "0"}
+
+    - name: "A"
+
+      upper4a: 0b1000
+
+      lower4a: {set: 0b1, bits_local: "3"}
+
+    - name: "B1"
+
+      parameters:
+        values: ["upper4b"]
+        mappings: ["upper4b"]
+
+      lower4b: {set: 0b1, bits_local: "0"}
+
+    - name: "B2"
+
+      parameters:
+        values: ["upper4b"]
+        mappings: ["upper4b"]
+
+      lower4b: {set: 0b1, bits_local: "3"}
+
+    - name: "C1"
+
+      parameters:
+        values: ["upper4c"]
+        mappings: ["upper4c"]
+
+      lower4c: {set: 0b1, bits_local: "3"}
+
+    - name: "C2"
+
+      parameters:
+        values: ["lower4c"]
+        mappings: ["lower4c"]
+
+      upper4a: {set: 0b1, bits_local: "0"}

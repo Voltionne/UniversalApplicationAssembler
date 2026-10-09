@@ -94,3 +94,25 @@ class MainTest extends munit.FunSuite:
     customAssembler.compileToString(inputStream0, outputPathString0)
     customAssembler.compileToBinary(inputStream0, outputPathBinary0)
   }
+
+  test("Test4") {
+    /*
+    Testing to check if mutability problem in InstructionTemplate
+     */
+
+    val stream = getClass.getResourceAsStream("/Test4.yaml")
+
+    val instructionMapping = IsaParser.parse(stream)
+
+    val customAssembler = new CustomAssembler(instructionMapping)
+
+    val outputDir = Files.createTempDirectory("uaa-test4-results")
+    println(s"Temp path Test4: $outputDir")
+
+    val inputStream0 = getClass.getResourceAsStream("/Test4_0.asm")
+    val outputPathString0 = outputDir.resolve("Test4_0-string.txt")
+    val outputPathBinary0 = outputDir.resolve("Test4_0-binary.txt")
+
+    customAssembler.compileToString(inputStream0, outputPathString0)
+    customAssembler.compileToBinary(inputStream0, outputPathBinary0)
+  }

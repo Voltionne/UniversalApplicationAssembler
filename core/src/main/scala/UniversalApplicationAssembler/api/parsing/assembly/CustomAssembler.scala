@@ -139,6 +139,11 @@ class CustomAssembler(instructionMapping: InstructionMapping, assemblerConfig: A
     Yooo, longest comment ever
      */
 
+    /*
+    After some heavy testing trying to produce the effect of the aforementioned problem. I haven't been successful on building a test to reproduce it (see test 4).
+    Therefore, even though it is theoretically true, I will it consider negligible for all practical purposes for now and will only fix it with low priority, if even needed.
+     */
+
     //Calls to .apply always works because if no parameters, simply the for loop is skipped in InstructionTemplate
 
     val instruction = instructionMapping(parsedWrittenInstruction.head)
