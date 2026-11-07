@@ -28,32 +28,11 @@ class CustomAssembler(instructionMapping: InstructionMapping, assemblerConfig: A
    * @param outputFile The path of the output file
    */
   def compileToString(source: String, outputFile: Path): Unit =
-    val assemblyFile = CustomAssembler.preprocessFile(source) //Preprocess: i.e. delete comments
+    val (instructions, tags) = compileFirstPass(source)
 
-    val (tags, finalAssemblyFile) = CustomAssembler.getTags(assemblyFile)
+    val compiledCode = compileSecondPass(instructions, tags, true)
 
-    val instructions = CustomAssembler.parseToList(finalAssemblyFile)
-
-    if instructions.nonEmpty then
-
-      var compiledCode = ""
-
-      for (instruction, instructionIdx) <- instructions.zipWithIndex do
-
-        for idx <- instruction.indices do
-          if instruction(idx).head == '@' then //This is a tag
-
-            if assemblerConfig.useRelativeAddresses then
-              instruction(idx) = (tags(instruction(idx)) - instructionIdx).toString
-            else
-              instruction(idx) = (tags(instruction(idx)) + assemblerConfig.startAddress).toString
-
-        compiledCode += compileInstruction(instruction) + "\n"
-
-      Files.writeString(outputFile, compiledCode, StandardCharsets.UTF_8)
-
-    else
-      Files.writeString(outputFile, "", StandardCharsets.UTF_8) //write empty
+    Files.writeString(outputFile, compiledCode, StandardCharsets.UTF_8)
 
   /**
    * Compiles a source file to a string representation of "1" and "0", for debugging purposes
@@ -80,33 +59,11 @@ class CustomAssembler(instructionMapping: InstructionMapping, assemblerConfig: A
    * @param outputFile The path of the output file
    */
   def compileToBinary(source: String, outputFile: Path): Unit =
-    val assemblyFile = CustomAssembler.preprocessFile(source) //Preprocess: i.e. delete comments
+    val (instructions, tags) = compileFirstPass(source)
 
-    val (tags, finalAssemblyFile) = CustomAssembler.getTags(assemblyFile)
+    val compiledCode = compileSecondPass(instructions, tags)
 
-    val instructions = CustomAssembler.parseToList(finalAssemblyFile)
-
-    if instructions.nonEmpty then
-
-      var compiledCode = ""
-
-      for (instruction, instructionIdx) <- instructions.zipWithIndex do
-
-        for idx <- instruction.indices do
-          if instruction(idx).head == '@' then //This is a tag
-
-            if assemblerConfig.useRelativeAddresses then
-              instruction(idx) = (tags(instruction(idx)) - instructionIdx).toString
-            else
-              instruction(idx) = (tags(instruction(idx)) + assemblerConfig.startAddress).toString
-
-        compiledCode += compileInstruction(instruction)
-
-      //Write the binary directly
-      Files.write(outputFile, CustomAssembler.bitsToBytes(compiledCode))
-
-    else
-      Files.writeString(outputFile, "", StandardCharsets.UTF_8) //write empty
+    Files.write(outputFile, CustomAssembler.bitsToBytes(compiledCode))
 
   /**
    * Compiles a source file to a binary file
@@ -124,6 +81,89 @@ class CustomAssembler(instructionMapping: InstructionMapping, assemblerConfig: A
    */
   def compileToBinary(sourceInputStream: InputStream, outputFile: Path): Unit =
     compileToBinary(String(sourceInputStream.readAllBytes()), outputFile)
+
+
+  /**
+   * Performs the first compilation pass of the assembler. This pass resolves all tags,
+   * which includes compiling once the instructions to know its size
+   *
+   * NOTE: It will be heavily optimized in the future
+   * @param source The source file directly
+   * @return The instructions already divided and the tags
+   */
+  private def compileFirstPass(source: String): (List[Array[String]], Map[String, BigInt]) =
+
+    //First pass: collect tag addresses
+    val preprocessed = CustomAssembler.preprocessFile(source)
+
+    val assemblyLines = preprocessed.split("\n").map(_.trim).filter(_.nonEmpty)
+
+    var currentRelativeAddress: BigInt = 0
+    var tags = Map.empty[String, BigInt]
+
+    var instructions: List[Array[String]] = List.empty
+
+    for assemblyLine <- assemblyLines do
+      //It is a tag
+      if assemblyLine.head == '@' then
+        tags += (assemblyLine -> currentRelativeAddress)
+      else
+        //It is an instruction, separate fully:
+        val instruction =
+          val parts = assemblyLine.split("\\s+", 2)
+
+          if parts.length == 1 then
+            parts
+          else
+            val opcode = parts(0)
+            val operands = parts(1).split(",").map(_.trim)
+            opcode +: operands
+
+        //Clone so that it isn't modified later
+        instructions = instruction.clone() :: instructions
+
+        //Check if it contains some tag, if yes, replace for a dummy value
+        for idx <- instruction.indices do
+          if instruction(idx).head == '@' then
+            instruction(idx) = "0" //Dummy value
+
+        //Add this instruction length as current relative address
+        currentRelativeAddress += compileInstruction(instruction).length
+
+    //Reverse the instructions list, in regular order. This should be O(n)
+    (instructions.reverse, tags)
+
+  /**
+   * Performs the second compilation pass of the assembler. It compiles the definitive
+   * instructions using the tags when needed
+   * @param instructions The instructions already divided
+   * @param tags The tags
+   * @param separateInstructions Indicates whether separate instructions individually by with a \n,
+   *                             defaults to false
+   * @return The compiled code, as string of 0s and 1s (may be optimized in the future)
+   */
+  private def compileSecondPass(instructions: List[Array[String]], tags: Map[String, BigInt], separateInstructions: Boolean = false): String =
+
+    var currentRelativeAddress: BigInt = 0
+
+    var compiledCode = ""
+
+    for instruction <- instructions do
+
+      for idx <- instruction.indices do
+        if instruction(idx).head == '@' then //This is a tag
+
+          if assemblerConfig.useRelativeAddresses then
+            instruction(idx) = (tags(instruction(idx)) - currentRelativeAddress).toString
+          else
+            instruction(idx) = (tags(instruction(idx)) + assemblerConfig.startAddress).toString
+
+      val compiledInstruction = compileInstruction(instruction)
+      println(s"\"${instruction(0)}\" -> $compiledInstruction")
+      currentRelativeAddress += compiledInstruction.length
+      compiledCode += compiledInstruction + (if separateInstructions then "\n" else "")
+
+    compiledCode
 
   private def compileInstruction(parsedWrittenInstruction: Array[String]): String =
 
