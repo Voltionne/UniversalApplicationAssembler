@@ -14,6 +14,6 @@ lazy val core = (project in file("core"))
   .settings(
     name := "UniversalApplicationAssembler",
     libraryDependencies ++= Seq(
-      "org.snakeyaml" % "snakeyaml-engine" % "3.1.1",
+      "org.snakeyaml" % "snakeyaml-engine" % "3.2",
       "org.scalameta" %% "munit" % "1.3.6" % Test)
   )
